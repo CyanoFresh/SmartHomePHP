@@ -4,7 +4,7 @@ $params = require(__DIR__ . '/params.php');
 
 return [
     'id' => 'basic',
-    'name' => 'PROJECTNAME',
+    'name' => 'SmartHome',
     'language' => 'ru',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
