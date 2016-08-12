@@ -1,8 +1,7 @@
-Yii2 Template
+SmartHome Web Panel & API
 ============================
 
-This is my template for quick project development. Based on basic template
-but with environments and other features.
+This is controller for SmartHome project.
 
 
 DIRECTORY STRUCTURE
@@ -33,8 +32,8 @@ INSTALLATION
 Get project files:
 
 ~~~
-git clone https://github.com/CyanoFresh/yii2-my-template.git PROJECTNAME
-cd PROJECTNAME
+git clone https://github.com/CyanoFresh/SmartHome
+cd SmartHome
 composer install
 php init
 ~~~
