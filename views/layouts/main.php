@@ -3,9 +3,11 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
+use rmrevin\yii\fontawesome\FA;
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
+use yii\helpers\Url;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 
@@ -34,54 +36,30 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap">
-    <?php
-    NavBar::begin([
-        'brandLabel' => Yii::$app->name,
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
-        ],
-    ]);
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button"
+                    class="navbar-toggle collapsed"
+                    data-toggle="collapse"
+                    data-target="#topmenu"
+                    aria-expanded="false">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="<?= Url::home() ?>">Smart Home</a>
+        </div>
 
-    $items = [
-        ['label' => 'Главная', 'url' => ['/site/index']],
-    ];
-
-    if (Yii::$app->user->isGuest) {
-        $items[] = ['label' => 'Войти', 'url' => ['/site/login']];
-    } else {
-        $items[] = [
-            'label' => 'Выйти (' . Yii::$app->user->identity->username . ')',
-            'url' => ['/site/logout'],
-            'linkOptions' => ['data-method' => 'post'],
-        ];
-    }
-
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'encodeLabels' => false,
-        'items' => $items,
-    ]);
-
-    NavBar::end();
-    ?>
-
-    <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= $content ?>
-    </div>
-</div>
-
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; <?= Yii::$app->name ?> <?= date('Y') ?></p>
-
-        <p class="pull-right">By <a href="//solomaha.pp.ua">Alex Solomaha</a></p>
-    </div>
-</footer>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="topmenu">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><?= FA::i('sign-out') ?></a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
 
 <?php $this->endBody() ?>
 </body>

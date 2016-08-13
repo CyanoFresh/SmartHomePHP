@@ -11,7 +11,8 @@
     "bower-asset/js-cookie": "*",
     "bower-asset/noty": "*",
     "rmrevin/yii2-fontawesome": "~2.12",
-    "himiklab/yii2-recaptcha-widget": "*"
+    "himiklab/yii2-recaptcha-widget": "*",
+    "dmstr/yii2-adminlte-asset": "2.*"
   },
   "require-dev": {
     "yiisoft/yii2-codeception": "*",

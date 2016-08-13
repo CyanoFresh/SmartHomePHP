@@ -49,6 +49,11 @@ return [
             'minify_path' => '@webroot/assets',
             'js_position' => [\yii\web\View::POS_END],
             'force_charset' => 'UTF-8',
+//            'theme' => [
+//                'pathMap' => [
+//                    '@app/views' => '@vendor/dmstr/yii2-adminlte-asset/example-views/yiisoft/yii2-app'
+//                ],
+//            ],
         ],
         'formatter' => [
             'dateFormat' => 'dd.MM.yyyy',
