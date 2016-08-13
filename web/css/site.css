@@ -2,3 +2,11 @@
     color: #c55;
     font-style: italic;
 }
+
+.product-font {
+    font-family: 'Product Sans', Arial, sans-serif;
+}
+
+.product-font span {
+    font-weight: bold;
+}

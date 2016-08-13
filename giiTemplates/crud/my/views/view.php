@@ -23,8 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-view">
 
-    <h1 class="page-header">
-        <?= "<?= " ?>$this->title ?>
+    <p>
         <?= "<?= " ?>Html::a(<?= $generator->generateString('Редактировать') ?>, ['update', <?= $urlParams ?>], ['class' => 'btn btn-primary']) ?>
         <?= "<?= " ?>Html::a(<?= $generator->generateString('Удалить') ?>, ['delete', <?= $urlParams ?>], [
             'class' => 'btn btn-danger',
@@ -33,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-    </h1>
+    </p>
 
     <?= "<?= " ?>DetailView::widget([
         'model' => $model,

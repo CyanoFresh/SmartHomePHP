@@ -25,10 +25,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-index">
 
-    <h1 class="page-header">
-        <?= "<?= " ?>$this->title ?>
+    <p>
         <?= "<?= " ?>Html::a(<?= $generator->generateString('Добавить') ?>, ['create'], ['class' => 'btn btn-success']) ?>
-    </h1>
+    </p>
 <?php if(!empty($generator->searchModelClass)): ?>
 <?= "    <?php " . ($generator->indexWidgetType === 'grid' ? "// " : "") ?>echo $this->render('_search', ['model' => $searchModel]); ?>
 <?php endif; ?>

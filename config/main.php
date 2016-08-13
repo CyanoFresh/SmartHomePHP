@@ -59,14 +59,17 @@ return [
             'dateFormat' => 'dd.MM.yyyy',
             'datetimeFormat' => 'php:d.m.Y H:i',
         ],
-        /*'assetManager' => [
+        'assetManager' => [
             'bundles' => [
-                'yii\bootstrap\BootstrapAsset' => [
-                    'css' => [],
-                    'js' => [],
+                'dmstr\web\AdminLteAsset' => [
+                    'skin' => 'skin-purple',
                 ],
+//                'yii\bootstrap\BootstrapAsset' => [
+//                    'css' => [],
+//                    'js' => [],
+//                ],
             ],
-        ],*/
+        ],
     ],
     'params' => $params,
 ];
