@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ec5448d6c7e523d3141ff5028be4ec78",
-    "content-hash": "612581958e0390e1efd292797da97fe9",
+    "hash": "e84f77301a8bec4a012ca7834606f886",
+    "content-hash": "7067023d3309598cbb1d5d2a5ffa3e3f",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -863,6 +863,49 @@
                 "yii2"
             ],
             "time": "2016-06-10 15:38:28"
+        },
+        {
+            "name": "linslin/yii2-curl",
+            "version": "1.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/linslin/Yii2-Curl.git",
+                "reference": "9bf2af281fba4e4f0923a055ee673ac2db955513"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/linslin/Yii2-Curl/zipball/9bf2af281fba4e4f0923a055ee673ac2db955513",
+                "reference": "9bf2af281fba4e4f0923a055ee673ac2db955513",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "yiisoft/yii2": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "linslin\\yii2\\curl\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nils Gajsek",
+                    "email": "info@linslin.org"
+                }
+            ],
+            "description": "Easy and nice cURL extension with RESTful support for Yii2",
+            "keywords": [
+                " curl",
+                "extension",
+                "restful",
+                "yii2"
+            ],
+            "time": "2016-04-20 14:14:59"
         },
         {
             "name": "mrclay/minify",

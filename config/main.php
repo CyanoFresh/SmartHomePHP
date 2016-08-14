@@ -37,11 +37,11 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                '' => 'site/index',
+                '' => 'panel/index',
                 'login' => 'site/login',
                 '<controller>/<id:\d+>/<action:(create|update|delete)>' => '<controller>/<action>',
                 '<controller>/<id:\d+>' => '<controller>/view',
-                '<controller>s' => '<controller>/index',
+                '<controller>' => '<controller>/index',
             ],
         ],
         'view' => [
@@ -72,4 +72,5 @@ return [
         ],
     ],
     'params' => $params,
+    'defaultRoute' => ['panel/index'],
 ];
