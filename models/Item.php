@@ -4,6 +4,7 @@ namespace app\models;
 
 use linslin\yii2\curl\Curl;
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "item".
@@ -20,8 +21,11 @@ use Yii;
  * @property History[] $histories
  * @property Room $room
  */
-class Item extends \yii\db\ActiveRecord
+class Item extends ActiveRecord
 {
+    const TYPE_SWITCH = 10;
+    const TYPE_VARIABLE = 20;
+    
     /**
      * @inheritdoc
      */
@@ -83,10 +87,5 @@ class Item extends \yii\db\ActiveRecord
     public static function find()
     {
         return new ItemQuery(get_called_class());
-    }
-
-    public function getValueViaApi()
-    {
-        $curl = new Curl();
     }
 }

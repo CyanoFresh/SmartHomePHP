@@ -47,9 +47,34 @@ class ApiHelper
 
     /**
      * @param Item $item
+     * @return mixed
      */
     public static function getItemValue($item)
     {
         $data = self::makeRequest($item->url);
+
+        return $data['value'];
+    }
+
+    /**
+     * Turn item on and return current state
+     * 
+     * @param Item $item
+     * @return boolean
+     */
+    public static function itemTurnOn($item)
+    {
+        return self::makeRequest($item->url . '/1');
+    }
+
+    /**
+     * Turn item off and return current state
+     * 
+     * @param Item $item
+     * @return boolean
+     */
+    public static function itemTurnOff($item)
+    {
+        return self::makeRequest($item->url . '/0');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace app\servers;
 
+use app\components\ApiHelper;
 use app\models\History;
 use app\models\Item;
 use app\models\User;
@@ -174,390 +175,33 @@ class Panel implements MessageComponentInterface
      * @param array $data
      * @return bool|mixed
      */
-    protected function handleWithdraw(ConnectionInterface $from, $user, $data)
+    protected function handleTurnOn(ConnectionInterface $from, $user, $data)
     {
-        $opening_id = (int)$data['opening_id'];
-        $trade_url = (string)$data['trade_url'];
+        $item_id = (int)$data['item_id'];
 
-        $this->log("New withdraw request");
-        $this->log("Opening ID: $opening_id");
+        $item = Item::findOne($item_id);
 
-        if (!$trade_url or $trade_url == '') {
-            return $from->send(Json::encode([
+        if (!$item) {
+            return $from->send([
                 'type' => 'error',
-                'message' => [
-                    'key' => 'server.errors.no-trade-url',
-                ],
-            ]));
+                'message' => 'Включить не удалось',
+            ]);
         }
 
-        // Check Opening
-        $opening = DropsOpening::findOne($opening_id);
-
-        if (!$opening) {
-            return false;
-        }
-
-        if ($opening->status !== DropsOpening::STATUS_AVAILABLE) {
-            return false;
-        }
-
-        if ($opening->steamid != $user->steamid) {
-            return false;
-        }
-
-        // Check Item
-        $roomItem = $opening->roomItem;
-
-        if (!$roomItem) {
-            return false;
-        }
-
-        // Parse Trade URL
-        $tradeUrlQuery = parse_url($trade_url)['query'];
-        parse_str($tradeUrlQuery, $tradeUrlData);
-
-        $partnerID = $tradeUrlData['partner'];
-        $tradeUrlToken = $tradeUrlData['token'];
-
-        if (!$partnerID or $partnerID == '') {
-            return $from->send(Json::encode([
+        if ($item->type !== Item::TYPE_SWITCH) {
+            return $from->send([
                 'type' => 'error',
-                'message' => [
-                    'key' => 'server.errors.trade-url-not-valid',
-                ],
-            ]));
+                'message' => 'Данный тип устройства нельзя переключать',
+            ]);
         }
 
-        $this->log("Trade URL partnerID: $partnerID; Token: $tradeUrlToken;");
+        ApiHelper::itemTurnOn($item);
 
-        if (!$tradeUrlToken or $tradeUrlToken == '') {
-            return $from->send(Json::encode([
-                'type' => 'error',
-                'message' => [
-                    'key' => 'server.errors.trade-url-not-valid',
-                ],
-            ]));
-        }
-
-        if ($partnerID != Helper::toAccountID($user->steamid)) {
-            return $from->send(Json::encode([
-                'type' => 'error',
-                'message' => [
-                    'key' => 'server.errors.trade-url-not-valid',
-                ],
-            ]));
-        }
-
-        // Create withdraw
-        $itemWithdraw = new ItemWithdraw();
-        $itemWithdraw->status = ItemWithdraw::STATUS_QUEUE;
-        $itemWithdraw->steamid = $user->steamid;
-        $itemWithdraw->opening_id = $opening->id;
-        $itemWithdraw->room_item_id = $roomItem->id;
-        $itemWithdraw->save();
-
-        // Handle bot
-        /** @var Bot $bot */
-        $bot = $roomItem->bot;
-
-        if (!$bot) {
-            return false;
-        }
-
-        $this->log("Bot ID: {$bot->id}");
-
-        $this->log("Connecting to the Steam...");
-        $time = microtime(true);
-
-        // Connect to the Steam
-        $steam = $bot->processing()->getSteam();
-
-        if (!$steam) {
-            return false;
-        }
-
-        $this->log("Connected (" . round(microtime(true) - $time, 1) . "s)");
-
-        $this->log("Fetching Offers...");
-        $time = microtime(true);
-
-        $tradeOffers = $steam->tradeOffers();
-
-        $this->log("Fetched (" . round(microtime(true) - $time, 1) . "s)");
-
-        // Create Trade
-        $secureCode = $this->generateTradeCode();
-
-        $trade = $tradeOffers->createTrade($partnerID);
-
-        $trade->addMyItem(730, 2, $roomItem->assetid);
-        $trade->setMessage("Secure code: $secureCode");
-
-        $this->log("Sending trade...");
-        $time = microtime(true);
-
-        $tradeID = $trade->sendWithToken($tradeUrlToken);
-
-        $this->log("Sent (" . round(microtime(true) - $time, 1) . "s)");
-
-        $this->log("Result: $tradeID");
-
-        if ($tradeID == 0) {
-            $this->log('Cannot send trade');
-
-            return $from->send(Json::encode([
-                'type' => 'error',
-                'message' => [
-                    'key' => 'server.errors.cannot-create-trade',
-                    'values' => [
-                        'error' => $trade->getError(),
-                    ],
-                ],
-            ]));
-        }
-
-        $this->log('Trade successfully sent. Confirming...');
-
-        // Confirm on mobile
-        $confirmMobileResult = false;
-
-        while (!$confirmMobileResult) {
-            $confirmMobileResult = $this->confirmTradeMobile($steam, $user, $tradeID);
-        }
-
-        // Save & send result
-        $bot->notProcessing();
-
-        $itemWithdraw->status = ItemWithdraw::STATUS_ACTIVE;
-        $itemWithdraw->tradeid = $tradeID;
-        $itemWithdraw->code = $secureCode;
-        $itemWithdraw->save();
-
-        return $from->send(Json::encode([
-            'type' => 'trade_created',
-            'tradeid' => $tradeID,
-            'opening_id' => $opening->id,
-            'code' => $secureCode,
-        ]));
+        return $this->saveHistory($item, 1);
     }
 
     /**
-     * Confirm mobile trade by tradeID and partner Username
-     *
-     * @param SteamCommunity $steam
-     * @param User $user
-     * @param string $tradeID
-     * @return bool
-     */
-    private function confirmTradeMobile($steam, $user, $tradeID)
-    {
-        $this->log('Loading mobile confirmations...');
-
-        // Load all available mobile confirmations in loop
-        $confirmations = [];
-
-        while ($confirmations == []) {
-            try {
-                $confirmations = $steam->mobileAuth()->confirmations()->fetchConfirmations();
-            } catch (WgTokenInvalidException $ex) {
-                $this->log('Regenerating mobile session...');
-                $steam->mobileAuth()->refreshMobileSession();
-                $this->log('Regenerated');
-            }
-        }
-
-        $this->log('Loaded');
-
-        $this->log('Looking for confirmation by username and trade ID...');
-
-        // Find our confirmation
-        foreach ($confirmations as $confirmation) {
-            // Check for username
-            if (stristr($confirmation->getConfirmationDescription(), $user->username) === false) {
-                $this->log("Not suitable due to the username");
-                continue;
-            }
-
-            // Get current trade id
-            $confirmationTradeId = '0';
-
-            $this->log("Getting confirmation TradeOffer ID...");
-
-            while ($confirmationTradeId == '0') {
-                $confirmationTradeId = $steam->mobileAuth()->confirmations()->getConfirmationTradeOfferId($confirmation);
-            }
-
-            // Check for trade id
-            if ($confirmationTradeId != $tradeID) {
-                $this->log("Not suitable due to the Trade ID");
-                continue;
-            }
-
-            $this->log('Confirming trade...');
-
-            // Confirm trade in loop
-            $confirmResult = false;
-
-            while (!$confirmResult) {
-                $confirmResult = $steam->mobileAuth()->confirmations()->acceptConfirmation($confirmation);
-            }
-
-            $this->log('Confirmed');
-
-            return true;
-        }
-
-        $this->log('Confirmation was not found');
-
-        return false;
-    }
-
-    /**
-     * @param ConnectionInterface $from
-     * @param User $user
-     * @param array $data
-     * @return bool|mixed
-     */
-    protected function handleUpdate(ConnectionInterface $from, $user, $data)
-    {
-        $tradeID = (int)$data['tradeID'];
-
-        if (!$tradeID) {
-            return false;
-        }
-
-        // Check Opening
-        $itemWithdraw = ItemWithdraw::findOne(['tradeid' => $tradeID]);
-
-        if (!$itemWithdraw) {
-            return false;
-        }
-
-        if ($itemWithdraw->status !== ItemWithdraw::STATUS_ACTIVE) {
-            return false;
-        }
-
-        if ($itemWithdraw->steamid != $user->steamid) {
-            return false;
-        }
-
-        $opening = $itemWithdraw->opening;
-        $roomItem = $opening->roomItem;
-
-        // Handle bot
-        /** @var Bot $bot */
-        $bot = $roomItem->bot;
-
-        if (!$bot) {
-            return $from->send(Json::encode([
-                'type' => 'error',
-                'message' => [
-                    'key' => 'server.errors.bot-not-available',
-                ],
-            ]));
-        }
-
-        $this->log("Connecting to the Steam...");
-        $time = microtime(true);
-
-        // Connect to the Steam
-        $steam = $bot->processing()->getSteam();
-
-        if (!$steam) {
-            $bot->notProcessing();
-            return $from->send(Json::encode([
-                'type' => 'error',
-                'message' => [
-                    'key' => 'server.errors.bot-not-available',
-                ],
-            ]));
-        }
-
-        $this->log("Connected (" . round(microtime(true) - $time, 1) . "s)");
-
-        $tradeOffers = $steam->tradeOffers();
-
-        $this->log("Fetched (" . round(microtime(true) - $time, 1) . "s)");
-
-        $this->log("Fetching Offer by ID...");
-        $time = microtime(true);
-
-        $offer = $tradeOffers->getTradeOfferViaAPI($tradeID);
-
-        $this->log("Fetched (" . round(microtime(true) - $time, 1) . "s)");
-
-        if (is_null($offer)) {
-            $bot->notProcessing();
-
-            return $from->send(Json::encode([
-                'type' => 'close_active_trade',
-            ]));
-        }
-
-        // Handle Trade Offer state
-        $offerState = $offer->getTradeOfferState();
-
-        switch ($offerState) {
-            case State::Accepted:
-                $itemWithdraw->status = ItemWithdraw::STATUS_ENDED;
-                $itemWithdraw->save();
-
-                $opening->status = DropsOpening::STATUS_WITHDRAWN;
-                $opening->save();
-
-                $bot->notProcessing();
-
-                return $from->send(Json::encode([
-                    'type' => 'close_active_trade',
-                ]));
-
-                break;
-
-            case State::Active:
-                return false;
-
-            case State::Invalid:
-            case State::Expired:
-            case State::Canceled:
-            case State::Declined:
-            case State::InvalidItems:
-                $itemWithdraw->status = ItemWithdraw::STATUS_CANCELED;
-                $itemWithdraw->save();
-
-                $bot->notProcessing();
-
-                return $from->send(Json::encode([
-                    'type' => 'canceled_active_trade',
-                    'opening_id' => $opening->id,
-                ]));
-
-                break;
-
-            case State::Countered:
-            case State::CanceledBySecondFactor:
-            case State::InEscrow:
-                // Cancel because we don't want to trade in this cases
-                $tradeOffers->declineTradeById($tradeID);
-
-                $itemWithdraw->status = ItemWithdraw::STATUS_CANCELED;
-                $itemWithdraw->save();
-
-                $bot->notProcessing();
-
-                return $from->send(Json::encode([
-                    'type' => 'canceled_active_trade',
-                    'opening_id' => $opening->id,
-                ]));
-
-                break;
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * Send data to all clients
+     * Send data to all users
      *
      * @param array $data
      */
@@ -571,17 +215,17 @@ class Panel implements MessageComponentInterface
     }
 
     /**
-     * Send data to specific client with given SteamID
+     * Send data to specific user
      *
-     * @param string|integer $steamID
+     * @param integer $user_id
      * @param array $data
      * @return bool
      */
-    private function sendTo($steamID, $data)
+    private function sendTo($user_id, $data)
     {
-        if (isset($this->clients[$steamID])) {
+        if (isset($this->clients[$user_id])) {
             /** @var ConnectionInterface $client */
-            $client = $this->clients[$steamID];
+            $client = $this->clients[$user_id];
 
             $client->send(Json::encode($data));
 
@@ -589,16 +233,6 @@ class Panel implements MessageComponentInterface
         }
 
         return false;
-    }
-
-    /**
-     * Generate code for trade message
-     *
-     * @return string
-     */
-    private function generateTradeCode()
-    {
-        return strtoupper(Yii::$app->security->generateRandomString(5));
     }
 
     /**
@@ -620,7 +254,7 @@ class Panel implements MessageComponentInterface
     {
         if ($value === null) {
             try {
-                $value = $this->getValue($item);
+                $value = ApiHelper::getItemValue($item);
             } catch (\Exception $e) {
                 return false;
             }
@@ -632,12 +266,5 @@ class Panel implements MessageComponentInterface
         $history->value = $value;
 
         return $history->save();
-    }
-
-    /**
-     * @param Item $item
-     */
-    private function getValue($item)
-    {
     }
 }
