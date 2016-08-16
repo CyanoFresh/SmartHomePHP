@@ -5,12 +5,12 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Item;
+use app\models\Board;
 
 /**
- * ItemSearch represents the model behind the search form about `app\models\Item`.
+ * BoardSearch represents the model behind the search form about `app\models\Board`.
  */
-class ItemSearch extends Item
+class BoardSearch extends Board
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class ItemSearch extends Item
     public function rules()
     {
         return [
-            [['id', 'type', 'update_interval', 'save_history_interval', 'room_id', 'sort_order'], 'integer'],
-            [['url', 'name'], 'safe'],
+            [['id'], 'integer'],
+            [['name', 'baseUrl'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class ItemSearch extends Item
      */
     public function search($params)
     {
-        $query = Item::find();
+        $query = Board::find();
 
         // add conditions that should always apply here
 
@@ -60,15 +60,10 @@ class ItemSearch extends Item
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'type' => $this->type,
-            'update_interval' => $this->update_interval,
-            'save_history_interval' => $this->save_history_interval,
-            'room_id' => $this->room_id,
-            'sort_order' => $this->sort_order,
         ]);
 
-        $query->andFilterWhere(['like', 'url', $this->url])
-            ->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'baseUrl', $this->baseUrl]);
 
         return $dataProvider;
     }

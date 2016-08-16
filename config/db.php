@@ -4,7 +4,7 @@ use yii\helpers\ArrayHelper;
 
 $db = [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=example',
+    'dsn' => 'mysql:host=localhost;dbname=smarthome',
     'username' => 'root',
     'password' => '',
     'charset' => 'utf8',

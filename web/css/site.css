@@ -10,3 +10,17 @@
 .product-font span {
     font-weight: bold;
 }
+
+.control-panel-room-title {
+    color: #8a8a8a;
+    border-bottom: 1px solid #efefef;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.item-switch .info-box-text {
+    font-weight: 400;
+    font-size: 20px;
+    text-align: center;
+    line-height: 80px;
+}

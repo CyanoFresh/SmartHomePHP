@@ -12,13 +12,13 @@ class UserController extends Controller
         $user = new User([
             'scenario' => 'create',
         ]);
-        
+
         $user->username = $username;
         $user->email = $email;
         $user->generateAuthKey();
         $user->setPassword($password);
 
-        if ($user->save()) {
+        if ($user->save(false)) {
             echo 'Success' . PHP_EOL;
             return 1;
         }

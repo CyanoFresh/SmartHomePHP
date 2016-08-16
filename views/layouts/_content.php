@@ -1,9 +1,12 @@
 <?php
+
 use yii\helpers\Html;
 use yii\helpers\Inflector;
 use yii\widgets\Breadcrumbs;
 use dmstr\widgets\Alert;
+
 ?>
+
 <div class="content-wrapper">
     <section class="content-header">
         <?php if (isset($this->blocks['content-header'])) { ?>
@@ -32,17 +35,22 @@ use dmstr\widgets\Alert;
 
     <section class="content">
         <?= Alert::widget() ?>
-        
-        <div class="box">
-            <div class="box-body">
-                <?= $content ?>
+
+        <?php if (!$this->params['not-boxed']): ?>
+            <div class="box">
+                <div class="box-body">
+                    <?= $content ?>
+                </div>
             </div>
-        </div>
+        <?php else: ?>
+            <?= $content ?>
+        <?php endif; ?>
     </section>
 </div>
 
 <footer class="main-footer">
-    <span class="product-font"><span>Smart</span> Home</span> by <a href="//solomaha.com">Alex Solomaha</a>
+    <span class="product-font"><span>Smart</span> Home</span> by <a href="//solomaha.com" target="_blank">Alex
+        Solomaha</a>
 </footer>
 
 <!-- Control Sidebar -->

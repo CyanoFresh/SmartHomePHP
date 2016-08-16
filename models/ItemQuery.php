@@ -9,10 +9,25 @@ namespace app\models;
  */
 class ItemQuery extends \yii\db\ActiveQuery
 {
-    /*public function active()
+    public function variables()
     {
-        return $this->andWhere('[[status]]=1');
-    }*/
+        return $this->andWhere([
+            'type' => [
+                Item::TYPE_VARIABLE,
+                Item::TYPE_VARIABLE_BOOLEAN,
+                Item::TYPE_VARIABLE_BOOLEAN_DOOR,
+            ],
+        ]);
+    }
+
+    public function switches()
+    {
+        return $this->andWhere([
+            'type' => [
+                Item::TYPE_SWITCH,
+            ],
+        ]);
+    }
 
     /**
      * @inheritdoc

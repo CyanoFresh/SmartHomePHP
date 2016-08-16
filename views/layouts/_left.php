@@ -5,7 +5,7 @@
         <!-- Sidebar user panel -->
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                <img src="<?= Yii::$app->user->identity->getAvatar() ?>" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
                 <p><?= Yii::$app->user->identity->username ?></p>
@@ -24,12 +24,13 @@
                     ['label' => 'Настройки', 'options' => ['class' => 'header']],
                     ['label' => 'Устройства', 'icon' => 'fa fa-cubes', 'url' => ['/item/index']],
                     ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/room/index']],
-                    ['label' => 'Пользователи', 'icon' => 'fa fa-users', 'url' => ['/user/index']],
                     ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/history/index']],
+                    ['label' => 'Платы', 'icon' => 'fa fa-bolt', 'url' => ['/board/index']],
+                    ['label' => 'Пользователи', 'icon' => 'fa fa-users', 'url' => ['/user/index']],
 
-                    ['label' => 'Yii2', 'options' => ['class' => 'header']],
-                    ['label' => 'Gii', 'icon' => 'fa fa-file-code-o', 'url' => ['/gii']],
-                    ['label' => 'Debug', 'icon' => 'fa fa-dashboard', 'url' => ['/debug']],
+                    ['label' => 'Yii2', 'options' => ['class' => 'header'], 'visible' => YII_DEBUG],
+                    ['label' => 'Gii', 'icon' => 'fa fa-file-code-o', 'url' => ['/gii'], 'visible' => YII_DEBUG],
+                    ['label' => 'Debug', 'icon' => 'fa fa-dashboard', 'url' => ['/debug'], 'visible' => YII_DEBUG],
                 ],
             ]
         ) ?>

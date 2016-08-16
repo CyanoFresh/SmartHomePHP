@@ -1,16 +1,16 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\RoomSearch */
+/* @var $searchModel app\models\BoardSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-$this->title = 'Rooms';
+$this->title = 'Boards';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="room-index">
+<div class="board-index">
 
     <p>
         <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'id',
             'name',
-            'bg',
+            'baseUrl',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

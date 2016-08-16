@@ -7,6 +7,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+
 $this->title = 'Items';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -25,13 +26,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             'id',
-            'type',
-            'update_interval',
-            'save_history',
-            'room_id',
-            // 'url:url',
-            // 'name',
-            // 'sort_order',
+            'name',
+            'icon',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

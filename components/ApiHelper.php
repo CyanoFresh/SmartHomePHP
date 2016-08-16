@@ -26,7 +26,7 @@ class ApiHelper
     /**
      * @return string
      */
-    public static function getBaseUrl()
+    public static function getBaseUrl($item)
     {
         return Yii::$app->params['apiBaseUrl'];
     }
@@ -58,7 +58,7 @@ class ApiHelper
 
     /**
      * Turn item on and return current state
-     * 
+     *
      * @param Item $item
      * @return boolean
      */
@@ -69,7 +69,7 @@ class ApiHelper
 
     /**
      * Turn item off and return current state
-     * 
+     *
      * @param Item $item
      * @return boolean
      */

@@ -3,24 +3,23 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "room".
+ * This is the model class for table "board".
  *
  * @property integer $id
  * @property string $name
- * @property string $bg
- *
- * @property Item[] $items
+ * @property string $baseUrl
  */
-class Room extends \yii\db\ActiveRecord
+class Board extends ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'room';
+        return 'board';
     }
 
     /**
@@ -29,8 +28,9 @@ class Room extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
-            [['name', 'bg'], 'string', 'max' => 255],
+            [['name', 'baseUrl'], 'required'],
+            [['baseUrl'], 'string'],
+            [['name'], 'string', 'max' => 255],
         ];
     }
 
@@ -42,7 +42,7 @@ class Room extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Название'),
-            'bg' => Yii::t('app', 'Фон'),
+            'baseUrl' => Yii::t('app', 'Base Url'),
         ];
     }
 
@@ -51,15 +51,15 @@ class Room extends \yii\db\ActiveRecord
      */
     public function getItems()
     {
-        return $this->hasMany(Item::className(), ['room_id' => 'id'])->inverseOf('room');
+        return $this->hasMany(Item::className(), ['board_id' => 'id']);
     }
 
     /**
      * @inheritdoc
-     * @return RoomQuery the active query used by this AR class.
+     * @return BoardQuery the active query used by this AR class.
      */
     public static function find()
     {
-        return new RoomQuery(get_called_class());
+        return new BoardQuery(get_called_class());
     }
 }

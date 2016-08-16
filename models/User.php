@@ -19,7 +19,7 @@ use yii\web\IdentityInterface;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
- * 
+ *
  * @property string $password write-only password
  */
 class User extends ActiveRecord implements IdentityInterface
@@ -174,5 +174,11 @@ class User extends ActiveRecord implements IdentityInterface
     public function generateAuthKey()
     {
         $this->auth_key = Yii::$app->security->generateRandomString();
+    }
+
+    public function getAvatar()
+    {
+        $hash = md5($this->email);
+        return 'https://www.gravatar.com/avatar/' . $hash . '?s=45';
     }
 }

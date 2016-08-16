@@ -1,16 +1,16 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Item */
+/* @var $model app\models\Board */
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Boards', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="item-view">
+<div class="board-view">
 
     <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -28,16 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'name',
-            'icon',
-            'bg',
-            'class',
-            ['attribute' => 'board_id', 'value' => $model->board->name],
-            'type',
-            'update_interval',
-            'save_history_interval',
-            ['attribute' => 'room_id', 'value' => $model->room->name],
-            'url:url',
-            'sort_order',
+            'baseUrl:ntext',
         ],
     ]) ?>
 
