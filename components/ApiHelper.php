@@ -5,17 +5,36 @@ namespace app\components;
 use app\models\Item;
 use linslin\yii2\curl\Curl;
 use Yii;
+use yii\base\Component;
 use yii\helpers\Json;
 
-class ApiHelper
+class ApiHelper extends Component implements ApiHelperInterface
 {
+    /**
+     * @var Item
+     */
+    public $item;
+
+    /**
+     * ApiHelper constructor.
+     * @param Item $item
+     */
+    public function __construct(Item $item)
+    {
+        parent::__construct();
+
+        $this->item = $item;
+
+        return $this;
+    }
+
     /**
      * Get CURL instance
      *
      * @param int $timeout
      * @return Curl
      */
-    public static function getCurl($timeout = 2)
+    public function getCurl($timeout = 2)
     {
         $curl = new Curl();
         $curl->setOption(CURLOPT_TIMEOUT, $timeout);
@@ -26,9 +45,9 @@ class ApiHelper
     /**
      * @return string
      */
-    public static function getBaseUrl($item)
+    public function getBaseUrl()
     {
-        return Yii::$app->params['apiBaseUrl'];
+        return $this->item->board->baseUrl;
     }
 
     /**
@@ -37,21 +56,19 @@ class ApiHelper
      * @param $url
      * @return array
      */
-    public static function makeRequest($url)
+    public function makeRequestToApi($url)
     {
-        $curl = self::getCurl();
-        $response = $curl->get(self::getBaseUrl() . $url);
+        $response = $this->getCurl()->get($this->getBaseUrl() . $url);
 
         return Json::decode($response);
     }
 
     /**
-     * @param Item $item
      * @return mixed
      */
-    public static function getItemValue($item)
+    public function getValue()
     {
-        $data = self::makeRequest($item->url);
+        $data = $this->makeRequestToApi($this->item->url);
 
         return $data['value'];
     }
@@ -59,22 +76,20 @@ class ApiHelper
     /**
      * Turn item on and return current state
      *
-     * @param Item $item
-     * @return boolean
+     * @return array
      */
-    public static function itemTurnOn($item)
+    public function turnOn()
     {
-        return self::makeRequest($item->url . '/1');
+        return $this->makeRequestToApi($this->item->url . '/1');
     }
 
     /**
      * Turn item off and return current state
      *
-     * @param Item $item
-     * @return boolean
+     * @return array
      */
-    public static function itemTurnOff($item)
+    public function turnOff()
     {
-        return self::makeRequest($item->url . '/0');
+        return $this->makeRequestToApi($this->item->url . '/0');
     }
 }

@@ -4,7 +4,9 @@ use yii\helpers\ArrayHelper;
 
 $params = [
     'adminEmail' => 'admin@example.com',
-    'apiBaseUrl' => 'http://176.36.54.229',
+    'auth' => [
+        'tokenExpireSec' => 2,
+    ],
 ];
 
 return ArrayHelper::merge($params, require 'params-local.php');

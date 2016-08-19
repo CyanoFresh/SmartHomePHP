@@ -8,6 +8,7 @@ use app\models\Item;
 use app\models\User;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
+use Ratchet\WebSocket\Version\RFC6455\Connection;
 use React\EventLoop\LoopInterface;
 use Yii;
 use yii\helpers\Json;
@@ -65,7 +66,7 @@ class Panel implements MessageComponentInterface
             $this->items[$item->id] = $item;
 
             if ($item->save_history_interval > 0) {
-                $this->loop->addPeriodicTimer($item->save_history_interval, function () {
+                $this->loop->addPeriodicTimer($item->save_history_interval, function () use ($item) {
                     $this->saveHistory($item);
                 });
             }
@@ -80,8 +81,36 @@ class Panel implements MessageComponentInterface
         // Get query
         $query = $conn->WebSocket->request->getQuery();
 
-        // Welcome user
-        return $this->auth($conn, $query);
+        $id = $query->get('id');
+        $time = $query->get('time');
+        $token = $query->get('token');
+
+        if ((time() - $time) >= Yii::$app->params['auth']['tokenExpireSec']) {
+            return $this->log("Auth failed (Token expired). ID: $id; Token: $token; IP: {$conn->remoteAddress}; Timestamp: $time");
+        }
+
+        // Find user by auth info
+        /** @var User $user */
+        $user = User::findOne([
+            'id' => $id,
+            'auth_key' => $token,
+        ]);
+
+        // Security checks
+        if (!$user) {
+            return $this->log("Auth failed. ID: $id; Token: $token; IP: {$conn->remoteAddress}; Timestamp: $time");
+        }
+
+        // Close previous connection
+        if (isset($this->clients[$user->id])) {
+            $this->clients[$user->id]->close();
+        }
+
+        // Attach to online users
+        $conn->User = $user;
+        $this->clients[$user->id] = $conn;
+
+        return $this->log("Connected new user [$id] {$user->username}");
     }
 
     public function onMessage(ConnectionInterface $from, $msg)
@@ -95,7 +124,7 @@ class Panel implements MessageComponentInterface
 
         /** @var User $user */
         $user = $from->User;
-        $data = json_decode($msg, true);
+        $data = Json::decode($msg);
 
         if ($data['type'] === 'switch') {
             return $this->handleSwitch($from, $user, $data);
@@ -118,55 +147,10 @@ class Panel implements MessageComponentInterface
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
         // Logging
-        echo "An error has occurred: {$e->getMessage()} in file {$e->getFile()} at line {$e->getLine()}" . PHP_EOL;
+        echo "Error: {$e->getMessage()} in file {$e->getFile()} at line {$e->getLine()}" . PHP_EOL;
 
         // Close connection
         $conn->close();
-    }
-
-    /**
-     * Authenticate connected user
-     *
-     * @param ConnectionInterface $conn
-     * @param $query
-     * @return bool
-     */
-    protected function auth(ConnectionInterface $conn, $query)
-    {
-        $id = $query->get('id');
-        $time = $query->get('time');
-        $token = $query->get('token');
-
-        if ((time() - $time) >= Yii::$app->params['auth']['tokenExpireSec']) {
-            echo 'Token expired' . PHP_EOL;
-
-            return false;
-        }
-
-        // Find user by auth info
-        /** @var User $user */
-        $user = User::findOne([
-            'id' => $id,
-            'auth_key' => $token,
-        ]);
-
-        // Security checks
-        if (!$user) {
-            echo 'Wrong token or id: steamID: "' . $id . '", token: "' . $token . '", IP: ' . $conn->remoteAddress . ', time: ' . $time . PHP_EOL;
-
-            return false;
-        }
-
-        // Close previous connection
-        if (isset($this->clients[$user->id])) {
-            $this->clients[$user->id]->close();
-        }
-
-        // Attach to online users
-        $conn->User = $user;
-        $this->clients[$user->id] = $conn;
-
-        return true;
     }
 
     /**
@@ -195,9 +179,10 @@ class Panel implements MessageComponentInterface
             ]);
         }
 
-        ApiHelper::itemTurnOn($item);
+        $api = new ApiHelper($item);
+        $api->turnOn();
 
-        return $this->saveHistory($item, 1);
+        return $this->saveHistory($item, Item::VALUE_ON);
     }
 
     /**
@@ -219,7 +204,7 @@ class Panel implements MessageComponentInterface
      *
      * @param integer $user_id
      * @param array $data
-     * @return bool
+     * @return bool|mixed
      */
     private function sendTo($user_id, $data)
     {
@@ -227,9 +212,7 @@ class Panel implements MessageComponentInterface
             /** @var ConnectionInterface $client */
             $client = $this->clients[$user_id];
 
-            $client->send(Json::encode($data));
-
-            return true;
+            return $client->send(Json::encode($data));
         }
 
         return false;
@@ -254,7 +237,8 @@ class Panel implements MessageComponentInterface
     {
         if ($value === null) {
             try {
-                $value = ApiHelper::getItemValue($item);
+                $api = new ApiHelper($item);
+                $value = $api->getValue();
             } catch (\Exception $e) {
                 return false;
             }

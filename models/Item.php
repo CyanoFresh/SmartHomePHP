@@ -33,6 +33,9 @@ class Item extends ActiveRecord
     const TYPE_VARIABLE_BOOLEAN = 25;
     const TYPE_VARIABLE_BOOLEAN_DOOR = 26;
 
+    const VALUE_ON = 1;
+    const VALUE_OFF = 0;
+
     /**
      * @inheritdoc
      */
