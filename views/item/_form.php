@@ -29,6 +29,8 @@ use yii\widgets\ActiveForm;
         ArrayHelper::map(Board::find()->all(), 'id', 'name')
     ) ?>
 
+    <?= $form->field($model, 'pin')->input('number') ?>
+
     <?= $form->field($model, 'type')->dropDownList(Item::getTypesArray()) ?>
 
     <?= $form->field($model, 'update_interval')->textInput() ?>

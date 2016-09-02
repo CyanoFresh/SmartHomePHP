@@ -69,7 +69,7 @@ class Test implements MessageComponentInterface
         $type = $query->get('type');
 
         if (!$type) {
-            return $conn->send('Need more info!');
+            return false;
         }
 
         if ($type == 'board') {
@@ -79,25 +79,22 @@ class Test implements MessageComponentInterface
             $conn->id = $id;
             $this->boards[$id] = $conn;
 
-            $this->sendAll("Board connected. BoardID: $id");
             $this->log("Board connected. BoardID: $id");
 
-            $this->loop->addPeriodicTimer(5, function () use ($conn) {
-                $conn->send('switch');
+            $this->loop->addPeriodicTimer(3, function () use ($conn) {
+                $conn->send(Json::encode(['type' => 'switch', 'pin' => 8]));
             });
 
             return true;
         } elseif ($type == 'user') {
             $id = $query->get('id');
-            $username = $query->get('username');
 
             $conn->type = 'user';
             $conn->id = $id;
-            $conn->username = $username;
 
             $this->clients[$id] = $conn;
 
-            $this->log("New user. Username: $username; ID: $id");
+            $this->log("User connected. ID: $id");
 
             return true;
         }

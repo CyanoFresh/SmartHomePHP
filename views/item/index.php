@@ -8,7 +8,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 
-$this->title = 'Items';
+$this->title = 'Элементы';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-index">

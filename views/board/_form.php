@@ -4,6 +4,7 @@
 /* @var $model app\models\Board */
 /* @var $form yii\widgets\ActiveForm */
 
+use app\models\Board;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 ?>
@@ -13,6 +14,10 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'type')->dropDownList(Board::getTypesArray()) ?>
+
+    <?= $form->field($model, 'secret')->textInput() ?>
 
     <?= $form->field($model, 'baseUrl')->textInput(['maxlength' => true]) ?>
 

@@ -22,7 +22,7 @@
                     ['label' => 'Панель Управления', 'icon' => 'fa fa-sliders', 'url' => ['/panel/index']],
 
                     ['label' => 'Настройки', 'options' => ['class' => 'header']],
-                    ['label' => 'Устройства', 'icon' => 'fa fa-cubes', 'url' => ['/item/index']],
+                    ['label' => 'Элементы', 'icon' => 'fa fa-cubes', 'url' => ['/item/index']],
                     ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/room/index']],
                     ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/history/index']],
                     ['label' => 'Платы', 'icon' => 'fa fa-bolt', 'url' => ['/board/index']],

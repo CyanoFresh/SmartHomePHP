@@ -2,12 +2,15 @@
 
 /* @var $this yii\web\View */
 
+use app\assets\WSClientAsset;
 use app\models\Item;
 use app\models\Room;
+use yii\web\View;
 
 $this->title = 'Панель Управления';
 $this->params['not-boxed'] = true;
 
+WSClientAsset::register($this);
 ?>
 
 <div class="control-panel">

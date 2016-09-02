@@ -18,8 +18,8 @@ class BoardSearch extends Board
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['name', 'baseUrl'], 'safe'],
+            [['id', 'type'], 'integer'],
+            [['name', 'baseUrl', 'secret'], 'safe'],
         ];
     }
 
@@ -60,9 +60,11 @@ class BoardSearch extends Board
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'type' => $this->type,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'secret', $this->secret])
             ->andFilterWhere(['like', 'baseUrl', $this->baseUrl]);
 
         return $dataProvider;

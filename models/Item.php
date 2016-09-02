@@ -15,6 +15,7 @@ use yii\db\ActiveRecord;
  * @property integer $save_history_interval
  * @property integer $room_id
  * @property integer $board_id
+ * @property integer $pin
  * @property string $url
  * @property string $name
  * @property string $icon
@@ -50,8 +51,8 @@ class Item extends ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'update_interval', 'save_history_interval', 'room_id', 'url', 'name', 'icon', 'bg', 'board_id'], 'required'],
-            [['type', 'update_interval', 'save_history_interval', 'room_id', 'sort_order', 'board_id'], 'integer'],
+            [['type', 'update_interval', 'save_history_interval', 'room_id', 'name', 'icon', 'bg', 'board_id'], 'required'],
+            [['type', 'update_interval', 'save_history_interval', 'room_id', 'sort_order', 'board_id', 'pin'], 'integer'],
             [['url', 'name', 'icon', 'bg', 'class'], 'string', 'max' => 255],
             [['room_id'], 'exist', 'skipOnError' => true, 'targetClass' => Room::className(), 'targetAttribute' => ['room_id' => 'id']],
             [['board_id'], 'exist', 'skipOnError' => true, 'targetClass' => Board::className(), 'targetAttribute' => ['board_id' => 'id']],

@@ -32,6 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'bg',
             'class',
             ['attribute' => 'board_id', 'value' => $model->board->name],
+            'pin',
             'type',
             'update_interval',
             'save_history_interval',

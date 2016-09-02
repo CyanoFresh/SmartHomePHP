@@ -9,11 +9,16 @@ use yii\db\ActiveRecord;
  * This is the model class for table "board".
  *
  * @property integer $id
+ * @property integer $type
  * @property string $name
+ * @property string $secret
  * @property string $baseUrl
  */
 class Board extends ActiveRecord
 {
+    const TYPE_AREST = 10;
+    const TYPE_WEBSOCKET = 20;
+
     /**
      * @inheritdoc
      */
@@ -28,9 +33,10 @@ class Board extends ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'baseUrl'], 'required'],
+            [['type', 'name'], 'required'],
+            [['type'], 'integer'],
             [['baseUrl'], 'string'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'secret'], 'string', 'max' => 255],
         ];
     }
 
@@ -41,7 +47,9 @@ class Board extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'type' => Yii::t('app', 'Тип'),
             'name' => Yii::t('app', 'Название'),
+            'secret' => Yii::t('app', 'Ключ'),
             'baseUrl' => Yii::t('app', 'Base Url'),
         ];
     }
@@ -61,5 +69,24 @@ class Board extends ActiveRecord
     public static function find()
     {
         return new BoardQuery(get_called_class());
+    }
+
+    /**
+     * @return array
+     */
+    public static function getTypesArray()
+    {
+        return [
+            self::TYPE_AREST => 'aREST API',
+            self::TYPE_WEBSOCKET => 'WebSocket API',
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getTypeLabel()
+    {
+        return self::getTypesArray()[$this->type];
     }
 }

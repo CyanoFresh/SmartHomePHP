@@ -3,6 +3,7 @@
 namespace app\servers;
 
 use app\components\ApiHelper;
+use app\models\Board;
 use app\models\History;
 use app\models\Item;
 use app\models\User;
@@ -31,7 +32,12 @@ class Panel implements MessageComponentInterface
     /**
      * @var ConnectionInterface[]
      */
-    protected $clients;
+    protected $user_clients;
+
+    /**
+     * @var ConnectionInterface[]
+     */
+    protected $board_clients;
 
     /**
      * @var array
@@ -48,7 +54,8 @@ class Panel implements MessageComponentInterface
     public function __construct($loop)
     {
         $this->loop = $loop;
-        $this->clients = [];
+        $this->user_clients = [];
+        $this->board_clients = [];
         $this->items = [];
 
         // Database driver hack
@@ -81,53 +88,75 @@ class Panel implements MessageComponentInterface
         // Get query
         $query = $conn->WebSocket->request->getQuery();
 
-        $id = $query->get('id');
-        $time = $query->get('time');
-        $token = $query->get('token');
+        $type = $query->get('type');
 
-        if ((time() - $time) >= Yii::$app->params['auth']['tokenExpireSec']) {
-            return $this->log("Auth failed (Token expired). ID: $id; Token: $token; IP: {$conn->remoteAddress}; Timestamp: $time");
+        switch ($type) {
+            case 'user':
+                $userID = $query->get('id');
+                $userAuthKey = $query->get('auth_key');
+
+                if (!$userID or !$userAuthKey) {
+                    return false;
+                }
+
+                $user = User::findOne([
+                    'id' => $userID,
+                    'auth_key' => $userAuthKey,
+                ]);
+
+                if (!$user) {
+                    return false;
+                }
+
+                // Close previous connection
+                if (isset($this->user_clients[$user->id])) {
+                    $this->user_clients[$user->id]->close();
+                }
+
+                // Attach to clients
+                $conn->User = $user;
+                $this->user_clients[$user->id] = $conn;
+
+                return $this->log("Connected user [{$user->id}] {$user->username}");
+            case 'board':
+                $boardID = $query->get('id');
+                $boardSecret = $query->get('secret');
+
+                if (!$boardID or !$boardSecret) {
+                    return false;
+                }
+
+                $board = Board::findOne([
+                    'id' => $boardID,
+                    'type' => Board::TYPE_WEBSOCKET,
+                    'secret' => $boardSecret,
+                ]);
+
+                if (!$board) {
+                    return false;
+                }
+
+                // Close previous connection
+                if (isset($this->board_clients[$board->id])) {
+                    $this->board_clients[$board->id]->close();
+                }
+
+                // Attach to clients
+                $conn->Board = $board;
+                $this->board_clients[$board->id] = $conn;
+
+                return $this->log("Connected board [{$board->id}]");
         }
 
-        // Find user by auth info
-        /** @var User $user */
-        $user = User::findOne([
-            'id' => $id,
-            'auth_key' => $token,
-        ]);
-
-        // Security checks
-        if (!$user) {
-            return $this->log("Auth failed. ID: $id; Token: $token; IP: {$conn->remoteAddress}; Timestamp: $time");
-        }
-
-        // Close previous connection
-        if (isset($this->clients[$user->id])) {
-            $this->clients[$user->id]->close();
-        }
-
-        // Attach to online users
-        $conn->User = $user;
-        $this->clients[$user->id] = $conn;
-
-        return $this->log("Connected new user [$id] {$user->username}");
+        return false;
     }
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        if (!$from->User) {
-            return $from->send(Json::encode([
-                'type' => 'error',
-                'message' => 'Необходима авторизаия',
-            ]));
-        }
-
-        /** @var User $user */
-        $user = $from->User;
-        $data = Json::decode($msg);
-
-        if ($data['type'] === 'switch') {
-            return $this->handleSwitch($from, $user, $data);
+        if ($from->User) {
+            return $this->handleUserMessage($from, $msg);
+        } elseif ($from->Board) {
+            return $this->handleBoardMessage($from, $msg);
         }
 
         return false;
@@ -136,11 +165,9 @@ class Panel implements MessageComponentInterface
     public function onClose(ConnectionInterface $conn)
     {
         if (isset($conn->User)) {
-            unset($this->clients[$conn->User->id]);
-
-            // Regenerate auth key
-            $conn->User->generateAuthKey();
-            $conn->User->save();
+            unset($this->user_clients[$conn->User->id]);
+        } elseif (isset($conn->Board)) {
+            unset($this->board_clients[$conn->Board->id]);
         }
     }
 
@@ -151,6 +178,61 @@ class Panel implements MessageComponentInterface
 
         // Close connection
         $conn->close();
+    }
+
+    public function handleUserMessage($from, $msg)
+    {
+        $user = $from->User;
+        $data = Json::decode($msg);
+
+        switch ($data['type']) {
+            case 'switch':
+                $item_id = $data['item_id'];
+                $item = Item::findOne($item_id);
+
+                if (!$item) {
+                    return false;
+                }
+
+                $board = $item->board;
+
+                if ($board->type === Board::TYPE_WEBSOCKET) {
+                    if (isset($this->board_clients[$board->id])) {
+                        $this->board_clients[$board->id]->send(Json::encode([
+                            'type' => 'switch',
+                            'pin' => $item->pin,
+                        ]));
+                    }
+                }
+
+                break;
+        }
+
+        return false;
+    }
+
+    public function handleBoardMessage($from, $msg)
+    {
+        $board = $from->Board;
+        $data = Json::decode($msg);
+
+        switch ($data['type']) {
+            case 'value':
+                $pin = $data['pin'];
+
+                $item = Item::findOne([
+                    'board_id' => $board->id,
+                    'pin' => $pin,
+                ]);
+
+                if (!$item) {
+                    return false;
+                }
+
+                break;
+        }
+
+        return false;
     }
 
     /**
@@ -194,7 +276,7 @@ class Panel implements MessageComponentInterface
     {
         $encodedData = Json::encode($data);
 
-        foreach ($this->clients as $client) {
+        foreach ($this->user_clients as $client) {
             $client->send($encodedData);
         }
     }
@@ -208,9 +290,9 @@ class Panel implements MessageComponentInterface
      */
     private function sendTo($user_id, $data)
     {
-        if (isset($this->clients[$user_id])) {
+        if (isset($this->user_clients[$user_id])) {
             /** @var ConnectionInterface $client */
-            $client = $this->clients[$user_id];
+            $client = $this->user_clients[$user_id];
 
             return $client->send(Json::encode($data));
         }
