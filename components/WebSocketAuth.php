@@ -18,12 +18,6 @@ class WebSocketAuth
             return null;
         }
 
-        $auth_key = $user->auth_key;
-
-        // Regenerate auth key
-        $user->generateAuthKey();
-        $user->save();
-
-        return $auth_key;
+        return $user->auth_key;
     }
 }

@@ -38,6 +38,12 @@ class Item extends ActiveRecord
     const VALUE_OFF = 0;
 
     /**
+     * Used for WS handler
+     * @var mixed
+     */
+    public $value;
+
+    /**
      * @inheritdoc
      */
     public static function tableName()

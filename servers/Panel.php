@@ -9,7 +9,6 @@ use app\models\Item;
 use app\models\User;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
-use Ratchet\WebSocket\Version\RFC6455\Connection;
 use React\EventLoop\LoopInterface;
 use Yii;
 use yii\helpers\Json;
@@ -30,38 +29,38 @@ class Panel implements MessageComponentInterface
     protected $loop;
 
     /**
+     * All connected users
      * @var ConnectionInterface[]
      */
     protected $user_clients;
 
     /**
+     * All connected boards
      * @var ConnectionInterface[]
      */
     protected $board_clients;
 
     /**
-     * @var array
+     * @var Item[]
      */
     protected $items;
 
     /**
-     * Panel constructor.
+     * Class constructor.
      *
-     * Init variables and preparing
+     * Init variables, etc.
      *
      * @param LoopInterface $loop
      */
     public function __construct($loop)
     {
+        // Init variables
         $this->loop = $loop;
         $this->user_clients = [];
         $this->board_clients = [];
-        $this->items = [];
 
-        // Database driver hack
+        // Database driver hack: Prevent MySQL for disconnecting by timeout
         Yii::$app->db->createCommand('SET SESSION wait_timeout = 2147483;')->execute();
-
-        // Prevent MySQL for disconnecting by timeout
         $this->loop->addPeriodicTimer(8600, function () {
             Yii::$app->db->createCommand('SHOW TABLES;')->execute();
         });
@@ -72,22 +71,21 @@ class Panel implements MessageComponentInterface
         foreach ($items as $item) {
             $this->items[$item->id] = $item;
 
-            if ($item->save_history_interval > 0) {
-                $this->loop->addPeriodicTimer($item->save_history_interval, function () use ($item) {
-                    $this->saveHistory($item);
-                });
-            }
+//            if ($item->save_history_interval > 0) {
+//                $this->loop->addPeriodicTimer($item->save_history_interval, function () use ($item) {
+//                    $this->saveHistory($item);
+//                });
+//            }
         }
+
+        $this->log('Server started');
     }
 
-    /**
-     * @inheritdoc
-     */
     public function onOpen(ConnectionInterface $conn)
     {
-        // Get query
         $query = $conn->WebSocket->request->getQuery();
 
+        // Handle connection by type
         $type = $query->get('type');
 
         switch ($type) {
@@ -96,7 +94,7 @@ class Panel implements MessageComponentInterface
                 $userAuthKey = $query->get('auth_key');
 
                 if (!$userID or !$userAuthKey) {
-                    return false;
+                    return $conn->close();
                 }
 
                 $user = User::findOne([
@@ -105,7 +103,7 @@ class Panel implements MessageComponentInterface
                 ]);
 
                 if (!$user) {
-                    return false;
+                    return $conn->close();
                 }
 
                 // Close previous connection
@@ -113,9 +111,14 @@ class Panel implements MessageComponentInterface
                     $this->user_clients[$user->id]->close();
                 }
 
-                // Attach to clients
+                // Attach to users
                 $conn->User = $user;
                 $this->user_clients[$user->id] = $conn;
+
+                $conn->send(Json::encode([
+                    'type' => 'init',
+                    'items' => $this->items,
+                ]));
 
                 return $this->log("Connected user [{$user->id}] {$user->username}");
             case 'board':
@@ -123,7 +126,7 @@ class Panel implements MessageComponentInterface
                 $boardSecret = $query->get('secret');
 
                 if (!$boardID or !$boardSecret) {
-                    return false;
+                    return $conn->close();
                 }
 
                 $board = Board::findOne([
@@ -133,7 +136,7 @@ class Panel implements MessageComponentInterface
                 ]);
 
                 if (!$board) {
-                    return false;
+                    return $conn->close();
                 }
 
                 // Close previous connection
@@ -141,7 +144,7 @@ class Panel implements MessageComponentInterface
                     $this->board_clients[$board->id]->close();
                 }
 
-                // Attach to clients
+                // Attach to boards
                 $conn->Board = $board;
                 $this->board_clients[$board->id] = $conn;
 
@@ -153,6 +156,7 @@ class Panel implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
+        $this->log('new message ' . $msg);
         if ($from->User) {
             return $this->handleUserMessage($from, $msg);
         } elseif ($from->Board) {
@@ -166,27 +170,42 @@ class Panel implements MessageComponentInterface
     {
         if (isset($conn->User)) {
             unset($this->user_clients[$conn->User->id]);
+
+            $conn->User->generateAuthKey();
+            $conn->User->save();
+
+            $this->log("User [{$conn->User->id} disconnected]");
         } elseif (isset($conn->Board)) {
             unset($this->board_clients[$conn->Board->id]);
+
+            $this->log("Board [{$conn->Board->id} disconnected]");
         }
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
-        // Logging
-        echo "Error: {$e->getMessage()} in file {$e->getFile()} at line {$e->getLine()}" . PHP_EOL;
+        $this->log("Error: {$e->getMessage()} in file {$e->getFile()} at line {$e->getLine()}");
 
         // Close connection
         $conn->close();
     }
 
+    /**
+     * @param $from
+     * @param $msg
+     * @return bool
+     */
     public function handleUserMessage($from, $msg)
     {
         $user = $from->User;
         $data = Json::decode($msg);
 
         switch ($data['type']) {
-            case 'switch':
+            case 'turnON':
+                return $this->handleTurnOn($from, $user, $data);
+            case 'turnOFF':
+                return $this->handleTurnOff($from, $user, $data);
+            /*case 'switch':
                 $item_id = $data['item_id'];
                 $item = Item::findOne($item_id);
 
@@ -205,20 +224,26 @@ class Panel implements MessageComponentInterface
                     }
                 }
 
-                break;
+                break;*/
         }
 
         return false;
     }
 
+    /**
+     * @param $from
+     * @param $msg
+     * @return bool
+     */
     public function handleBoardMessage($from, $msg)
     {
+        /** @var Board $board */
         $board = $from->Board;
         $data = Json::decode($msg);
 
         switch ($data['type']) {
             case 'value':
-                $pin = $data['pin'];
+                $pin = (integer)$data['pin'];
 
                 $item = Item::findOne([
                     'board_id' => $board->id,
@@ -228,6 +253,14 @@ class Panel implements MessageComponentInterface
                 if (!$item) {
                     return false;
                 }
+
+                $this->items[$item->id]->value = $data['value'];
+
+                $this->sendUsers([
+                    'type' => 'value',
+                    'item_id' => $item->id,
+                    'value' => $data['value'],
+                ]);
 
                 break;
         }
@@ -243,6 +276,8 @@ class Panel implements MessageComponentInterface
      */
     protected function handleTurnOn(ConnectionInterface $from, $user, $data)
     {
+        $this->log('handle turn on ');
+
         $item_id = (int)$data['item_id'];
 
         $item = Item::findOne($item_id);
@@ -261,10 +296,67 @@ class Panel implements MessageComponentInterface
             ]);
         }
 
-        $api = new ApiHelper($item);
-        $api->turnOn();
+        $board = $item->board;
 
-        return $this->saveHistory($item, Item::VALUE_ON);
+        if ($board->type === Board::TYPE_AREST) {
+            $api = new ApiHelper($item);
+            $result = $api->turnOn();
+        } elseif ($board->type === Board::TYPE_WEBSOCKET) {
+            $result = $this->sendToBoard($board->id, [
+                'type' => 'turnON',
+                'pin' => $item->pin,
+            ]);
+        }
+
+        if (!$result) {
+            return $from->send(Json::encode([
+                'type' => 'error',
+                'message' => 'Не получилось включить: устройство не подключено',
+            ]));
+        }
+
+        return true;
+    }
+
+    /**
+     * @param ConnectionInterface $from
+     * @param User $user
+     * @param array $data
+     * @return bool|mixed
+     */
+    protected function handleTurnOff(ConnectionInterface $from, $user, $data)
+    {
+        $item_id = (int)$data['item_id'];
+
+        $item = Item::findOne($item_id);
+
+        if (!$item) {
+            return $from->send([
+                'type' => 'error',
+                'message' => 'Выключить не удалось',
+            ]);
+        }
+
+        if ($item->type !== Item::TYPE_SWITCH) {
+            return $from->send([
+                'type' => 'error',
+                'message' => 'Данный тип устройства нельзя переключать',
+            ]);
+        }
+
+        $board = $item->board;
+
+        if ($board->type === Board::TYPE_AREST) {
+            $api = new ApiHelper($item);
+            return $api->turnOff();
+        } elseif ($board->type === Board::TYPE_WEBSOCKET) {
+            return $this->sendToBoard($board->id, [
+                'type' => 'turnOFF',
+                'pin' => $item->pin,
+            ]);
+        }
+
+        return false;
     }
 
     /**
@@ -272,30 +364,36 @@ class Panel implements MessageComponentInterface
      *
      * @param array $data
      */
-    private function sendAll($data)
+    private function sendUsers($data)
     {
-        $encodedData = Json::encode($data);
+        $msg = Json::encode($data);
 
         foreach ($this->user_clients as $client) {
-            $client->send($encodedData);
+            $client->send($msg);
         }
     }
 
     /**
-     * Send data to specific user
+     * Send data to specific board
      *
-     * @param integer $user_id
+     * @param integer $board_id
      * @param array $data
-     * @return bool|mixed
+     * @return bool|ConnectionInterface
      */
-    private function sendTo($user_id, $data)
+    private function sendToBoard($board_id, $data)
     {
-        if (isset($this->user_clients[$user_id])) {
+        if (isset($this->board_clients[$board_id])) {
             /** @var ConnectionInterface $client */
-            $client = $this->user_clients[$user_id];
+            $client = $this->board_clients[$board_id];
 
-            return $client->send(Json::encode($data));
+            $msg = Json::encode($data);
+
+            $this->log("Sending to board [$board_id]: $msg");
+
+            return $client->send($msg);
         }
+
+        $this->log("Cannot send to board [$board_id]: not connected");
 
         return false;
     }

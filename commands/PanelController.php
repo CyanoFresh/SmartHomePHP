@@ -2,17 +2,16 @@
 
 namespace app\commands;
 
-use app\servers\Test;
+use app\servers\Panel;
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use React\EventLoop\Factory;
 use React\Socket\Server;
-use Ratchet\Http\OriginCheck;
 use Yii;
 use yii\console\Controller;
 
-class TestController extends Controller
+class PanelController extends Controller
 {
     public function actionIndex($port = 8081)
     {
@@ -26,7 +25,7 @@ class TestController extends Controller
         $server = new IoServer(
             new HttpServer(
                 new WsServer(
-                    new Test($loop)
+                    new Panel($loop)
                 )
             ),
             $socket,
