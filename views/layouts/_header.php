@@ -7,7 +7,8 @@ use yii\helpers\Html;
 
 <header class="main-header">
 
-    <?= Html::a('<span class="logo-mini product-font">SH</span><span class="logo-lg product-font"><span>Smart</span> Home</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
+    <?= Html::a('<span class="logo-mini product-font">SH</span><span class="logo-lg product-font"><span>Smart</span> Home</span>',
+        Yii::$app->homeUrl, ['class' => 'logo']) ?>
 
     <nav class="navbar navbar-static-top" role="navigation">
 
@@ -227,14 +228,14 @@ use yii\helpers\Html;
 
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="user-image" alt="User Image"/>
+                        <img src="<?= Yii::$app->user->identity->getAvatar() ?>" class="user-image" alt="User Image">
                         <span class="hidden-xs"><?= Yii::$app->user->identity->username ?></span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- User image -->
                         <li class="user-header">
-                            <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle"
-                                 alt="User Image"/>
+                            <img src="<?= Yii::$app->user->identity->getAvatar() ?>" class="img-circle"
+                                 alt="User Image">
 
                             <p><?= Yii::$app->user->identity->username ?></p>
                         </li>
@@ -246,7 +247,7 @@ use yii\helpers\Html;
                             <div class="pull-right">
                                 <?= Html::a(
                                     'Выйти',
-                                    ['/site/logout'],
+                                    ['/auth/logout'],
                                     ['data-method' => 'post', 'class' => 'btn btn-default btn-flat']
                                 ) ?>
                             </div>
@@ -255,9 +256,9 @@ use yii\helpers\Html;
                 </li>
 
                 <!-- User Account: style can be found in dropdown.less -->
-<!--                <li>-->
-<!--                    <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>-->
-<!--                </li>-->
+                <!--                <li>-->
+                <!--                    <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>-->
+                <!--                </li>-->
             </ul>
         </div>
     </nav>

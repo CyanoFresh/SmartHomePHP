@@ -15,6 +15,7 @@ return [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'loginUrl' => ['/auth/login'],
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -38,7 +39,7 @@ return [
             'showScriptName' => false,
             'rules' => [
                 '' => 'panel/index',
-                'login' => 'site/login',
+                'login' => 'auth/login',
                 '<controller>/<id:\d+>/<action:(create|update|delete)>' => '<controller>/<action>',
                 '<controller>/<id:\d+>' => '<controller>/view',
                 '<controller>' => '<controller>/index',

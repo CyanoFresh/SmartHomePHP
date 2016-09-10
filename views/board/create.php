@@ -5,8 +5,8 @@
 
 use yii\helpers\Html;
 
-$this->title = 'Добавить Board';
-$this->params['breadcrumbs'][] = ['label' => 'Boards', 'url' => ['index']];
+$this->title = 'Добавить Устройство';
+$this->params['breadcrumbs'][] = ['label' => 'Устройства', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="board-create">

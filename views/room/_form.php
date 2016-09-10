@@ -14,7 +14,12 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'bg')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'bg')->dropDownList([
+        'success' => 'Зеленый',
+        'danger' => 'Красный',
+        'warning' => 'Оранжевый',
+        'info' => 'Синий',
+    ]) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

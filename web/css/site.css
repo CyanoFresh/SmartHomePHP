@@ -24,3 +24,11 @@
     text-align: center;
     line-height: 80px;
 }
+
+.login-page {
+    background: url("../img/login-bg.png") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}

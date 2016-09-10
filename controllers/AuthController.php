@@ -10,6 +10,8 @@ use app\models\LoginForm;
 
 class AuthController extends Controller
 {
+    public $layout = 'base';
+
     public function behaviors()
     {
         return [

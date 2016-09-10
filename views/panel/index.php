@@ -23,14 +23,14 @@ WSClientAsset::register($this);
             <div class="box-body control-panel-items">
                 <div class="row items-variable">
                     <?php foreach ($room->getItems()->variables()->all() as $item): ?>
-                        <div class="col-md-3 col-sm-6 col-xs-12 control-panel-item item-variable"
+                        <div class="col-md-3 col-sm-4 control-panel-item item-variable"
                              data-item-id="<?= $item->id ?>">
                             <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
                                 <span class="info-box-icon"><i class="fa fa-<?= $item->icon ?>"></i></span>
 
                                 <div class="info-box-content">
                                     <span class="info-box-text"><?= $item->name ?></span>
-                                    <span class="info-box-number item-value"></span>
+                                    <span class="info-box-number item-value">НЕИЗВЕСТНО</span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -39,7 +39,7 @@ WSClientAsset::register($this);
                 </div>
                 <div class="row items-switch">
                     <?php foreach ($room->getItems()->switches()->all() as $item): ?>
-                        <div class="col-md-2 col-sm-4 col-xs-12 control-panel-item item-switch"
+                        <div class="col-md-3 col-sm-4 control-panel-item item-switch"
                              data-item-id="<?= $item->id ?>">
                             <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
                                 <span class="info-box-icon"><i class="fa fa-<?= $item->icon ?>"></i></span>

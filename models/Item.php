@@ -62,6 +62,7 @@ class Item extends ActiveRecord
             [['url', 'name', 'icon', 'bg', 'class'], 'string', 'max' => 255],
             [['room_id'], 'exist', 'skipOnError' => true, 'targetClass' => Room::className(), 'targetAttribute' => ['room_id' => 'id']],
             [['board_id'], 'exist', 'skipOnError' => true, 'targetClass' => Board::className(), 'targetAttribute' => ['board_id' => 'id']],
+            [['sort_order'], 'default', 'value' => 0],
         ];
     }
 
@@ -78,6 +79,7 @@ class Item extends ActiveRecord
             'room_id' => Yii::t('app', 'Комната'),
             'board_id' => Yii::t('app', 'Плата'),
             'url' => Yii::t('app', 'Url'),
+            'pin' => Yii::t('app', 'Pin'),
             'name' => Yii::t('app', 'Название'),
             'icon' => Yii::t('app', 'Иконка'),
             'bg' => Yii::t('app', 'Фон'),

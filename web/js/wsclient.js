@@ -10,6 +10,9 @@ function initWebSocket() {
     WS = new WebSocket(wsURL);
 
     WS.onmessage = onMessage;
+    WS.close(function () {
+        showErrorMessage('Невозможно подключиться к серверу');
+    });
 }
 
 function onMessage(e) {

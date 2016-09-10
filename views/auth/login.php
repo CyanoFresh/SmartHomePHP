@@ -8,6 +8,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
 $this->title = 'Авторизация';
+$this->params['body-class'] = 'login-page';
 
 $fieldOptions1 = [
     'options' => ['class' => 'form-group has-feedback'],
@@ -28,7 +29,7 @@ $fieldOptions2 = [
             <span>Solomaha</span> Home
         </div>
 
-        <hr>
+<!--        <hr>-->
 
         <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientValidation' => false]); ?>
 

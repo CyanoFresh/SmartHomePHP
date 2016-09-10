@@ -19,7 +19,7 @@ class RoomSearch extends Room
     {
         return [
             [['id'], 'integer'],
-            [['name'], 'safe'],
+            [['name', 'bg'], 'safe'],
         ];
     }
 
@@ -62,7 +62,8 @@ class RoomSearch extends Room
             'id' => $this->id,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'bg', $this->bg]);
 
         return $dataProvider;
     }

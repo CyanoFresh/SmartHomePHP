@@ -7,7 +7,8 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-$this->title = 'Boards';
+
+$this->title = 'Устройства';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="board-index">
@@ -26,7 +27,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'id',
             'name',
-            'baseUrl',
+            [
+                'attribute' => 'type',
+                'value' => function (\app\models\Board $model) {
+                    return $model->getTypeLabel();
+                }
+            ],
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

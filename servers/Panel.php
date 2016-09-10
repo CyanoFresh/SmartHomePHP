@@ -41,9 +41,9 @@ class Panel implements MessageComponentInterface
     protected $board_clients;
 
     /**
-     * @var Item[]
+     * @var array
      */
-    protected $items;
+    protected $item_values;
 
     /**
      * Class constructor.
@@ -58,6 +58,7 @@ class Panel implements MessageComponentInterface
         $this->loop = $loop;
         $this->user_clients = [];
         $this->board_clients = [];
+        $this->item_values = [];
 
         // Database driver hack: Prevent MySQL for disconnecting by timeout
         Yii::$app->db->createCommand('SET SESSION wait_timeout = 2147483;')->execute();
@@ -65,18 +66,18 @@ class Panel implements MessageComponentInterface
             Yii::$app->db->createCommand('SHOW TABLES;')->execute();
         });
 
-        /** @var Item[] $items */
-        $items = Item::find()->all();
-
-        foreach ($items as $item) {
-            $this->items[$item->id] = $item;
-
+//        /** @var Item[] $items */
+//        $items = Item::find()->all();
+//
+//        foreach ($items as $item) {
+//            $this->item_values[$item->id] = $item;
+//
 //            if ($item->save_history_interval > 0) {
 //                $this->loop->addPeriodicTimer($item->save_history_interval, function () use ($item) {
 //                    $this->saveHistory($item);
 //                });
 //            }
-        }
+//        }
 
         $this->log('Server started');
     }
@@ -117,7 +118,7 @@ class Panel implements MessageComponentInterface
 
                 $conn->send(Json::encode([
                     'type' => 'init',
-                    'items' => $this->items,
+                    'items' => $this->item_values,
                 ]));
 
                 return $this->log("Connected user [{$user->id}] {$user->username}");
@@ -254,7 +255,7 @@ class Panel implements MessageComponentInterface
                     return false;
                 }
 
-                $this->items[$item->id]->value = $data['value'];
+                $this->item_values[$item->id] = $data['value'];
 
                 $this->sendUsers([
                     'type' => 'value',

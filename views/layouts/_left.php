@@ -24,7 +24,7 @@
                     ['label' => 'Настройки', 'options' => ['class' => 'header']],
                     ['label' => 'Элементы', 'icon' => 'fa fa-cubes', 'url' => ['/item/index']],
                     ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/room/index']],
-                    ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/history/index']],
+//                    ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/history/index']],
                     ['label' => 'Платы', 'icon' => 'fa fa-bolt', 'url' => ['/board/index']],
                     ['label' => 'Пользователи', 'icon' => 'fa fa-users', 'url' => ['/user/index']],
 

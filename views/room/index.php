@@ -7,7 +7,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-$this->title = 'Rooms';
+$this->title = 'Комнаты';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="room-index">
