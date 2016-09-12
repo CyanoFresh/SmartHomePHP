@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e84f77301a8bec4a012ca7834606f886",
-    "content-hash": "7067023d3309598cbb1d5d2a5ffa3e3f",
+    "hash": "2be324c2b8696ab21a67e298d066020b",
+    "content-hash": "51dfcbf9d2451a7b2de5180d705142c9",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -1180,6 +1180,51 @@
                 "yii2"
             ],
             "time": "2016-08-03 15:13:16"
+        },
+        {
+            "name": "shifrin/yii2-noty",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Shifrin/yii2-noty.git",
+                "reference": "a818379e79a7ea218b58cb4efc01cc2f45f40d4f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Shifrin/yii2-noty/zipball/a818379e79a7ea218b58cb4efc01cc2f45f40d4f",
+                "reference": "a818379e79a7ea218b58cb4efc01cc2f45f40d4f",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/noty": "^2.3",
+                "yiisoft/yii2": ">=2.0.6"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "shifrin\\noty\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mohammed Shifreen",
+                    "email": "mshifreen@gmail.com"
+                }
+            ],
+            "description": "Yii widget for Noty jQuery notification plugin",
+            "keywords": [
+                "alert",
+                "flash",
+                "message",
+                "notification",
+                "noty",
+                "yii2"
+            ],
+            "time": "2016-02-21 06:48:51"
         },
         {
             "name": "swiftmailer/swiftmailer",

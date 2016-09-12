@@ -20,5 +20,6 @@ class AppAsset extends AssetBundle
         'yii\bootstrap\BootstrapAsset',
         'rmrevin\yii\fontawesome\AssetBundle',
         'dmstr\web\AdminLteAsset',
+        'shifrin\noty\NotyAsset',
     ];
 }

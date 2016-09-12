@@ -6,7 +6,7 @@ use yii\widgets\Breadcrumbs;
 use dmstr\widgets\Alert;
 
 ?>
-
+<div class="shadow-wrapper">
 <div class="content-wrapper">
     <section class="content-header">
         <?php if (isset($this->blocks['content-header'])) { ?>
@@ -52,6 +52,7 @@ use dmstr\widgets\Alert;
     <span class="product-font"><span>Smart</span> Home</span> by <a href="//solomaha.com" target="_blank">Alex
         Solomaha</a>
 </footer>
+</div>
 
 <!-- Control Sidebar -->
 <aside class="control-sidebar control-sidebar-dark">

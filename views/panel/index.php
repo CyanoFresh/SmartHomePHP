@@ -13,7 +13,12 @@ $this->params['not-boxed'] = true;
 WSClientAsset::register($this);
 ?>
 
+<div class="loader">
+    Подключение...
+</div>
+
 <div class="control-panel">
+
     <?php foreach (Room::find()->all() as $room): ?>
         <div class="box control-panel-room box-<?= $room->bg ?>" data-room-id="<?= $room->id ?>">
             <div class="box-header with-border">
@@ -42,7 +47,10 @@ WSClientAsset::register($this);
                         <div class="col-md-3 col-sm-4 control-panel-item item-switch"
                              data-item-id="<?= $item->id ?>">
                             <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
-                                <span class="info-box-icon"><i class="fa fa-<?= $item->icon ?>"></i></span>
+                                <div class="info-box-action material-switch">
+                                    <input id="someSwitchOptionDefault" type="checkbox" data-item-id="<?= $item->id ?>">
+                                    <label for="someSwitchOptionDefault" class="label-default"></label>
+                                </div>
 
                                 <div class="info-box-content">
                                     <span class="info-box-text"><?= $item->name ?></span>

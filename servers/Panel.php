@@ -88,6 +88,7 @@ class Panel implements MessageComponentInterface
 
         // Handle connection by type
         $type = $query->get('type');
+        $this->log('New connection...');
 
         switch ($type) {
             case 'user':
@@ -123,10 +124,13 @@ class Panel implements MessageComponentInterface
 
                 return $this->log("Connected user [{$user->id}] {$user->username}");
             case 'board':
+                $this->log('Authenticating board...');
+
                 $boardID = $query->get('id');
                 $boardSecret = $query->get('secret');
 
                 if (!$boardID or !$boardSecret) {
+                    $this->log('Wrong login data!');
                     return $conn->close();
                 }
 
@@ -137,6 +141,7 @@ class Panel implements MessageComponentInterface
                 ]);
 
                 if (!$board) {
+                    $this->log('Not found!');
                     return $conn->close();
                 }
 
@@ -206,26 +211,6 @@ class Panel implements MessageComponentInterface
                 return $this->handleTurnOn($from, $user, $data);
             case 'turnOFF':
                 return $this->handleTurnOff($from, $user, $data);
-            /*case 'switch':
-                $item_id = $data['item_id'];
-                $item = Item::findOne($item_id);
-
-                if (!$item) {
-                    return false;
-                }
-
-                $board = $item->board;
-
-                if ($board->type === Board::TYPE_WEBSOCKET) {
-                    if (isset($this->board_clients[$board->id])) {
-                        $this->board_clients[$board->id]->send(Json::encode([
-                            'type' => 'switch',
-                            'pin' => $item->pin,
-                        ]));
-                    }
-                }
-
-                break;*/
         }
 
         return false;
@@ -257,10 +242,17 @@ class Panel implements MessageComponentInterface
 
                 $this->item_values[$item->id] = $data['value'];
 
+                if ($item->type === Item::TYPE_SWITCH) {
+                    $value = $data['value'] === 0 ? false : true;
+                } else {
+                    $value = $data['value'];
+                }
+
                 $this->sendUsers([
                     'type' => 'value',
                     'item_id' => $item->id,
-                    'value' => $data['value'],
+                    'item_type' => $item->type,
+                    'value' => $value,
                 ]);
 
                 break;
@@ -277,7 +269,7 @@ class Panel implements MessageComponentInterface
      */
     protected function handleTurnOn(ConnectionInterface $from, $user, $data)
     {
-        $this->log('handle turn on ');
+        $this->log('handle turn on');
 
         $item_id = (int)$data['item_id'];
 
@@ -299,21 +291,26 @@ class Panel implements MessageComponentInterface
 
         $board = $item->board;
 
-        if ($board->type === Board::TYPE_AREST) {
-            $api = new ApiHelper($item);
-            $result = $api->turnOn();
-        } elseif ($board->type === Board::TYPE_WEBSOCKET) {
-            $result = $this->sendToBoard($board->id, [
-                'type' => 'turnON',
-                'pin' => $item->pin,
-            ]);
-        }
+        switch ($board->type) {
+            case Board::TYPE_AREST:
+                $api = new ApiHelper($item);
+                $api->turnOn();
 
-        if (!$result) {
-            return $from->send(Json::encode([
-                'type' => 'error',
-                'message' => 'Не получилось включить: устройство не подключено',
-            ]));
+                break;
+            case Board::TYPE_WEBSOCKET:
+                if (!$this->isBoardConnected($board->id)) {
+                    return $from->send(Json::encode([
+                        'type' => 'error',
+                        'message' => 'Не получилось включить: устройство не подключено',
+                    ]));
+                }
+
+                $this->sendToBoard($board->id, [
+                    'type' => 'turnON',
+                    'pin' => $item->pin,
+                ]);
+
+                break;
         }
 
         return true;
@@ -431,5 +428,10 @@ class Panel implements MessageComponentInterface
         $history->value = $value;
 
         return $history->save();
+    }
+
+    private function isBoardConnected($boardID)
+    {
+        return isset($this->board_clients[$boardID]);
     }
 }
