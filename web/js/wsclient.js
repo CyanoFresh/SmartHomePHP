@@ -7,8 +7,18 @@ function log(msg) {
     console.log(msg);
 }
 
-function showErrorMessage(message) {
+function showErrorMessage(message, title) {
     log(message);
+
+    var stack_bottomright = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
+
+    new PNotify({
+        title: 'Ошибка',
+        text: message,
+        type: 'error',
+        addclass: "stack-bottomright",
+        stack: stack_bottomright
+    });
 }
 
 function initWebSocket(callback) {
@@ -18,10 +28,12 @@ function initWebSocket(callback) {
     WS.onopen = callback;
     WS.onclose = function () {
         if (WSopened) {
+            $('.loader-backdrop').fadeIn();
             showErrorMessage('Потеряно соединение');
         } else {
-            showErrorMessage('Невозможно подключиться к серверу');
-            $('.loader').html('Ошибка: не удается подключиться к серверу')
+            $('.loader').fadeOut(function () {
+                $(this).html('Не удается подключиться к серверу').fadeIn();
+            });
         }
     };
 }
@@ -33,6 +45,9 @@ function onMessage(e) {
         log(data);
 
         switch (data.type) {
+            case 'init':
+
+                break;
             case 'value':
                 updateValue(data);
                 break;
@@ -47,12 +62,11 @@ function onMessage(e) {
 }
 
 function send(msg) {
-    log('Sending:');
-    log(msg);
-
     if (typeof msg != "string") {
         msg = JSON.stringify(msg);
     }
+
+    log(msg);
 
     if (WS && WS.readyState == 1) {
         WS.send(msg);
@@ -78,14 +92,27 @@ function updateValue(data) {
             }
 
             break;
+        case 26:    // Variable boolean
+            var $div = $('.item-variable[data-item-id="' + data.item_id + '"]');
+            var $item_value = $div.find('.item-value');
+
+            if (data.value == 1) {
+                $item_value.html('ОТКРЫТО');
+            } else {
+                $item_value.html('ЗАКРЫТО');
+            }
+
+            break;
     }
 }
 
 $(document).ready(function () {
+    PNotify.prototype.options.styling = "fontawesome";
+
     initWebSocket(function () {
         WSopened = true;
 
-        $('.loader').fadeOut();
+        $('.loader-backdrop').fadeOut();
 
         $('input[type="checkbox"]').click(function (e) {
             e.preventDefault();
@@ -98,14 +125,14 @@ $(document).ready(function () {
 
         // Delegate click on block to checkbox
         /*$('.item-switch .info-box').click(function (e) {
-            var $target = $(e.target);
+         var $target = $(e.target);
 
-            if ($target.is('input[type="checkbox"]')) {
-                return false;
-            }
+         if ($target.is('input[type="checkbox"]')) {
+         return false;
+         }
 
-            var $checkbox = $(this).find('input[type="checkbox"]');
-            $checkbox.click();
-        });*/
+         var $checkbox = $(this).find('input[type="checkbox"]');
+         $checkbox.click();
+         });*/
     });
 });

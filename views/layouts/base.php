@@ -10,6 +10,12 @@ use app\assets\AppAsset;
 
 AppAsset::register($this);
 AdminLteAsset::register($this);
+
+if (isset($this->params['body-class'])) {
+    $bodyClass = $this->params['body-class'];
+} else {
+    $bodyClass = null;
+}
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -24,7 +30,7 @@ AdminLteAsset::register($this);
     <?php $this->head() ?>
 </head>
 
-<body class="hold-transition <?= AdminLteHelper::skinClass() ?> <?= $this->params['body-class'] ?> sidebar-mini">
+<body class="hold-transition <?= AdminLteHelper::skinClass() ?> <?= $bodyClass ?> sidebar-mini">
 <?php $this->beginBody() ?>
 
 <?= $content ?>

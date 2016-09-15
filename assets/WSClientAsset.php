@@ -17,6 +17,7 @@ class WSClientAsset extends AssetBundle
     ];
     public $depends = [
         'app\assets\AppAsset',
+        'app\assets\PNotifyAsset',
         'yii\web\JqueryAsset',
     ];
 }

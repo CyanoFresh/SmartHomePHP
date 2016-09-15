@@ -12,6 +12,7 @@ use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
 use Yii;
 use yii\helpers\Json;
+use yii\helpers\VarDumper;
 
 /**
  * Class Panel
@@ -46,6 +47,11 @@ class Panel implements MessageComponentInterface
     protected $item_values;
 
     /**
+     * @var Item[]
+     */
+    protected $items;
+
+    /**
      * Class constructor.
      *
      * Init variables, etc.
@@ -59,6 +65,7 @@ class Panel implements MessageComponentInterface
         $this->user_clients = [];
         $this->board_clients = [];
         $this->item_values = [];
+        $this->items = [];
 
         // Database driver hack: Prevent MySQL for disconnecting by timeout
         Yii::$app->db->createCommand('SET SESSION wait_timeout = 2147483;')->execute();
@@ -66,10 +73,18 @@ class Panel implements MessageComponentInterface
             Yii::$app->db->createCommand('SHOW TABLES;')->execute();
         });
 
-//        /** @var Item[] $items */
-//        $items = Item::find()->all();
-//
-//        foreach ($items as $item) {
+        /** @var Item[] $items */
+        $items = Item::find()->asArray()->all();
+
+        foreach ($items as $item) {
+            switch ($item['type']) {
+                case Item::TYPE_SWITCH:
+                    $item['value'] = false;
+
+                    $this->items[$item['id']] = $item;
+
+                    break;
+            }
 //            $this->item_values[$item->id] = $item;
 //
 //            if ($item->save_history_interval > 0) {
@@ -77,7 +92,7 @@ class Panel implements MessageComponentInterface
 //                    $this->saveHistory($item);
 //                });
 //            }
-//        }
+        }
 
         $this->log('Server started');
     }
@@ -119,7 +134,7 @@ class Panel implements MessageComponentInterface
 
                 $conn->send(Json::encode([
                     'type' => 'init',
-                    'items' => $this->item_values,
+                    'items' => $this->items,
                 ]));
 
                 return $this->log("Connected user [{$user->id}] {$user->username}");
@@ -154,7 +169,9 @@ class Panel implements MessageComponentInterface
                 $conn->Board = $board;
                 $this->board_clients[$board->id] = $conn;
 
-                return $this->log("Connected board [{$board->id}]");
+                $this->log("Connected board [{$board->id}]");
+
+                return true;
         }
 
         return false;
@@ -163,9 +180,9 @@ class Panel implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg)
     {
         $this->log('new message ' . $msg);
-        if ($from->User) {
+        if (isset($from->User)) {
             return $this->handleUserMessage($from, $msg);
-        } elseif ($from->Board) {
+        } elseif (isset($from->Board)) {
             return $this->handleBoardMessage($from, $msg);
         }
 
@@ -180,11 +197,11 @@ class Panel implements MessageComponentInterface
             $conn->User->generateAuthKey();
             $conn->User->save();
 
-            $this->log("User [{$conn->User->id} disconnected]");
+            $this->log("User [{$conn->User->id}] disconnected");
         } elseif (isset($conn->Board)) {
             unset($this->board_clients[$conn->Board->id]);
 
-            $this->log("Board [{$conn->Board->id} disconnected]");
+            $this->log("Board [{$conn->Board->id}] disconnected");
         }
     }
 
@@ -240,7 +257,7 @@ class Panel implements MessageComponentInterface
                     return false;
                 }
 
-                $this->item_values[$item->id] = $data['value'];
+                $this->items[$item->id]['value'] = $data['value'];
 
                 if ($item->type === Item::TYPE_SWITCH) {
                     $value = $data['value'] === 0 ? false : true;
@@ -254,6 +271,34 @@ class Panel implements MessageComponentInterface
                     'item_type' => $item->type,
                     'value' => $value,
                 ]);
+
+                break;
+            case 'values':
+                unset($data['type']);
+
+                foreach ($data as $pin => $value) {
+                    $item = Item::findOne([
+                        'board_id' => $board->id,
+                        'pin' => $pin,
+                    ]);
+
+                    if (!$item) {
+                        return $this->log('Trying to use unknown item');
+                    }
+
+                    $this->items[$item->id]['value'] = $value;
+
+                    if ($item->type === Item::TYPE_SWITCH) {
+                        $value = $value === 0 ? false : true;
+                    }
+
+                    $this->sendUsers([
+                        'type' => 'value',
+                        'item_id' => $item->id,
+                        'item_type' => $item->type,
+                        'value' => $value,
+                    ]);
+                }
 
                 break;
         }

@@ -13,6 +13,8 @@ use yii\db\ActiveRecord;
  * @property string $name
  * @property string $secret
  * @property string $baseUrl
+ *
+ * @property Item[] $items
  */
 class Board extends ActiveRecord
 {

@@ -13,8 +13,10 @@ $this->params['not-boxed'] = true;
 WSClientAsset::register($this);
 ?>
 
-<div class="loader">
-    Подключение...
+<div class="loader-backdrop">
+    <div class="loader">
+        <div class="loader-animation"><span></span><span></span><span></span></div>
+    </div>
 </div>
 
 <div class="control-panel">
@@ -48,8 +50,8 @@ WSClientAsset::register($this);
                              data-item-id="<?= $item->id ?>">
                             <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
                                 <div class="info-box-action material-switch">
-                                    <input id="someSwitchOptionDefault" type="checkbox" data-item-id="<?= $item->id ?>">
-                                    <label for="someSwitchOptionDefault" class="label-default"></label>
+                                    <input id="switch-for-item-<?= $item->id ?>" type="checkbox" data-item-id="<?= $item->id ?>">
+                                    <label for="switch-for-item-<?= $item->id ?>" class="label-default"></label>
                                 </div>
 
                                 <div class="info-box-content">

@@ -13,7 +13,8 @@
     "himiklab/yii2-recaptcha-widget": "*",
     "dmstr/yii2-adminlte-asset": "2.*",
     "linslin/yii2-curl": "1.0.8",
-    "shifrin/yii2-noty": "^1.0"
+    "shifrin/yii2-noty": "^1.0",
+    "bower-asset/pnotify": "^3.0"
   },
   "require-dev": {
     "yiisoft/yii2-codeception": "*",

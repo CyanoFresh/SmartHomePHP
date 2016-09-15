@@ -36,7 +36,7 @@ use dmstr\widgets\Alert;
     <section class="content">
         <?= Alert::widget() ?>
 
-        <?php if (!$this->params['not-boxed']): ?>
+        <?php if (!isset($this->params['not-boxed']) or !$this->params['not-boxed']): ?>
             <div class="box">
                 <div class="box-body">
                     <?= $content ?>
