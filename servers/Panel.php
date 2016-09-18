@@ -246,6 +246,7 @@ class Panel implements MessageComponentInterface
 
         switch ($data['type']) {
             case 'value':
+                $value = $data['value'];
                 $pin = (integer)$data['pin'];
 
                 $item = Item::findOne([
@@ -257,13 +258,11 @@ class Panel implements MessageComponentInterface
                     return false;
                 }
 
-                $this->items[$item->id]['value'] = $data['value'];
-
                 if ($item->type === Item::TYPE_SWITCH) {
                     $value = $data['value'] === 0 ? false : true;
-                } else {
-                    $value = $data['value'];
                 }
+
+                $this->items[$item->id]['value'] = $value;
 
                 $this->sendUsers([
                     'type' => 'value',
@@ -286,11 +285,11 @@ class Panel implements MessageComponentInterface
                         return $this->log('Trying to use unknown item');
                     }
 
-                    $this->items[$item->id]['value'] = $value;
-
                     if ($item->type === Item::TYPE_SWITCH) {
                         $value = $value === 0 ? false : true;
                     }
+
+                    $this->items[$item->id]['value'] = $value;
 
                     $this->sendUsers([
                         'type' => 'value',

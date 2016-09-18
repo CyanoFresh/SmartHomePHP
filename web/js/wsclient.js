@@ -8,14 +8,24 @@ function log(msg) {
 }
 
 function showErrorMessage(message, title) {
-    log(message);
-
     var stack_bottomright = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
 
     new PNotify({
         title: 'Ошибка',
         text: message,
         type: 'error',
+        addclass: "stack-bottomright",
+        stack: stack_bottomright
+    });
+}
+
+function showSuccessMessage(message, title) {
+    var stack_bottomright = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
+
+    new PNotify({
+        title: title == null ? 'Операция успешна' : title,
+        text: message,
+        type: 'success',
         addclass: "stack-bottomright",
         stack: stack_bottomright
     });
@@ -46,6 +56,11 @@ function onMessage(e) {
 
         switch (data.type) {
             case 'init':
+                $.each(data.items, function (key, value) {
+                    updateItemValue(value.id, value.type, value.value)
+                });
+
+                afterConnected();
 
                 break;
             case 'value':
@@ -61,6 +76,12 @@ function onMessage(e) {
     }
 }
 
+function afterConnected() {
+    WSopened = true;
+
+    $('.loader-backdrop').fadeOut();
+}
+
 function send(msg) {
     if (typeof msg != "string") {
         msg = JSON.stringify(msg);
@@ -74,29 +95,33 @@ function send(msg) {
 }
 
 function updateValue(data) {
-    switch (data.item_type) {
+    updateItemValue(data.item_id, data.item_type, data.value);
+}
+
+function updateItemValue(id, type, value) {
+    type = parseInt(type);
+
+    switch (type) {
         case 10:    // Switch
-            $('input[type="checkbox"][data-item-id="' + data.item_id + '"]').change().prop('checked', data.value);
+            $('.item-switch-checkbox[data-item-id="' + id + '"]').prop('checked', value);
             break;
         case 20:    // Variable
-            $('.item-variable[data-item-id="' + data.item_id + '"]').find('.item-value').html(data.value);
+            $('.item-variable[data-item-id="' + id + '"]').find('.item-value').html(value);
             break;
         case 25:    // Variable boolean
-            var $div = $('.item-variable[data-item-id="' + data.item_id + '"]');
-            var $item_value = $div.find('.item-value');
+            var $item_value = $('.item-variable[data-item-id="' + id + '"]').find('.item-value');
 
-            if (data.value == 1) {
+            if (value) {
                 $item_value.html('ДА');
             } else {
                 $item_value.html('НЕТ');
             }
 
             break;
-        case 26:    // Variable boolean
-            var $div = $('.item-variable[data-item-id="' + data.item_id + '"]');
-            var $item_value = $div.find('.item-value');
+        case 26:    // Variable boolean door
+            var $item_value = $('.item-variable[data-item-id="' + id + '"]').find('.item-value');
 
-            if (data.value == 1) {
+            if (value) {
                 $item_value.html('ОТКРЫТО');
             } else {
                 $item_value.html('ЗАКРЫТО');
@@ -110,29 +135,27 @@ $(document).ready(function () {
     PNotify.prototype.options.styling = "fontawesome";
 
     initWebSocket(function () {
-        WSopened = true;
-
-        $('.loader-backdrop').fadeOut();
-
-        $('input[type="checkbox"]').click(function (e) {
+        $('input[type="checkbox"].item-switch-checkbox').click(function (e) {
             e.preventDefault();
 
+            var item_id = $(this).data('item-id');
+            var action = $(this).prop('checked') ? 'turnON' : 'turnOFF';
+
             send({
-                "type": $(this).prop('checked') ? 'turnON' : 'turnOFF',
-                "item_id": $(this).data('item-id')
+                "type": action,
+                "item_id": item_id
             });
         });
 
         // Delegate click on block to checkbox
-        /*$('.item-switch .info-box').click(function (e) {
-         var $target = $(e.target);
+        $('.item-switch .info-box').click(function (e) {
+            e.preventDefault();
 
-         if ($target.is('input[type="checkbox"]')) {
-         return false;
-         }
+            if ($(e.target).is('.item-switch-checkbox')) {
+                return false;
+            }
 
-         var $checkbox = $(this).find('input[type="checkbox"]');
-         $checkbox.click();
-         });*/
+            $(this).find('.item-switch-checkbox').click();
+        });
     });
 });

@@ -50,7 +50,7 @@ WSClientAsset::register($this);
                              data-item-id="<?= $item->id ?>">
                             <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
                                 <div class="info-box-action material-switch">
-                                    <input id="switch-for-item-<?= $item->id ?>" type="checkbox" data-item-id="<?= $item->id ?>">
+                                    <input id="switch-for-item-<?= $item->id ?>" class="item-switch-checkbox" type="checkbox" data-item-id="<?= $item->id ?>">
                                     <label for="switch-for-item-<?= $item->id ?>" class="label-default"></label>
                                 </div>
 
