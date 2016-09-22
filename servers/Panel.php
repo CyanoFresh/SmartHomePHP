@@ -282,7 +282,7 @@ class Panel implements MessageComponentInterface
                 ]);
 
                 if (!$item) {
-                    return false;
+                    return $this->log('Trying to use unknown item');
                 }
 
                 if (in_array($item->type, [
@@ -291,6 +291,24 @@ class Panel implements MessageComponentInterface
                     Item::TYPE_VARIABLE_BOOLEAN_DOOR,
                 ])) {
                     $value = $this->valueToBoolean($data['value']);
+                }
+
+                if ($item->type === Item::TYPE_VARIABLE_BOOLEAN_DOOR) {
+                    curl_setopt_array($ch = curl_init(), array(
+                        CURLOPT_URL => "https://pushall.ru/api.php",
+                        CURLOPT_POSTFIELDS => array(
+                            "type" => "self",
+                            "id" => Yii::$app->params['pushAllID'],
+                            "key" => Yii::$app->params['pushAllKey'],
+                            "text" => $value ? "Дверь открыта" : "Дверь закрыта",
+                            "title" => "Сигнализация на двери"
+                        ),
+                        CURLOPT_RETURNTRANSFER => true
+                    ));
+                    $return = curl_exec($ch); //получить ответ или ошибку
+                    curl_close($ch);
+
+                    $this->log($return);
                 }
 
                 $this->items[$item->id]['value'] = $value;
