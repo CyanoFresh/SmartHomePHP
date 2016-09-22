@@ -4,6 +4,7 @@
 /* @var $searchModel app\models\ItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+use app\models\Item;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
@@ -27,7 +28,21 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'id',
             'name',
-            'icon',
+            [
+                'attribute' => 'board_id',
+                'value' => function ($model) {
+                    /** @var $model Item */
+                    return $model->board->name;
+                },
+            ],
+            [
+                'filter' => Item::getTypesArray(),
+                'attribute' => 'type',
+                'value' => function ($model) {
+                    /** @var $model Item */
+                    return $model->getTypeLabel();
+                },
+            ],
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

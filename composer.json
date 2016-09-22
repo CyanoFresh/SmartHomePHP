@@ -14,7 +14,8 @@
     "dmstr/yii2-adminlte-asset": "2.*",
     "linslin/yii2-curl": "1.0.8",
     "shifrin/yii2-noty": "^1.0",
-    "bower-asset/pnotify": "^3.0"
+    "bower-asset/pnotify": "^3.0",
+    "devristo/phpws": "dev-master"
   },
   "require-dev": {
     "yiisoft/yii2-codeception": "*",
@@ -25,6 +26,12 @@
   "config": {
     "process-timeout": 1800
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/Devristo/phpws"
+    }
+  ],
   "extra": {
     "asset-installer-paths": {
       "npm-asset-library": "vendor/npm",

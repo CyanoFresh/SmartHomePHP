@@ -21,6 +21,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'status')->dropDownList(User::getStatusesArray()) ?>
 
+    <?= $form->field($model, 'api_key')->textInput() ?>
+
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить', [
             'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary'

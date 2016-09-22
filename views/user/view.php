@@ -34,6 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'status',
                 'value' => $model->getStatusLabel(),
             ],
+            'api_key',
             'created_at:datetime',
             'updated_at:datetime',
         ],

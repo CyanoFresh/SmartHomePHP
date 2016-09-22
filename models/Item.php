@@ -130,4 +130,9 @@ class Item extends ActiveRecord
             self::TYPE_VARIABLE_BOOLEAN_DOOR => 'Переменная булев дверь',
         ];
     }
+
+    public function getTypeLabel()
+    {
+        return self::getTypesArray()[$this->type];
+    }
 }

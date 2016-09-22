@@ -79,13 +79,14 @@ class Panel implements MessageComponentInterface
         foreach ($items as $item) {
             switch ($item['type']) {
                 case Item::TYPE_SWITCH:
+                case Item::TYPE_VARIABLE_BOOLEAN:
+                case Item::TYPE_VARIABLE_BOOLEAN_DOOR:
                     $item['value'] = false;
 
                     $this->items[$item['id']] = $item;
 
                     break;
             }
-//            $this->item_values[$item->id] = $item;
 //
 //            if ($item->save_history_interval > 0) {
 //                $this->loop->addPeriodicTimer($item->save_history_interval, function () use ($item) {
@@ -99,14 +100,16 @@ class Panel implements MessageComponentInterface
 
     public function onOpen(ConnectionInterface $conn)
     {
+        $this->log('Managing new connection...');
+
         $query = $conn->WebSocket->request->getQuery();
 
-        // Handle connection by type
         $type = $query->get('type');
-        $this->log('New connection...');
 
         switch ($type) {
             case 'user':
+                $this->log('Connection type is User. Authenticating...');
+
                 $userID = $query->get('id');
                 $userAuthKey = $query->get('auth_key');
 
@@ -139,7 +142,7 @@ class Panel implements MessageComponentInterface
 
                 return $this->log("Connected user [{$user->id}] {$user->username}");
             case 'board':
-                $this->log('Authenticating board...');
+                $this->log('Connection type is Board. Authenticating...');
 
                 $boardID = $query->get('id');
                 $boardSecret = $query->get('secret');
@@ -160,26 +163,48 @@ class Panel implements MessageComponentInterface
                     return $conn->close();
                 }
 
-                // Close previous connection
-                if (isset($this->board_clients[$board->id])) {
-                    $this->board_clients[$board->id]->close();
-                }
-
                 // Attach to boards
                 $conn->Board = $board;
                 $this->board_clients[$board->id] = $conn;
 
-                $this->log("Connected board [{$board->id}]");
+                return $this->log("Connected board [{$board->id}]");
+            case 'api_user':
+                $this->log('Connection type is API User. Authenticating...');
 
-                return true;
+                $userID = $query->get('id');
+                $userAuthKey = $query->get('auth_key');
+
+                if (!$userID or !$userAuthKey) {
+                    return $conn->close();
+                }
+
+                $user = User::findOne([
+                    'id' => $userID,
+                    'auth_key' => $userAuthKey,
+                ]);
+
+                if (!$user) {
+                    return $conn->close();
+                }
+
+                // Attach to users
+                $conn->api_user = true;
+                $conn->User = $user;
+
+                return $this->log("Connected API User [{$user->id}]");
         }
 
-        return false;
+        return $this->log('Connection has unknown type. Disconnect');
     }
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        $this->log('new message ' . $msg);
+        $this->log('Message received: ' . $msg);
+
+//        if ($from->api_user) {
+//            return $this->handleApiUserMessage($from, $msg);
+//        }
+
         if (isset($from->User)) {
             return $this->handleUserMessage($from, $msg);
         } elseif (isset($from->Board)) {
@@ -192,7 +217,9 @@ class Panel implements MessageComponentInterface
     public function onClose(ConnectionInterface $conn)
     {
         if (isset($conn->User)) {
-            unset($this->user_clients[$conn->User->id]);
+            if (!$conn->api_user) {
+                unset($this->user_clients[$conn->User->id]);
+            }
 
             $conn->User->generateAuthKey();
             $conn->User->save();
@@ -258,8 +285,12 @@ class Panel implements MessageComponentInterface
                     return false;
                 }
 
-                if ($item->type === Item::TYPE_SWITCH) {
-                    $value = $data['value'] === 0 ? false : true;
+                if (in_array($item->type, [
+                    Item::TYPE_SWITCH,
+                    Item::TYPE_VARIABLE_BOOLEAN,
+                    Item::TYPE_VARIABLE_BOOLEAN_DOOR,
+                ])) {
+                    $value = $this->valueToBoolean($data['value']);
                 }
 
                 $this->items[$item->id]['value'] = $value;
@@ -285,7 +316,11 @@ class Panel implements MessageComponentInterface
                         return $this->log('Trying to use unknown item');
                     }
 
-                    if ($item->type === Item::TYPE_SWITCH) {
+                    if (in_array($item->type, [
+                        Item::TYPE_SWITCH,
+                        Item::TYPE_VARIABLE_BOOLEAN,
+                        Item::TYPE_VARIABLE_BOOLEAN_DOOR,
+                    ])) {
                         $value = $value === 0 ? false : true;
                     }
 
@@ -313,8 +348,6 @@ class Panel implements MessageComponentInterface
      */
     protected function handleTurnOn(ConnectionInterface $from, $user, $data)
     {
-        $this->log('handle turn on');
-
         $item_id = (int)$data['item_id'];
 
         $item = Item::findOne($item_id);
@@ -477,5 +510,16 @@ class Panel implements MessageComponentInterface
     private function isBoardConnected($boardID)
     {
         return isset($this->board_clients[$boardID]);
+    }
+
+    private function valueToBoolean($value)
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value)) {
+            return $value === 0 ? false : true;
+        }
     }
 }

@@ -16,7 +16,9 @@ use yii\web\IdentityInterface;
  * @property string $password_hash
  * @property string $email
  * @property string $auth_key
+ * @property string $api_key
  * @property integer $status
+ * @property integer $group
  * @property integer $created_at
  * @property integer $updated_at
  *
@@ -26,6 +28,9 @@ class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
+
+    const GROUP_ADMIN = 10;
+    const GROUP_USER = 20;
 
     public $password;
 
@@ -54,6 +59,8 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['username', 'email', 'password'], 'required'],
+            [['api_key'], 'string'],
+            [['group'], 'integer'],
             ['password', 'required', 'on' => 'create'],
             ['password', 'safe', 'on' => 'update'],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
@@ -72,6 +79,8 @@ class User extends ActiveRecord implements IdentityInterface
             'password' => 'Пароль',
             'email' => 'Email',
             'status' => 'Статус',
+            'group' => 'Группа',
+            'api_key' => 'API ключ',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата изменения',
         ];
