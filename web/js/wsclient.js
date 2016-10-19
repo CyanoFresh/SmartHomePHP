@@ -7,27 +7,21 @@ function log(msg) {
     console.log(msg);
 }
 
-function showErrorMessage(message, title) {
-    var stack_bottomright = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
-
-    new PNotify({
-        title: 'Ошибка',
+function showErrorMessage(message) {
+    return noty({
+        layout: 'bottomRight',
         text: message,
         type: 'error',
-        addclass: "stack-bottomright",
-        stack: stack_bottomright
+        theme: 'relax'
     });
 }
 
-function showSuccessMessage(message, title) {
-    var stack_bottomright = {"dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25};
-
-    new PNotify({
-        title: title == null ? 'Операция успешна' : title,
+function showSuccessMessage(message) {
+    return noty({
+        layout: 'bottomRight',
         text: message,
         type: 'success',
-        addclass: "stack-bottomright",
-        stack: stack_bottomright
+        theme: 'relax'
     });
 }
 
@@ -38,12 +32,15 @@ function initWebSocket(callback) {
     WS.onopen = callback;
     WS.onclose = function () {
         if (WSopened) {
-            $('.loader-backdrop').fadeIn();
-            showErrorMessage('Потеряно соединение');
-        } else {
-            $('.loader').fadeOut(function () {
-                $(this).html('Не удается подключиться к серверу').fadeIn();
+            log(1);
+            $('.loader-text').html('Отключен от сервера').fadeIn();
+
+            $('.control-panel').fadeOut(function () {
+                $('#loader').addClass('error').fadeIn();
             });
+        } else {
+            $('#loader').addClass('error');
+            $('.loader-text').html('Не удалось подключиться к серверу').fadeIn();
         }
     };
 }
@@ -79,7 +76,9 @@ function onMessage(e) {
 function afterConnected() {
     WSopened = true;
 
-    $('.loader-backdrop').fadeOut();
+    $('#loader').fadeOut(function () {
+        $('.control-panel').fadeIn();
+    });
 }
 
 function send(msg) {
@@ -106,7 +105,11 @@ function updateItemValue(id, type, value) {
             $('.item-switch-checkbox[data-item-id="' + id + '"]').prop('checked', value);
             break;
         case 20:    // Variable
-            $('.item-variable[data-item-id="' + id + '"]').find('.item-value').html(value);
+        case 21:    // Variable Temperature
+            $('.item-variable[data-item-id="' + id + '"]').find('.item-value').html(value + '°C');
+            break;
+        case 22:    // Variable Humidity
+            $('.item-variable[data-item-id="' + id + '"]').find('.item-value').html(value + "%");
             break;
         case 25:    // Variable boolean
             var $item_value = $('.item-variable[data-item-id="' + id + '"]').find('.item-value');
@@ -132,8 +135,6 @@ function updateItemValue(id, type, value) {
 }
 
 $(document).ready(function () {
-    PNotify.prototype.options.styling = "fontawesome";
-
     initWebSocket(function () {
         $('input[type="checkbox"].item-switch-checkbox').click(function (e) {
             e.preventDefault();

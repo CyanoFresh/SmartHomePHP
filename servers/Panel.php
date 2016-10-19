@@ -2,7 +2,6 @@
 
 namespace app\servers;
 
-use app\components\ApiHelper;
 use app\models\Board;
 use app\models\History;
 use app\models\Item;
@@ -11,8 +10,8 @@ use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
 use Yii;
+use yii\base\NotSupportedException;
 use yii\helpers\Json;
-use yii\helpers\VarDumper;
 
 /**
  * Class Panel
@@ -52,6 +51,16 @@ class Panel implements MessageComponentInterface
     protected $items;
 
     /**
+     * @var array
+     */
+    protected $isConnectedTimers;
+
+    /**
+     * @var array
+     */
+    protected $awaitingPing;
+
+    /**
      * Class constructor.
      *
      * Init variables, etc.
@@ -82,6 +91,13 @@ class Panel implements MessageComponentInterface
                 case Item::TYPE_VARIABLE_BOOLEAN:
                 case Item::TYPE_VARIABLE_BOOLEAN_DOOR:
                     $item['value'] = false;
+
+                    $this->items[$item['id']] = $item;
+
+                    break;
+                case Item::TYPE_VARIABLE_TEMPERATURE:
+                case Item::TYPE_VARIABLE_HUMIDITY:
+                    $item['value'] = 0;
 
                     $this->items[$item['id']] = $item;
 
@@ -167,6 +183,19 @@ class Panel implements MessageComponentInterface
                 $conn->Board = $board;
                 $this->board_clients[$board->id] = $conn;
 
+                $this->isConnectedTimers[$board->id] = $this->loop->addPeriodicTimer(180, function() use ($board) {
+                    if (isset($this->awaitingPing[$board->id])) {
+                        $this->board_clients[$board->id]->close();
+                        return $this->log("Board [{$board->id}] disconnected by timeout");
+                    }
+
+                    $this->awaitingPing[$board->id] = true;
+
+                    return $this->sendToBoard($board->id, [
+                        'type' => 'ping',
+                    ]);
+                });
+
                 return $this->log("Connected board [{$board->id}]");
             case 'api_user':
                 $this->log('Connection type is API User. Authenticating...');
@@ -187,7 +216,6 @@ class Panel implements MessageComponentInterface
                     return $conn->close();
                 }
 
-                // Attach to users
                 $conn->api_user = true;
                 $conn->User = $user;
 
@@ -200,10 +228,6 @@ class Panel implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg)
     {
         $this->log('Message received: ' . $msg);
-
-//        if ($from->api_user) {
-//            return $this->handleApiUserMessage($from, $msg);
-//        }
 
         if (isset($from->User)) {
             return $this->handleUserMessage($from, $msg);
@@ -227,6 +251,15 @@ class Panel implements MessageComponentInterface
             $this->log("User [{$conn->User->id}] disconnected");
         } elseif (isset($conn->Board)) {
             unset($this->board_clients[$conn->Board->id]);
+
+            // Remove timeout timer
+            if (isset($this->isConnectedTimers[$conn->Board->id])) {
+                $this->isConnectedTimers[$conn->Board->id]->cancel();
+                unset($this->isConnectedTimers[$conn->Board->id]);
+            }
+            if (isset($this->awaitingPing[$conn->Board->id])) {
+                unset($this->awaitingPing[$conn->Board->id]);
+            }
 
             $this->log("Board [{$conn->Board->id}] disconnected");
         }
@@ -320,6 +353,13 @@ class Panel implements MessageComponentInterface
                     'value' => $value,
                 ]);
 
+                // Save to history
+                $history = new History();
+                $history->item_id = $item->id;
+                $history->commited_at = time();
+                $history->value = $value;
+                $history->save();
+
                 break;
             case 'values':
                 unset($data['type']);
@@ -350,6 +390,19 @@ class Panel implements MessageComponentInterface
                         'item_type' => $item->type,
                         'value' => $value,
                     ]);
+
+                    // Save to history
+                    $history = new History();
+                    $history->item_id = $item->id;
+                    $history->commited_at = time();
+                    $history->value = $value;
+                    $history->save();
+                }
+
+                break;
+            case 'pong':
+                if (isset($this->awaitingPing[$board->id])) {
+                    unset($this->awaitingPing[$board->id]);
                 }
 
                 break;
@@ -363,6 +416,7 @@ class Panel implements MessageComponentInterface
      * @param User $user
      * @param array $data
      * @return bool|mixed
+     * @throws NotSupportedException
      */
     protected function handleTurnOn(ConnectionInterface $from, $user, $data)
     {
@@ -373,7 +427,7 @@ class Panel implements MessageComponentInterface
         if (!$item) {
             return $from->send([
                 'type' => 'error',
-                'message' => 'Включить не удалось',
+                'message' => 'Такое устройство не существует',
             ]);
         }
 
@@ -388,15 +442,14 @@ class Panel implements MessageComponentInterface
 
         switch ($board->type) {
             case Board::TYPE_AREST:
-                $api = new ApiHelper($item);
-                $api->turnOn();
+                throw new NotSupportedException();
 
                 break;
             case Board::TYPE_WEBSOCKET:
                 if (!$this->isBoardConnected($board->id)) {
                     return $from->send(Json::encode([
                         'type' => 'error',
-                        'message' => 'Не получилось включить: устройство не подключено',
+                        'message' => 'Устройство не подключено',
                     ]));
                 }
 
@@ -416,6 +469,7 @@ class Panel implements MessageComponentInterface
      * @param User $user
      * @param array $data
      * @return bool|mixed
+     * @throws NotSupportedException
      */
     protected function handleTurnOff(ConnectionInterface $from, $user, $data)
     {
@@ -426,7 +480,7 @@ class Panel implements MessageComponentInterface
         if (!$item) {
             return $from->send([
                 'type' => 'error',
-                'message' => 'Выключить не удалось',
+                'message' => 'Такое устройство не существует',
             ]);
         }
 
@@ -439,14 +493,25 @@ class Panel implements MessageComponentInterface
 
         $board = $item->board;
 
-        if ($board->type === Board::TYPE_AREST) {
-            $api = new ApiHelper($item);
-            return $api->turnOff();
-        } elseif ($board->type === Board::TYPE_WEBSOCKET) {
-            return $this->sendToBoard($board->id, [
-                'type' => 'turnOFF',
-                'pin' => $item->pin,
-            ]);
+        switch ($board->type) {
+            case Board::TYPE_AREST:
+                throw new NotSupportedException();
+
+                break;
+            case Board::TYPE_WEBSOCKET:
+                if (!$this->isBoardConnected($board->id)) {
+                    return $from->send(Json::encode([
+                        'type' => 'error',
+                        'message' => 'Устройство не подключено',
+                    ]));
+                }
+
+                $this->sendToBoard($board->id, [
+                    'type' => 'turnOFF',
+                    'pin' => $item->pin,
+                ]);
+
+                break;
         }
 
         return false;
@@ -500,36 +565,18 @@ class Panel implements MessageComponentInterface
     }
 
     /**
-     * Save to history Item value. Returns true if saved
-     *
-     * @param Item $item
-     * @param mixed|null $value
+     * @param integer $boardID
      * @return bool
      */
-    private function saveHistory($item, $value = null)
-    {
-        if ($value === null) {
-            try {
-                $api = new ApiHelper($item);
-                $value = $api->getValue();
-            } catch (\Exception $e) {
-                return false;
-            }
-        }
-
-        $history = new History();
-        $history->item_id = $item->id;
-        $history->commited_at = time();
-        $history->value = $value;
-
-        return $history->save();
-    }
-
     private function isBoardConnected($boardID)
     {
         return isset($this->board_clients[$boardID]);
     }
 
+    /**
+     * @param mixed $value
+     * @return bool
+     */
     private function valueToBoolean($value)
     {
         if (is_bool($value)) {
@@ -539,5 +586,7 @@ class Panel implements MessageComponentInterface
         if (is_int($value)) {
             return $value === 0 ? false : true;
         }
+
+        return (bool)$value;
     }
 }

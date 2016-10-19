@@ -104,42 +104,45 @@
     position: relative;
 }
 
-.loader-backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #efefef;
-    z-index: 100;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.control-panel {
+    display: none;
 }
 
-.loader {
-    text-transform: uppercase;
+.loader .loader-animation {
+    margin: 30px auto 0;
+}
+
+.loader .loader-text {
+    margin: 30px auto;
     text-align: center;
-    font-size: 25px;
-    color: #ff0700;
-    font-weight: bold;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: none;
+}
+
+.loader .loader-animation span {
+    transition: 0.5s;
+}
+
+.loader.error .loader-animation span {
+    background: #DD4B39;
 }
 
 .loader-animation {
+    position: relative;
+    display: block;
     width: 100px;
     height: 100px;
     margin: 50px;
-    position: relative;
-    display: inline-block;
     background: transparent;
 }
 
 .loader-animation span {
+    position: absolute;
+    top: 50px;
+    display: block;
     width: 20px;
     height: 20px;
-    position: absolute;
-    display: block;
-    top: 50px;
     background: #605ca8;
     border-radius: 50%;
 }

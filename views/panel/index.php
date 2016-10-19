@@ -13,10 +13,13 @@ $this->params['not-boxed'] = true;
 WSClientAsset::register($this);
 ?>
 
-<div class="loader-backdrop">
-    <div class="loader">
-        <div class="loader-animation"><span></span><span></span><span></span></div>
+<div class="loader" id="loader">
+    <div class="loader-animation">
+        <span></span>
+        <span></span>
+        <span></span>
     </div>
+    <div class="loader-text text-danger"></div>
 </div>
 
 <div class="control-panel">
@@ -37,7 +40,10 @@ WSClientAsset::register($this);
 
                                 <div class="info-box-content">
                                     <span class="info-box-text"><?= $item->name ?></span>
-                                    <span class="info-box-number item-value">НЕИЗВЕСТНО</span>
+                                    <span
+                                        class="info-box-number item-value <?= $item->type === Item::TYPE_VARIABLE_TEMPERATURE ? 'temperature' : '' ?>">
+                                        НЕИЗВЕСТНО
+                                    </span>
                                 </div>
                                 <!-- /.info-box-content -->
                             </div>
@@ -50,7 +56,8 @@ WSClientAsset::register($this);
                              data-item-id="<?= $item->id ?>">
                             <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
                                 <div class="info-box-action material-switch">
-                                    <input id="switch-for-item-<?= $item->id ?>" class="item-switch-checkbox" type="checkbox" data-item-id="<?= $item->id ?>">
+                                    <input id="switch-for-item-<?= $item->id ?>" class="item-switch-checkbox"
+                                           type="checkbox" data-item-id="<?= $item->id ?>">
                                     <label for="switch-for-item-<?= $item->id ?>" class="label-default"></label>
                                 </div>
 
