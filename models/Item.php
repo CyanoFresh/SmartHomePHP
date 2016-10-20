@@ -85,7 +85,7 @@ class Item extends ActiveRecord
             'name' => Yii::t('app', 'Название'),
             'icon' => Yii::t('app', 'Иконка'),
             'bg' => Yii::t('app', 'Фон'),
-            'class' => Yii::t('app', 'Класс'),
+            'class' => Yii::t('app', 'Кастомный Класс'),
             'sort_order' => Yii::t('app', 'Порядок сортировки'),
         ];
     }

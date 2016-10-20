@@ -38,7 +38,7 @@ use yii\widgets\ActiveForm;
                 </div>
             </div>
 
-            <?= $form->field($model, 'update_interval')->textInput() ?>
+            <?= $form->field($model, 'update_interval')->input('number') ?>
 
             <?= $form->field($model, 'save_history_interval')->input('number') ?>
         </div>
@@ -47,7 +47,20 @@ use yii\widgets\ActiveForm;
 
             <?= $form->field($model, 'icon')->textInput(['maxlength' => true]) ?>
 
-            <?= $form->field($model, 'bg')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'bg')->dropDownList([
+                'light-blue' => 'Светло-синий',
+                'aqua' => 'Бирюзовый',
+                'green' => 'Зеленый',
+                'yellow' => 'Желтый',
+                'red' => 'Красный',
+                'gray' => 'Серый',
+                'navy' => 'Navy',
+                'teal' => 'Teal',
+                'purple' => 'Фиолетовый',
+                'orange' => 'Оранжевый',
+                'maroon' => 'Бордовый',
+                'black' => 'Черный',
+            ]) ?>
 
             <?= $form->field($model, 'class')->textInput(['maxlength' => true]) ?>
 
@@ -55,7 +68,7 @@ use yii\widgets\ActiveForm;
                 ArrayHelper::map(Room::find()->all(), 'id', 'name')
             ) ?>
 
-            <?= $form->field($model, 'sort_order')->textInput() ?>
+            <?= $form->field($model, 'sort_order')->input('number') ?>
         </div>
     </div>
 

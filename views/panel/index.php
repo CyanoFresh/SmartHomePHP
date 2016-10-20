@@ -41,7 +41,7 @@ WSClientAsset::register($this);
                                 <div class="info-box-content">
                                     <span class="info-box-text"><?= $item->name ?></span>
                                     <span
-                                        class="info-box-number item-value <?= $item->type === Item::TYPE_VARIABLE_TEMPERATURE ? 'temperature' : '' ?>">
+                                        class="info-box-number item-value <?= ($item->type === Item::TYPE_VARIABLE_TEMPERATURE or $item->type === Item::TYPE_VARIABLE_HUMIDITY) ? 'temperature' : '' ?>">
                                         НЕИЗВЕСТНО
                                     </span>
                                 </div>

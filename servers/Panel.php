@@ -184,10 +184,15 @@ class Panel implements MessageComponentInterface
                 $this->board_clients[$board->id] = $conn;
 
                 $this->isConnectedTimers[$board->id] = $this->loop->addPeriodicTimer(180, function() use ($board) {
+                    $this->log("Checking for timeout [$board->id] board...");
+
                     if (isset($this->awaitingPing[$board->id])) {
-                        $this->board_clients[$board->id]->close();
-                        return $this->log("Board [{$board->id}] disconnected by timeout");
+                        $this->log("There was no response from last ping! Disconnecting...");
+
+                        return $this->board_clients[$board->id]->close();
                     }
+
+                    $this->log("Sending ping command...");
 
                     $this->awaitingPing[$board->id] = true;
 
@@ -401,6 +406,8 @@ class Panel implements MessageComponentInterface
 
                 break;
             case 'pong':
+                $this->log("Removing board [$board->id] from timeout queue");
+
                 if (isset($this->awaitingPing[$board->id])) {
                     unset($this->awaitingPing[$board->id]);
                 }
