@@ -22,7 +22,6 @@ $fieldOptions2 = [
 ?>
 
 <div class="login-box">
-    <!-- /.login-logo -->
     <div class="login-box-body">
 
         <div class="login-logo product-font">
@@ -47,15 +46,12 @@ $fieldOptions2 = [
             <div class="col-xs-8">
                 <?= $form->field($model, 'rememberMe')->checkbox() ?>
             </div>
-            <!-- /.col -->
             <div class="col-xs-4">
                 <?= Html::submitButton('Войти', ['class' => 'btn btn-primary btn-block btn-flat', 'name' => 'login-button']) ?>
             </div>
-            <!-- /.col -->
         </div>
 
         <?php ActiveForm::end(); ?>
 
     </div>
-    <!-- /.login-box-body -->
-</div><!-- /.login-box -->
+</div>

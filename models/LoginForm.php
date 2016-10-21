@@ -53,10 +53,27 @@ class LoginForm extends Model
     public function validatePassword($attribute, $params)
     {
         if (!$this->hasErrors()) {
+            $session = Yii::$app->session;
+
+            // Set timeout for first time if counter exceed
+            if ($session->get('failedLoginCount') >= Yii::$app->params['maxLoginFailCount'] and !$session->has('loginAgainAt')) {
+                $session->set('loginAgainAt', time() + Yii::$app->params['loginFailTimeout']);
+                $session->set('failedLoginCount', 0);
+            }
+
+            if ($session->has('loginAgainAt') and $session->get('loginAgainAt') >= time()) {
+                return $this->addError($attribute, 'Слишком много неудачных попыток. Попробуйте позже');
+            }
+
+            if ($session->has('loginAgainAt') and $session->get('loginAgainAt') <= time()) {
+                $session->remove('loginAgainAt');
+            }
+
             $user = $this->getUser();
 
             if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Неверный логин или пароль');
+                $session->set('failedLoginCount', $session->get('failedLoginCount', 0) + 1);
             }
         }
     }
@@ -68,9 +85,12 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
+            // Reset login failure counter
+            Yii::$app->session->set('failedLoginCount', 0);
+
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
         }
-        
+
         return false;
     }
 
