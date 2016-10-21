@@ -1,18 +1,16 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\ItemSearch */
+/* @var $searchModel app\models\HistorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-use app\models\Item;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-
-$this->title = 'Элементы';
+$this->title = 'Histories';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="item-index">
+<div class="history-index">
 
     <p>
         <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
@@ -27,24 +25,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             'id',
-            'name',
-            [
-                'attribute' => 'board_id',
-                'value' => function ($model) {
-                    /** @var $model Item */
-                    return $model->board->name;
-                },
-            ],
-            [
-                'filter' => Item::getTypesArray(),
-                'attribute' => 'type',
-                'value' => function ($model) {
-                    /** @var $model Item */
-                    return $model->getTypeLabel();
-                },
-            ],
+            'item_id',
+            'commited_at:datetime',
+            'value',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'app\components\ActionButtonColumn'],
         ],
     ]); ?>
     <?php Pjax::end(); ?>

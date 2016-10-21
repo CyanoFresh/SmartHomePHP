@@ -1,19 +1,19 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\admin\controllers;
 
 use Yii;
-use app\models\Board;
-use app\models\BoardSearch;
+use app\models\History;
+use app\models\HistorySearch;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * BoardController implements the CRUD actions for Board model.
+ * HistoryController implements the CRUD actions for History model.
  */
-class BoardController extends Controller
+class HistoryController extends Controller
 {
     /**
      * @inheritdoc
@@ -40,12 +40,12 @@ class BoardController extends Controller
     }
 
     /**
-     * Lists all Board models.
+     * Lists all History models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new BoardSearch();
+        $searchModel = new HistorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -55,7 +55,7 @@ class BoardController extends Controller
     }
 
     /**
-     * Displays a single Board model.
+     * Displays a single History model.
      * @param integer $id
      * @return mixed
      */
@@ -67,13 +67,13 @@ class BoardController extends Controller
     }
 
     /**
-     * Creates a new Board model.
+     * Creates a new History model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Board();
+        $model = new History();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -85,7 +85,7 @@ class BoardController extends Controller
     }
 
     /**
-     * Updates an existing Board model.
+     * Updates an existing History model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -104,7 +104,7 @@ class BoardController extends Controller
     }
 
     /**
-     * Deletes an existing Board model.
+     * Deletes an existing History model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -117,15 +117,15 @@ class BoardController extends Controller
     }
 
     /**
-     * Finds the Board model based on its primary key value.
+     * Finds the History model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Board the loaded model
+     * @return History the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Board::findOne($id)) !== null) {
+        if (($model = History::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

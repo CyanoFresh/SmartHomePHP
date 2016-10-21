@@ -5,6 +5,7 @@ $params = require(__DIR__ . '/params.php');
 return [
     'id' => 'basic',
     'name' => 'SmartHome',
+    'sourceLanguage' => 'ru',
     'language' => 'ru',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
@@ -65,6 +66,11 @@ return [
 //                    'js' => [],
 //                ],
             ],
+        ],
+    ],
+    'modules' => [
+        'admin' => [
+            'class' => 'app\modules\admin\Module',
         ],
     ],
     'params' => $params,

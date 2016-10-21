@@ -1,17 +1,18 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\BoardSearch */
+/* @var $searchModel app\models\ItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+use app\models\Item;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 
-$this->title = 'Устройства';
+$this->title = 'Элементы';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="board-index">
+<div class="item-index">
 
     <p>
         <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
@@ -28,13 +29,22 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'name',
             [
+                'attribute' => 'board_id',
+                'value' => function ($model) {
+                    /** @var $model Item */
+                    return $model->board->name;
+                },
+            ],
+            [
+                'filter' => Item::getTypesArray(),
                 'attribute' => 'type',
-                'value' => function (\app\models\Board $model) {
+                'value' => function ($model) {
+                    /** @var $model Item */
                     return $model->getTypeLabel();
-                }
+                },
             ],
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'app\components\ActionButtonColumn'],
         ],
     ]); ?>
     <?php Pjax::end(); ?>

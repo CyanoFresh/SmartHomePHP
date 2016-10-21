@@ -1,19 +1,19 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\admin\controllers;
 
 use Yii;
-use app\models\Room;
-use app\models\RoomSearch;
+use app\models\Board;
+use app\models\BoardSearch;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * RoomController implements the CRUD actions for Room model.
+ * BoardController implements the CRUD actions for Board model.
  */
-class RoomController extends Controller
+class BoardController extends Controller
 {
     /**
      * @inheritdoc
@@ -40,12 +40,12 @@ class RoomController extends Controller
     }
 
     /**
-     * Lists all Room models.
+     * Lists all Board models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new RoomSearch();
+        $searchModel = new BoardSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -55,7 +55,7 @@ class RoomController extends Controller
     }
 
     /**
-     * Displays a single Room model.
+     * Displays a single Board model.
      * @param integer $id
      * @return mixed
      */
@@ -67,13 +67,13 @@ class RoomController extends Controller
     }
 
     /**
-     * Creates a new Room model.
+     * Creates a new Board model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Room();
+        $model = new Board();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -85,7 +85,7 @@ class RoomController extends Controller
     }
 
     /**
-     * Updates an existing Room model.
+     * Updates an existing Board model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -104,7 +104,7 @@ class RoomController extends Controller
     }
 
     /**
-     * Deletes an existing Room model.
+     * Deletes an existing Board model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -117,15 +117,15 @@ class RoomController extends Controller
     }
 
     /**
-     * Finds the Room model based on its primary key value.
+     * Finds the Board model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Room the loaded model
+     * @return Board the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Room::findOne($id)) !== null) {
+        if (($model = Board::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

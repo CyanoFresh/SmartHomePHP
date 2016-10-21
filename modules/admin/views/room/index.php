@@ -1,16 +1,16 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\HistorySearch */
+/* @var $searchModel app\models\RoomSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-$this->title = 'Histories';
+$this->title = 'Комнаты';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="history-index">
+<div class="room-index">
 
     <p>
         <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
@@ -25,11 +25,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             'id',
-            'item_id',
-            'commited_at',
-            'value',
+            'name',
+            'bg',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'app\components\ActionButtonColumn'],
         ],
     ]); ?>
     <?php Pjax::end(); ?>

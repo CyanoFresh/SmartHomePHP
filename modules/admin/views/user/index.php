@@ -32,10 +32,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->getStatusLabel();
                 },
             ],
-            'created_at:datetime',
-            'updated_at:datetime',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'app\components\ActionButtonColumn'],
         ],
     ]); ?>
 </div>
