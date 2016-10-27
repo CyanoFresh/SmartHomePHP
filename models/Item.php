@@ -35,6 +35,7 @@ class Item extends ActiveRecord
     const TYPE_VARIABLE_BOOLEAN_DOOR = 26;
     const TYPE_VARIABLE_TEMPERATURE = 21;
     const TYPE_VARIABLE_HUMIDITY = 22;
+    const TYPE_RGB = 30;
 
     const VALUE_ON = 1;
     const VALUE_OFF = 0;
@@ -132,6 +133,7 @@ class Item extends ActiveRecord
             self::TYPE_VARIABLE_BOOLEAN_DOOR => 'Переменная булев дверь',
             self::TYPE_VARIABLE_TEMPERATURE => 'Переменная температура',
             self::TYPE_VARIABLE_HUMIDITY => 'Переменная влажность',
+            self::TYPE_RGB => 'RGB',
         ];
     }
 

@@ -102,6 +102,12 @@ class Panel implements MessageComponentInterface
                     $this->items[$item['id']] = $item;
 
                     break;
+                case Item::TYPE_RGB:
+                    $item['value'] = [0,0,0];
+
+                    $this->items[$item['id']] = $item;
+
+                    break;
             }
 //
 //            if ($item->save_history_interval > 0) {
@@ -293,6 +299,8 @@ class Panel implements MessageComponentInterface
                 return $this->handleTurnOn($from, $user, $data);
             case 'turnOFF':
                 return $this->handleTurnOff($from, $user, $data);
+            case 'rgb':
+                return $this->handleRgb($from, $user, $data);
         }
 
         return false;
@@ -516,6 +524,76 @@ class Panel implements MessageComponentInterface
                 $this->sendToBoard($board->id, [
                     'type' => 'turnOFF',
                     'pin' => $item->pin,
+                ]);
+
+                break;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param ConnectionInterface $from
+     * @param User $user
+     * @param array $data
+     * @return bool|mixed
+     * @throws NotSupportedException
+     */
+    private function handleRgb($from, $user, $data)
+    {
+        $item_id = (int)$data['item_id'];
+        $item = Item::findOne($item_id);
+
+        if (!$item) {
+            return $from->send([
+                'type' => 'error',
+                'message' => 'Такое устройство не существует',
+            ]);
+        }
+
+        if ($item->type !== Item::TYPE_RGB) {
+            return $from->send([
+                'type' => 'error',
+                'message' => 'Данный тип устройства не является RGB',
+            ]);
+        }
+
+        $red = $data['red'];
+        $green = $data['green'];
+        $blue = $data['blue'];
+
+        if ($red > 255) {
+            $red = 255;
+        }
+
+        if ($green > 255) {
+            $green = 255;
+        }
+
+        if ($blue > 255) {
+            $blue = 255;
+        }
+
+        $board = $item->board;
+
+        switch ($board->type) {
+            case Board::TYPE_AREST:
+                throw new NotSupportedException();
+
+                break;
+            case Board::TYPE_WEBSOCKET:
+                if (!$this->isBoardConnected($board->id)) {
+                    return $from->send(Json::encode([
+                        'type' => 'error',
+                        'message' => 'Устройство не подключено',
+                    ]));
+                }
+
+                $this->sendToBoard($board->id, [
+                    'type' => 'rgb',
+                    'red' => $red * 4,
+                    'green' => $green * 4,
+                    'blue' => $blue * 4,
                 ]);
 
                 break;
