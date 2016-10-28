@@ -131,10 +131,36 @@ function updateItemValue(id, type, value) {
             }
 
             break;
+        case 30:    // RGB
+            var $colorPicker = $('#colorpicker-' + id);
+
+            $colorPicker.spectrum('set', 'rgb(' + value.red + ', ' + value.green + ', ' + value.blue + ')');
+
+            break;
     }
 }
 
 $(document).ready(function () {
+    $('.rgb-colorpicker').spectrum({
+        showInput: true,
+        showButtons: false,
+        preferredFormat: 'rgb',
+        change: function(color) {
+            var item_id = $(this).data('item-id');
+            var red = Math.round(color._r);
+            var green = Math.round(color._g);
+            var blue = Math.round(color._b);
+
+            send({
+                'type': 'rgb',
+                'item_id': item_id,
+                'red': red,
+                'green': green,
+                'blue': blue
+            });
+        }
+    });
+
     initWebSocket(function () {
         $('input[type="checkbox"].item-switch-checkbox').click(function (e) {
             e.preventDefault();

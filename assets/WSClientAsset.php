@@ -16,6 +16,7 @@ class WSClientAsset extends AssetBundle
         'js/wsclient.js',
     ];
     public $depends = [
+        'app\assets\SpectrumAsset',
         'app\assets\AppAsset',
         'yii\web\JqueryAsset',
     ];

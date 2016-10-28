@@ -103,7 +103,11 @@ class Panel implements MessageComponentInterface
 
                     break;
                 case Item::TYPE_RGB:
-                    $item['value'] = [0,0,0];
+                    $item['value'] = [
+                        'red' => 0,
+                        'green' => 0,
+                        'blue' => 0,
+                    ];
 
                     $this->items[$item['id']] = $item;
 
@@ -189,7 +193,7 @@ class Panel implements MessageComponentInterface
                 $conn->Board = $board;
                 $this->board_clients[$board->id] = $conn;
 
-                $this->isConnectedTimers[$board->id] = $this->loop->addPeriodicTimer(180, function() use ($board) {
+                $this->isConnectedTimers[$board->id] = $this->loop->addPeriodicTimer(180, function () use ($board) {
                     $this->log("Checking for timeout [$board->id] board...");
 
                     if (isset($this->awaitingPing[$board->id])) {
@@ -341,13 +345,13 @@ class Panel implements MessageComponentInterface
 
                 if ($item->type === Item::TYPE_VARIABLE_BOOLEAN_DOOR) {
                     curl_setopt_array($ch = curl_init(), array(
-                        CURLOPT_URL => "https://pushall.ru/api.php",
+                        CURLOPT_URL => 'https://pushall.ru/api.php',
                         CURLOPT_POSTFIELDS => array(
-                            "type" => "self",
-                            "id" => Yii::$app->params['pushAllID'],
-                            "key" => Yii::$app->params['pushAllKey'],
-                            "text" => $value ? "Дверь открыта" : "Дверь закрыта",
-                            "title" => "Сигнализация на двери"
+                            'type' => 'self',
+                            'id' => Yii::$app->params['pushAllID'],
+                            'key' => Yii::$app->params['pushAllKey'],
+                            'text' => $value ? 'Дверь открыта' : 'Дверь закрыта',
+                            'title' => 'Сигнализация на двери'
                         ),
                         CURLOPT_RETURNTRANSFER => true
                     ));
@@ -598,6 +602,20 @@ class Panel implements MessageComponentInterface
 
                 break;
         }
+
+        $this->items[$item->id]['value'] = [
+            'red' => $red,
+            'green' => $green,
+            'blue' => $blue,
+        ];
+
+        $this->sendUsers([
+            'type' => 'value',
+            'item_id' => $item->id,
+            'red' => $red,
+            'green' => $green,
+            'blue' => $blue,
+        ]);
 
         return false;
     }

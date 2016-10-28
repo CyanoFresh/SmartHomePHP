@@ -8,13 +8,11 @@
     "rmrevin/yii2-minify-view": "*",
     "cboden/ratchet": "^0.3.4",
     "bower-asset/handlebars": "^4.0",
-    "bower-asset/js-cookie": "*",
+    "bower-asset/spectrum": "^1.8",
     "rmrevin/yii2-fontawesome": "~2.12",
-    "himiklab/yii2-recaptcha-widget": "*",
     "dmstr/yii2-adminlte-asset": "2.*",
     "linslin/yii2-curl": "1.0.8",
     "shifrin/yii2-noty": "^1.0",
-    "bower-asset/pnotify": "^3.0",
     "devristo/phpws": "dev-master"
   },
   "require-dev": {

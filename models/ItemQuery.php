@@ -31,6 +31,15 @@ class ItemQuery extends \yii\db\ActiveQuery
         ]);
     }
 
+    public function rgb()
+    {
+        return $this->andWhere([
+            'type' => [
+                Item::TYPE_RGB,
+            ],
+        ]);
+    }
+
     /**
      * @inheritdoc
      * @return Item[]|array

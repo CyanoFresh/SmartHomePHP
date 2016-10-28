@@ -69,6 +69,22 @@ WSClientAsset::register($this);
                         </div>
                     <?php endforeach; ?>
                 </div>
+                <div class="row items-rgb">
+                    <?php foreach ($room->getItems()->rgb()->all() as $item): ?>
+                        <div class="col-md-3 col-sm-4 control-panel-item item-rgb"
+                             data-item-id="<?= $item->id ?>">
+                            <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
+                                <span class="info-box-icon"><i class="fa fa-<?= $item->icon ?>"></i></span>
+
+                                <div class="info-box-content">
+                                    <span class="info-box-text"><?= $item->name ?></span>
+                                    <input type="text" id="colorpicker-<?= $item->id ?>" class="rgb-colorpicker" data-item-id="<?= $item->id ?>">
+                                </div>
+                                <!-- /.info-box-content -->
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
             <!-- /.box-body -->
         </div>
