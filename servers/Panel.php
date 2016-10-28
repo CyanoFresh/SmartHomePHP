@@ -603,19 +603,19 @@ class Panel implements MessageComponentInterface
                 break;
         }
 
-        $this->items[$item->id]['value'] = [
+        $rgbArray = [
             'red' => $red,
             'green' => $green,
-            'blue' => $blue,
+            'blue' => $blue
         ];
+
+        $this->items[$item->id]['value'] = $rgbArray;
 
         $this->sendUsers([
             'type' => 'value',
             'item_id' => $item->id,
             'item_type' => Item::TYPE_RGB,
-            'red' => $red,
-            'green' => $green,
-            'blue' => $blue,
+            'value' => $rgbArray,
         ]);
 
         return false;
