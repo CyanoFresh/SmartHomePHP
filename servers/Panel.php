@@ -612,6 +612,7 @@ class Panel implements MessageComponentInterface
         $this->sendUsers([
             'type' => 'value',
             'item_id' => $item->id,
+            'item_type' => Item::TYPE_RGB,
             'red' => $red,
             'green' => $green,
             'blue' => $blue,
