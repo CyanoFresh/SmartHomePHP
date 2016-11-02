@@ -58,7 +58,7 @@ class Panel implements MessageComponentInterface
     /**
      * @var array
      */
-    protected $awaitingPing;
+    protected $awaitingPong;
 
     /**
      * Class constructor.
@@ -196,15 +196,19 @@ class Panel implements MessageComponentInterface
                 $this->isConnectedTimers[$board->id] = $this->loop->addPeriodicTimer(180, function () use ($board) {
                     $this->log("Checking for timeout [$board->id] board...");
 
-                    if (isset($this->awaitingPing[$board->id])) {
-                        $this->log("There was no response from last ping! Disconnecting...");
+                    if (!isset($this->board_clients[$board->id])) {
+                        return $this->log("Board [$board->id] has already been disconnected!");
+                    }
+
+                    if (isset($this->awaitingPong[$board->id])) {
+                        $this->log("There was no pong from last ping! Disconnecting...");
 
                         return $this->board_clients[$board->id]->close();
                     }
 
                     $this->log("Sending ping command...");
 
-                    $this->awaitingPing[$board->id] = true;
+                    $this->awaitingPong[$board->id] = true;
 
                     return $this->sendToBoard($board->id, [
                         'type' => 'ping',
@@ -242,15 +246,17 @@ class Panel implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        $this->log('Message received: ' . $msg);
-
         if (isset($from->User)) {
+            $this->log("Message: '$msg' from User [{$from->User->id}]");
+
             return $this->handleUserMessage($from, $msg);
         } elseif (isset($from->Board)) {
+            $this->log("Message: '$msg' from Board [{$from->Board->id}]");
+
             return $this->handleBoardMessage($from, $msg);
         }
 
-        return false;
+        return $this->log("Message: '$msg' from unknown client");
     }
 
     public function onClose(ConnectionInterface $conn)
@@ -265,18 +271,31 @@ class Panel implements MessageComponentInterface
 
             $this->log("User [{$conn->User->id}] disconnected");
         } elseif (isset($conn->Board)) {
-            unset($this->board_clients[$conn->Board->id]);
+            $boardId = $conn->Board->id;
 
-            // Remove timeout timer
-            if (isset($this->isConnectedTimers[$conn->Board->id])) {
-                $this->isConnectedTimers[$conn->Board->id]->cancel();
-                unset($this->isConnectedTimers[$conn->Board->id]);
-            }
-            if (isset($this->awaitingPing[$conn->Board->id])) {
-                unset($this->awaitingPing[$conn->Board->id]);
+            $this->log("Disconnecting Board [{$boardId}]...");
+
+            // Remove timer
+            if (isset($this->isConnectedTimers[$boardId])) {
+                $this->log("Disabling timeout timer...");
+
+                $this->isConnectedTimers[$boardId]->cancel();
+                unset($this->isConnectedTimers[$boardId]);
+
+                $this->log("Disabled");
             }
 
-            $this->log("Board [{$conn->Board->id}] disconnected");
+            if (isset($this->awaitingPong[$boardId])) {
+                $this->log("Removing from pong list...");
+
+                unset($this->awaitingPong[$boardId]);
+
+                $this->log("Removed");
+            }
+
+            unset($this->board_clients[$boardId]);
+
+            $this->log("Board [{$boardId}] disconnected");
         }
     }
 
@@ -420,8 +439,8 @@ class Panel implements MessageComponentInterface
             case 'pong':
                 $this->log("Removing board [$board->id] from timeout queue");
 
-                if (isset($this->awaitingPing[$board->id])) {
-                    unset($this->awaitingPing[$board->id]);
+                if (isset($this->awaitingPong[$board->id])) {
+                    unset($this->awaitingPong[$board->id]);
                 }
 
                 break;
