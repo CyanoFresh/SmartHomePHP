@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\modules\admin\models;
 
 use Yii;
 use yii\base\Model;
@@ -18,7 +18,7 @@ class HistorySearch extends History
     public function rules()
     {
         return [
-            [['id', 'type', 'event_id', 'board_id', 'user_id', 'item_id', 'commited_at', 'value'], 'integer'],
+            [['id', 'item_id', 'commited_at', 'value'], 'integer'],
         ];
     }
 
@@ -46,11 +46,6 @@ class HistorySearch extends History
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort' => [
-                'defaultOrder' => [
-                    'commited_at' => SORT_DESC,
-                ],
-            ],
         ]);
 
         $this->load($params);
@@ -64,10 +59,6 @@ class HistorySearch extends History
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'type' => $this->type,
-            'event_id' => $this->event_id,
-            'board_id' => $this->board_id,
-            'user_id' => $this->user_id,
             'item_id' => $this->item_id,
             'commited_at' => $this->commited_at,
             'value' => $this->value,

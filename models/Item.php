@@ -10,6 +10,7 @@ use yii\db\ActiveRecord;
  * This is the model class for table "item".
  *
  * @property integer $id
+ * @property boolean $active
  * @property integer $type
  * @property integer $update_interval
  * @property integer $save_history_interval
@@ -60,12 +61,14 @@ class Item extends ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'update_interval', 'save_history_interval', 'room_id', 'name', 'icon', 'bg', 'board_id'], 'required'],
+            [['active', 'type', 'room_id', 'name', 'icon', 'bg', 'board_id'], 'required'],
             [['type', 'update_interval', 'save_history_interval', 'room_id', 'sort_order', 'board_id', 'pin'], 'integer'],
             [['url', 'name', 'icon', 'bg', 'class'], 'string', 'max' => 255],
             [['room_id'], 'exist', 'skipOnError' => true, 'targetClass' => Room::className(), 'targetAttribute' => ['room_id' => 'id']],
             [['board_id'], 'exist', 'skipOnError' => true, 'targetClass' => Board::className(), 'targetAttribute' => ['board_id' => 'id']],
-            [['sort_order'], 'default', 'value' => 0],
+            [['sort_order', 'update_interval', 'save_history_interval'], 'default', 'value' => 0],
+            [['active'], 'default', 'value' => true],
+            [['active'], 'boolean'],
         ];
     }
 
@@ -76,6 +79,7 @@ class Item extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'active' => Yii::t('app', 'Активно'),
             'type' => Yii::t('app', 'Тип'),
             'update_interval' => Yii::t('app', 'Интервал обновления'),
             'save_history_interval' => Yii::t('app', 'Интервал сохранения в историю'),

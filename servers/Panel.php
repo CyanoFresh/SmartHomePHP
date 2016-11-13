@@ -41,11 +41,6 @@ class Panel implements MessageComponentInterface
     protected $board_clients;
 
     /**
-     * @var array
-     */
-    protected $item_values;
-
-    /**
      * @var Item[]
      */
     protected $items;
@@ -73,7 +68,6 @@ class Panel implements MessageComponentInterface
         $this->loop = $loop;
         $this->user_clients = [];
         $this->board_clients = [];
-        $this->item_values = [];
         $this->items = [];
 
         // Database driver hack: Prevent MySQL for disconnecting by timeout
@@ -113,12 +107,6 @@ class Panel implements MessageComponentInterface
 
                     break;
             }
-//
-//            if ($item->save_history_interval > 0) {
-//                $this->loop->addPeriodicTimer($item->save_history_interval, function () use ($item) {
-//                    $this->saveHistory($item);
-//                });
-//            }
         }
 
         $this->log('Server started');
@@ -166,6 +154,8 @@ class Panel implements MessageComponentInterface
                     'items' => $this->items,
                 ]));
 
+                $this->logUserConnection($user, true);
+
                 return $this->log("Connected user [{$user->id}] {$user->username}");
             case 'board':
                 $this->log('Connection type is Board. Authenticating...');
@@ -197,6 +187,8 @@ class Panel implements MessageComponentInterface
                     $this->log("Checking for timeout [$board->id] board...");
 
                     if (!isset($this->board_clients[$board->id])) {
+                        $this->logBoardConnection($board, false);
+
                         return $this->log("Board [$board->id] has already been disconnected!");
                     }
 
@@ -214,6 +206,8 @@ class Panel implements MessageComponentInterface
                         'type' => 'ping',
                     ]);
                 });
+
+                $this->logBoardConnection($board, true);
 
                 return $this->log("Connected board [{$board->id}]");
             case 'api_user':
@@ -269,6 +263,8 @@ class Panel implements MessageComponentInterface
             $conn->User->generateAuthKey();
             $conn->User->save();
 
+            $this->logUserConnection($conn->User, false);
+
             $this->log("User [{$conn->User->id}] disconnected");
         } elseif (isset($conn->Board)) {
             $boardId = $conn->Board->id;
@@ -294,6 +290,8 @@ class Panel implements MessageComponentInterface
             }
 
             unset($this->board_clients[$boardId]);
+
+            $this->logBoardConnection($boardId, false);
 
             $this->log("Board [{$boardId}] disconnected");
         }
@@ -499,6 +497,13 @@ class Panel implements MessageComponentInterface
                 break;
         }
 
+        $history = new History();
+        $history->type = History::TYPE_USER_ACTION;
+        $history->user_id = $user->id;
+        $history->item_id = $item->id;
+        $history->value = 1;
+        $history->save();
+
         return true;
     }
 
@@ -551,6 +556,13 @@ class Panel implements MessageComponentInterface
 
                 break;
         }
+
+        $history = new History();
+        $history->type = History::TYPE_USER_ACTION;
+        $history->user_id = $user->id;
+        $history->item_id = $item->id;
+        $history->value = 0;
+        $history->save();
 
         return false;
     }
@@ -637,6 +649,13 @@ class Panel implements MessageComponentInterface
             'value' => $rgbArray,
         ]);
 
+        $history = new History();
+        $history->type = History::TYPE_USER_ACTION;
+        $history->user_id = $user->id;
+        $history->item_id = $item->id;
+        $history->value = $red . ',' . $green . ',' . $blue;
+        $history->save();
+
         return false;
     }
 
@@ -711,5 +730,33 @@ class Panel implements MessageComponentInterface
         }
 
         return (bool)$value;
+    }
+
+    /**
+     * @param Board $board
+     * @param boolean $connected
+     */
+    protected function logBoardConnection($board, $connected)
+    {
+        $model = new History();
+        $model->type = History::TYPE_BOARD_CONNECTION;
+        $model->board_id = $board->id;
+        $model->value = $connected;
+        $model->commited_at = time();
+        $model->save();
+    }
+
+    /**
+     * @param User $user
+     * @param boolean $connected
+     */
+    protected function logUserConnection($user, $connected)
+    {
+        $model = new History();
+        $model->type = History::TYPE_USER_CONNECTION;
+        $model->board_id = $user->id;
+        $model->value = $connected;
+        $model->commited_at = time();
+        $model->save();
     }
 }

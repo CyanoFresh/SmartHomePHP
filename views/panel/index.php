@@ -32,7 +32,7 @@ WSClientAsset::register($this);
 
             <div class="box-body control-panel-items">
                 <div class="row items-variable">
-                    <?php foreach ($room->getItems()->variables()->all() as $item): ?>
+                    <?php foreach ($room->getItems()->variables()->active()->all() as $item): ?>
                         <div class="col-md-3 col-sm-4 control-panel-item item-variable"
                              data-item-id="<?= $item->id ?>">
                             <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
@@ -51,7 +51,7 @@ WSClientAsset::register($this);
                     <?php endforeach; ?>
                 </div>
                 <div class="row items-switch">
-                    <?php foreach ($room->getItems()->switches()->all() as $item): ?>
+                    <?php foreach ($room->getItems()->switches()->active()->all() as $item): ?>
                         <div class="col-md-3 col-sm-4 control-panel-item item-switch"
                              data-item-id="<?= $item->id ?>">
                             <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">

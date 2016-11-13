@@ -9,6 +9,17 @@ namespace app\models;
  */
 class ItemQuery extends \yii\db\ActiveQuery
 {
+    /**
+     * @return $this
+     */
+    public function active()
+    {
+        return $this->andWhere(['active' => true]);
+    }
+
+    /**
+     * @return $this
+     */
     public function variables()
     {
         return $this->andWhere([
@@ -22,6 +33,9 @@ class ItemQuery extends \yii\db\ActiveQuery
         ]);
     }
 
+    /**
+     * @return $this
+     */
     public function switches()
     {
         return $this->andWhere([
@@ -31,6 +45,9 @@ class ItemQuery extends \yii\db\ActiveQuery
         ]);
     }
 
+    /**
+     * @return $this
+     */
     public function rgb()
     {
         return $this->andWhere([

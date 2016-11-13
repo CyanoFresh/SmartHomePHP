@@ -69,6 +69,8 @@ use yii\widgets\ActiveForm;
             ) ?>
 
             <?= $form->field($model, 'sort_order')->input('number') ?>
+
+            <?= $form->field($model, 'active')->checkbox() ?>
         </div>
     </div>
 

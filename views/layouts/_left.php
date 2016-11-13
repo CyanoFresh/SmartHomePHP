@@ -21,6 +21,9 @@
                     ['label' => 'Управление', 'options' => ['class' => 'header']],
                     ['label' => 'Панель Управления', 'icon' => 'fa fa-sliders', 'url' => ['/panel/index']],
 
+                    ['label' => 'Информация', 'options' => ['class' => 'header']],
+                    ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/history/index']],
+
                     ['label' => 'Настройки', 'options' => ['class' => 'header']],
                     ['label' => 'Элементы', 'icon' => 'fa fa-cubes', 'url' => ['/admin/item/index']],
                     ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/admin/room/index']],
