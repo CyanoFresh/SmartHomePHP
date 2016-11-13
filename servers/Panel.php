@@ -392,7 +392,11 @@ class Panel implements MessageComponentInterface
                 $history->item_id = $item->id;
                 $history->commited_at = time();
                 $history->value = $value;
-                $history->save();
+
+                if (!$history->save()) {
+                    $this->log("Cannot log: ");
+                    var_dump($history->errors);
+                }
 
                 break;
             case 'values':
@@ -430,7 +434,11 @@ class Panel implements MessageComponentInterface
                     $history->item_id = $item->id;
                     $history->commited_at = time();
                     $history->value = $value;
-                    $history->save();
+
+                    if (!$history->save()) {
+                        $this->log("Cannot log: ");
+                        var_dump($history->errors);
+                    }
                 }
 
                 break;
@@ -643,6 +651,7 @@ class Panel implements MessageComponentInterface
         $history->type = History::TYPE_USER_ACTION;
         $history->user_id = $user->id;
         $history->item_id = $item->id;
+        $history->commited_at = time();
         $history->value = $red . ',' . $green . ',' . $blue;
 
         if (!$history->save()) {

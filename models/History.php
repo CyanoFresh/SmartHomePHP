@@ -43,6 +43,7 @@ class History extends \yii\db\ActiveRecord
         return [
             [['type', 'commited_at'], 'required'],
             [['type', 'item_id', 'board_id', 'event_id', 'user_id', 'commited_at', 'value'], 'integer'],
+            [['commited_at'], 'default', 'value' => time()],
         ];
     }
 
