@@ -497,12 +497,7 @@ class Panel implements MessageComponentInterface
                 break;
         }
 
-        $history = new History();
-        $history->type = History::TYPE_USER_ACTION;
-        $history->user_id = $user->id;
-        $history->item_id = $item->id;
-        $history->value = 1;
-        $history->save();
+        $this->logSwitch($item, $user, 1);
 
         return true;
     }
@@ -557,12 +552,7 @@ class Panel implements MessageComponentInterface
                 break;
         }
 
-        $history = new History();
-        $history->type = History::TYPE_USER_ACTION;
-        $history->user_id = $user->id;
-        $history->item_id = $item->id;
-        $history->value = 0;
-        $history->save();
+        $this->logSwitch($item, $user, 0);
 
         return false;
     }
@@ -654,7 +644,11 @@ class Panel implements MessageComponentInterface
         $history->user_id = $user->id;
         $history->item_id = $item->id;
         $history->value = $red . ',' . $green . ',' . $blue;
-        $history->save();
+
+        if (!$history->save()) {
+            $this->log("Cannot log: ");
+            var_dump($history->errors);
+        }
 
         return false;
     }
@@ -743,7 +737,11 @@ class Panel implements MessageComponentInterface
         $model->board_id = $board->id;
         $model->value = $connected;
         $model->commited_at = time();
-        $model->save();
+
+        if (!$model->save()) {
+            $this->log("Cannot log: ");
+            var_dump($model->errors);
+        }
     }
 
     /**
@@ -757,6 +755,30 @@ class Panel implements MessageComponentInterface
         $model->user_id = $user->id;
         $model->value = $connected;
         $model->commited_at = time();
-        $model->save();
+
+        if (!$model->save()) {
+            $this->log("Cannot log: ");
+            var_dump($model->errors);
+        }
+    }
+
+    /**
+     * @param Item $item
+     * @param User $user
+     * @param boolean $value
+     */
+    protected function logSwitch($item, $user, $value)
+    {
+        $model = new History();
+        $model->type = History::TYPE_USER_ACTION;
+        $model->item_id = $item->id;
+        $model->user_id = $user->id;
+        $model->value = $value;
+        $model->commited_at = time();
+
+        if (!$model->save()) {
+            $this->log("Cannot log: ");
+            var_dump($model->errors);
+        }
     }
 }
