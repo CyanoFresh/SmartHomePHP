@@ -388,15 +388,7 @@ class Panel implements MessageComponentInterface
                 ]);
 
                 // Save to history
-                $history = new History();
-                $history->item_id = $item->id;
-                $history->commited_at = time();
-                $history->value = $value;
-
-                if (!$history->save()) {
-                    $this->log("Cannot log: ");
-                    var_dump($history->errors);
-                }
+                $this->logItemValue($item, $value);
 
                 break;
             case 'values':
@@ -430,15 +422,7 @@ class Panel implements MessageComponentInterface
                     ]);
 
                     // Save to history
-                    $history = new History();
-                    $history->item_id = $item->id;
-                    $history->commited_at = time();
-                    $history->value = $value;
-
-                    if (!$history->save()) {
-                        $this->log("Cannot log: ");
-                        var_dump($history->errors);
-                    }
+                    $this->logItemValue($item, $value);
                 }
 
                 break;
@@ -784,6 +768,24 @@ class Panel implements MessageComponentInterface
         $model->user_id = $user->id;
         $model->value = $value;
         $model->commited_at = time();
+
+        if (!$model->save()) {
+            $this->log("Cannot log: ");
+            var_dump($model->errors);
+        }
+    }
+
+    /**
+     * @param Item $item
+     * @param mixed $value
+     */
+    protected function logItemValue($item, $value)
+    {
+        $model = new History();
+        $model->type = History::TYPE_ITEM_VALUE;
+        $model->item_id = $item->id;
+        $model->commited_at = time();
+        $model->value = $value;
 
         if (!$model->save()) {
             $this->log("Cannot log: ");
