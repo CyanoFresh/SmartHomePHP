@@ -52,10 +52,12 @@ return [
             'js_position' => [\yii\web\View::POS_END],
             'force_charset' => 'UTF-8',
         ],
-//        'formatter' => [
+        'formatter' => [
 //            'dateFormat' => 'dd.MM.yyyy',
 //            'datetimeFormat' => 'php:d.m.Y H:i',
-//        ],
+            'defaultTimeZone' => 'Europe/Kiev',
+            'timeZone' => 'Europe/Kiev',
+        ],
         'assetManager' => [
             'bundles' => [
                 'dmstr\web\AdminLteAsset' => [
