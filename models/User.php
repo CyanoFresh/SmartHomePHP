@@ -189,4 +189,12 @@ class User extends ActiveRecord implements IdentityInterface
         $hash = md5($this->email);
         return 'https://www.gravatar.com/avatar/' . $hash . '?s=45';
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHistories()
+    {
+        return $this->hasMany(History::className(), ['user_id' => 'id'])->inverseOf('user');
+    }
 }

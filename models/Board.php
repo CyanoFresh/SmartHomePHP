@@ -91,4 +91,12 @@ class Board extends ActiveRecord
     {
         return self::getTypesArray()[$this->type];
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHistories()
+    {
+        return $this->hasMany(History::className(), ['board_id' => 'id'])->inverseOf('board');
+    }
 }
