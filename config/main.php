@@ -52,10 +52,10 @@ return [
             'js_position' => [\yii\web\View::POS_END],
             'force_charset' => 'UTF-8',
         ],
-        'formatter' => [
-            'dateFormat' => 'dd.MM.yyyy',
-            'datetimeFormat' => 'php:d.m.Y H:i',
-        ],
+//        'formatter' => [
+//            'dateFormat' => 'dd.MM.yyyy',
+//            'datetimeFormat' => 'php:d.m.Y H:i',
+//        ],
         'assetManager' => [
             'bundles' => [
                 'dmstr\web\AdminLteAsset' => [
