@@ -754,7 +754,7 @@ class Panel implements MessageComponentInterface
     {
         $model = new History();
         $model->type = History::TYPE_USER_CONNECTION;
-        $model->board_id = $user->id;
+        $model->user_id = $user->id;
         $model->value = $connected;
         $model->commited_at = time();
         $model->save();
