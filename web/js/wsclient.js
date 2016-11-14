@@ -134,7 +134,7 @@ function updateItemValue(id, type, value) {
         case 30:    // RGB
             var $colorPicker = $('#colorpicker-' + id);
 
-            $colorPicker.spectrum('set', 'rgb(' + value.red + ', ' + value.green + ', ' + value.blue + ')');
+            $colorPicker.spectrum('set', 'rgb(' + value[0] + ', ' + value[1] + ', ' + value[2] + ')');
 
             break;
     }
