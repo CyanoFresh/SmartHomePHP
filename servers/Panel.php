@@ -338,6 +338,12 @@ class Panel implements MessageComponentInterface
         $board = $from->Board;
         $data = Json::decode($msg);
 
+        $this->log("Removing board [$board->id] from timeout queue");
+
+        if (isset($this->awaitingPong[$board->id])) {
+            unset($this->awaitingPong[$board->id]);
+        }
+
         switch ($data['type']) {
             case 'value':
                 $value = $data['value'];
@@ -433,11 +439,7 @@ class Panel implements MessageComponentInterface
 
                 break;
             case 'pong':
-                $this->log("Removing board [$board->id] from timeout queue");
-
-                if (isset($this->awaitingPong[$board->id])) {
-                    unset($this->awaitingPong[$board->id]);
-                }
+                $this->log("Pong from board [$board->id]");
 
                 break;
         }
