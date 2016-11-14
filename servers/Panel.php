@@ -98,9 +98,9 @@ class Panel implements MessageComponentInterface
                     break;
                 case Item::TYPE_RGB:
                     $item['value'] = [
-                        'red' => 0,
-                        'green' => 0,
-                        'blue' => 0,
+                        0,
+                        0,
+                        0,
                     ];
 
                     $this->items[$item['id']] = $item;
@@ -378,6 +378,10 @@ class Panel implements MessageComponentInterface
                     $this->log($return);
                 }
 
+                if ($item->type === Item::TYPE_RGB) {
+                    $value = explode(',', $value);
+                }
+
                 $this->items[$item->id]['value'] = $value;
 
                 $this->sendUsers([
@@ -410,6 +414,8 @@ class Panel implements MessageComponentInterface
                         Item::TYPE_VARIABLE_BOOLEAN_DOOR,
                     ])) {
                         $value = $value === 0 ? false : true;
+                    } elseif ($item->type === Item::TYPE_RGB) {
+                        $value = explode(',', $value);
                     }
 
                     $this->items[$item->id]['value'] = $value;
@@ -617,9 +623,9 @@ class Panel implements MessageComponentInterface
         }
 
         $rgbArray = [
-            'red' => $red,
-            'green' => $green,
-            'blue' => $blue
+            $red,
+            $green,
+            $blue
         ];
 
         $this->items[$item->id]['value'] = $rgbArray;
@@ -781,6 +787,10 @@ class Panel implements MessageComponentInterface
      */
     protected function logItemValue($item, $value)
     {
+        if ($item->type === Item::TYPE_RGB) {
+            $value = implode(',', $value);
+        }
+
         $model = new History();
         $model->type = History::TYPE_ITEM_VALUE;
         $model->item_id = $item->id;
