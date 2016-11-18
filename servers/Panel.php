@@ -183,29 +183,32 @@ class Panel implements MessageComponentInterface
                 $conn->Board = $board;
                 $this->board_clients[$board->id] = $conn;
 
-                $this->isConnectedTimers[$board->id] = $this->loop->addPeriodicTimer(180, function () use ($board) {
-                    $this->log("Checking for timeout [$board->id] board...");
+                $this->isConnectedTimers[$board->id] = $this->loop->addPeriodicTimer(
+                    Yii::$app->params['server']['connectionCheckTimeout'],
+                    function () use ($board) {
+                        $this->log("Checking for timeout [$board->id] board...");
 
-                    if (!isset($this->board_clients[$board->id])) {
-                        $this->logBoardConnection($board, false);
+                        if (!isset($this->board_clients[$board->id])) {
+                            $this->logBoardConnection($board, false);
 
-                        return $this->log("Board [$board->id] has already been disconnected!");
+                            return $this->log("Board [$board->id] has already been disconnected!");
+                        }
+
+                        if (isset($this->awaitingPong[$board->id])) {
+                            $this->log("There was no pong from last ping! Disconnecting...");
+
+                            return $this->board_clients[$board->id]->close();
+                        }
+
+                        $this->log("Sending ping command...");
+
+                        $this->awaitingPong[$board->id] = true;
+
+                        return $this->sendToBoard($board->id, [
+                            'type' => 'ping',
+                        ]);
                     }
-
-                    if (isset($this->awaitingPong[$board->id])) {
-                        $this->log("There was no pong from last ping! Disconnecting...");
-
-                        return $this->board_clients[$board->id]->close();
-                    }
-
-                    $this->log("Sending ping command...");
-
-                    $this->awaitingPong[$board->id] = true;
-
-                    return $this->sendToBoard($board->id, [
-                        'type' => 'ping',
-                    ]);
-                });
+                );
 
                 $this->logBoardConnection($board, true);
 
@@ -282,7 +285,7 @@ class Panel implements MessageComponentInterface
             }
 
             if (isset($this->awaitingPong[$boardId])) {
-                $this->log("Removing from pong list...");
+                $this->log("Removing from awaiting pong list...");
 
                 unset($this->awaitingPong[$boardId]);
 
@@ -338,10 +341,10 @@ class Panel implements MessageComponentInterface
         $board = $from->Board;
         $data = Json::decode($msg);
 
-        $this->log("Removing board [$board->id] from timeout queue");
-
         if (isset($this->awaitingPong[$board->id])) {
             unset($this->awaitingPong[$board->id]);
+
+            $this->log("Removed board [$board->id] from timeout queue");
         }
 
         switch ($data['type']) {

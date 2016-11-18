@@ -9,6 +9,9 @@ $params = [
     'pushAllKey' => '83a29d6a4bb068458d375daaa16039c4',
     'maxLoginFailCount' => 5,
     'loginFailTimeout' => 600,
+    'server' => [
+        'connectionCheckTimeout' => 180,
+    ],
 ];
 
 return ArrayHelper::merge($params, require 'params-local.php');
