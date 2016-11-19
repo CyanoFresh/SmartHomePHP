@@ -9,6 +9,7 @@ use app\models\User;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\TimerInterface;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\helpers\Json;
@@ -46,7 +47,7 @@ class Panel implements MessageComponentInterface
     protected $items;
 
     /**
-     * @var array
+     * @var TimerInterface[]
      */
     protected $isConnectedTimers;
 
@@ -183,30 +184,10 @@ class Panel implements MessageComponentInterface
                 $conn->Board = $board;
                 $this->board_clients[$board->id] = $conn;
 
-                $this->isConnectedTimers[$board->id] = $this->loop->addPeriodicTimer(
+                $this->isConnectedTimers[$board->id] = $this->loop->addTimer(
                     Yii::$app->params['server']['connectionCheckTimeout'],
                     function () use ($board) {
-                        $this->log("Checking for timeout [$board->id] board...");
-
-                        if (!isset($this->board_clients[$board->id])) {
-                            $this->logBoardConnection($board, false);
-
-                            return $this->log("Board [$board->id] has already been disconnected!");
-                        }
-
-                        if (isset($this->awaitingPong[$board->id])) {
-                            $this->log("There was no pong from last ping! Disconnecting...");
-
-                            return $this->board_clients[$board->id]->close();
-                        }
-
-                        $this->log("Sending ping command...");
-
-                        $this->awaitingPong[$board->id] = true;
-
-                        return $this->sendToBoard($board->id, [
-                            'type' => 'ping',
-                        ]);
+                        return $this->doConnectionCheckTimer($board);
                     }
                 );
 
@@ -445,6 +426,9 @@ class Panel implements MessageComponentInterface
                 $this->log("Pong from board [$board->id]");
 
                 break;
+            default:
+                $this->log("Unknown command: \"{$data['type']}\"");
+                break;
         }
 
         return false;
@@ -557,7 +541,7 @@ class Panel implements MessageComponentInterface
 
         $this->logSwitch($item, $user, 0);
 
-        return false;
+        return true;
     }
 
     /**
@@ -654,7 +638,7 @@ class Panel implements MessageComponentInterface
             var_dump($history->errors);
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -806,5 +790,39 @@ class Panel implements MessageComponentInterface
             $this->log("Cannot log: ");
             var_dump($model->errors);
         }
+    }
+
+    public function doConnectionCheckTimer($board)
+    {
+        $this->log("Checking for timeout [$board->id] board...");
+
+        if (!isset($this->board_clients[$board->id])) {
+            $this->logBoardConnection($board, false);
+
+            return $this->log("Board [$board->id] has already been disconnected!");
+        }
+
+        if (isset($this->awaitingPong[$board->id])) {
+            $this->log("There was no pong from last ping! Disconnecting...");
+
+            return $this->board_clients[$board->id]->close();
+        }
+
+        $this->awaitingPong[$board->id] = true;
+
+        $this->sendToBoard($board->id, [
+            'type' => 'ping',
+        ]);
+
+        $this->isConnectedTimers[$board->id]->cancel();
+
+        $this->isConnectedTimers[$board->id] = $this->loop->addTimer(
+            Yii::$app->params['server']['connectionCheckTimeout'],
+            function () use ($board) {
+                return $this->doConnectionCheckTimer($board);
+            }
+        );
+
+        return true;
     }
 }

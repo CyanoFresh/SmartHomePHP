@@ -3,10 +3,7 @@
 namespace app\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\filters\VerbFilter;
-use app\models\LoginForm;
 
 class SiteController extends Controller
 {
@@ -14,7 +11,8 @@ class SiteController extends Controller
     {
         return [
             'error' => [
-                'class' => 'yii\web\ErrorAction',
+                'class' => 'app\components\ErrorAction',
+                'layout' => Yii::$app->user->isGuest ? 'base' : 'main',
             ],
         ];
     }
