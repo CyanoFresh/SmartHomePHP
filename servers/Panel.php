@@ -423,7 +423,7 @@ class Panel implements MessageComponentInterface
 
                 break;
             case 'pong':
-                $this->log("Pong from board [$board->id]");
+                $this->log("Received pong from board [$board->id]");
 
                 break;
             default:
@@ -606,6 +606,7 @@ class Panel implements MessageComponentInterface
                     'red' => $red * 4,
                     'green' => $green * 4,
                     'blue' => $blue * 4,
+                    'fade' => (bool)$data['fade'],
                 ]);
 
                 break;
