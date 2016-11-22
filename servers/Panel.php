@@ -601,12 +601,14 @@ class Panel implements MessageComponentInterface
                     ]));
                 }
 
+                $fade = isset($data['fade']) ? (bool) $data['fade'] : false;
+
                 $this->sendToBoard($board->id, [
                     'type' => 'rgb',
                     'red' => $red * 4,
                     'green' => $green * 4,
                     'blue' => $blue * 4,
-                    'fade' => (bool)$data['fade'],
+                    'fade' => $fade,
                 ]);
 
                 break;
