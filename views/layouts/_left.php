@@ -26,9 +26,14 @@
 
                     ['label' => 'Настройки', 'options' => ['class' => 'header']],
                     ['label' => 'Элементы', 'icon' => 'fa fa-cubes', 'url' => ['/admin/item/index']],
+                    ['label' => 'Платы', 'icon' => 'fa fa-cogs', 'url' => ['/admin/board/index']],
+                    ['label' => 'Events', 'icon' => 'fa fa-cogs', 'items' => [
+                        ['label' => 'События', 'icon' => 'fa fa-cubes', 'url' => ['/admin/event/index']],
+                        ['label' => 'Задачи', 'icon' => 'fa fa-cubes', 'url' => ['/admin/task/index']],
+                        ['label' => 'Действия', 'icon' => 'fa fa-cubes', 'url' => ['/admin/task-action/index']],
+                    ]],
                     ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/admin/room/index']],
                     ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/admin/history/index']],
-                    ['label' => 'Платы', 'icon' => 'fa fa-cogs', 'url' => ['/admin/board/index']],
                     ['label' => 'Пользователи', 'icon' => 'fa fa-users', 'url' => ['/admin/user/index']],
 
                     ['label' => 'Yii2', 'options' => ['class' => 'header'], 'visible' => YII_DEBUG],

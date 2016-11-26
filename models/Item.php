@@ -5,6 +5,7 @@ namespace app\models;
 use linslin\yii2\curl\Curl;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "item".
@@ -40,6 +41,9 @@ class Item extends ActiveRecord
 
     const VALUE_ON = 1;
     const VALUE_OFF = 0;
+
+    const MODE_RAINBOW = 'rainbow';
+    const MODE_BREATH = 'breath';
 
     /**
      * Used for WS handler
@@ -144,5 +148,10 @@ class Item extends ActiveRecord
     public function getTypeLabel()
     {
         return self::getTypesArray()[$this->type];
+    }
+
+    public static function getList()
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'name');
     }
 }

@@ -3,8 +3,10 @@
 namespace app\servers;
 
 use app\models\Board;
+use app\models\Event;
 use app\models\History;
 use app\models\Item;
+use app\models\TaskAction;
 use app\models\User;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -306,9 +308,11 @@ class Panel implements MessageComponentInterface
                 return $this->handleTurnOff($from, $user, $data);
             case 'rgb':
                 return $this->handleRgb($from, $user, $data);
+            case 'rgbMode':
+                return $this->handleRgbMode($from, $user, $data);
         }
 
-        return false;
+        return $this->log("Unknown command from user: $msg");
     }
 
     /**
@@ -341,6 +345,9 @@ class Panel implements MessageComponentInterface
                 if (!$item) {
                     return $this->log('Trying to use unknown item');
                 }
+
+                // Trig event
+                $this->trigItemValueEvent($item, $value);
 
                 if (in_array($item->type, [
                     Item::TYPE_SWITCH,
@@ -397,6 +404,9 @@ class Panel implements MessageComponentInterface
                     if (!$item) {
                         return $this->log('Trying to use unknown item');
                     }
+
+                    // Trig event
+                    $this->trigItemValueEvent($item, $value);
 
                     if (in_array($item->type, [
                         Item::TYPE_SWITCH,
@@ -645,6 +655,79 @@ class Panel implements MessageComponentInterface
     }
 
     /**
+     * @param ConnectionInterface $from
+     * @param User $user
+     * @param array $data
+     * @return bool|mixed
+     * @throws NotSupportedException
+     */
+    private function handleRgbMode($from, $user, $data)
+    {
+        $item_id = (int)$data['item_id'];
+        $item = Item::findOne($item_id);
+
+        if (!$item) {
+            return $from->send([
+                'type' => 'error',
+                'message' => 'Такое устройство не существует',
+            ]);
+        }
+
+        if ($item->type !== Item::TYPE_RGB) {
+            return $from->send([
+                'type' => 'error',
+                'message' => 'Данный тип устройства не является RGB',
+            ]);
+        }
+
+        $mode = $data['mode'];
+
+        if (!in_array($mode, [Item::MODE_BREATH, Item::MODE_RAINBOW])) {
+            return $from->send([
+                'type' => 'error',
+                'message' => 'Неизвестный режим',
+            ]);
+        }
+
+        $board = $item->board;
+
+        switch ($board->type) {
+            case Board::TYPE_AREST:
+                throw new NotSupportedException();
+
+                break;
+            case Board::TYPE_WEBSOCKET:
+                if (!$this->isBoardConnected($board->id)) {
+                    return $from->send(Json::encode([
+                        'type' => 'error',
+                        'message' => 'Устройство не подключено',
+                    ]));
+                }
+
+                $this->sendToBoard($board->id, [
+                    'type' => 'rgbMode',
+                    'mode' => $mode,
+                ]);
+
+                break;
+        }
+
+        $history = new History();
+        $history->type = History::TYPE_USER_ACTION;
+        $history->user_id = $user->id;
+        $history->item_id = $item->id;
+        $history->commited_at = time();
+        $history->value = $mode;
+
+        if (!$history->save()) {
+            $this->log("Cannot log: ");
+            var_dump($history->errors);
+        }
+
+        return true;
+    }
+
+    /**
      * Send data to all users
      *
      * @param array $data
@@ -827,5 +910,84 @@ class Panel implements MessageComponentInterface
         );
 
         return true;
+    }
+
+    /**
+     * @param Item $item
+     * @param string $value
+     */
+    private function trigItemValueEvent($item, $value)
+    {
+        // Find event
+        $event = Event::findOne([
+            'trig_item_id' => $item->id,
+            'trig_item_value' => $value,
+        ]);
+
+        if (!$event) {
+            return;
+        }
+
+        // Do the tasks
+        $task = $event->task;
+
+        foreach ($task->taskActions as $action) {
+            $this->doTaskAction($action, $item);
+        }
+    }
+
+    /**
+     * @param TaskAction $action
+     * @param null $item
+     */
+    private function doTaskAction($action, $item = null)
+    {
+        switch ($action->type) {
+            case TaskAction::TYPE_CHANGE_ITEM_VALUE:
+                $item = $item ? $item : $action->item;
+
+                switch ($item->type) {
+                    case Item::TYPE_SWITCH:
+                        $data = [
+                            'type' => $action->item_value == '1' ? 'turnON' : 'turnOFF',
+                            'pin' => $item->pin,
+                        ];
+
+                        break;
+                    case Item::TYPE_RGB:
+                        $rgbData = $this->valueToRgbData($action->item_value);
+                        $red = $rgbData[0];
+                        $green = $rgbData[1];
+                        $blue = $rgbData[2];
+                        $fade = $rgbData[3];
+
+                        $data = [
+                            'type' => 'rgb',
+                            'red' => $red * 4,
+                            'green' => $green * 4,
+                            'blue' => $blue * 4,
+                            'fade' => $fade,
+                        ];
+
+                        break;
+                    default:
+                        $data = [
+                            'type' => 'value',
+                            'value' => $action->item_value,
+                            'pin' => $item->pin,
+                        ];
+
+                        break;
+                }
+
+                $this->sendToBoard($item->board_id, $data);
+
+                break;
+        }
+    }
+
+    private function valueToRgbData($value)
+    {
+        return explode(',', $value);
     }
 }
