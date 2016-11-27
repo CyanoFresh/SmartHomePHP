@@ -98,7 +98,7 @@ class Event extends ActiveRecord
      */
     public function getTask()
     {
-        return $this->hasOne(Task::className(), ['id' => 'task_id'])->inverseOf('events');
+        return $this->hasOne(Task::className(), ['id' => 'task_id']);
     }
 
     public static function getList()
