@@ -1144,6 +1144,6 @@ class Panel implements MessageComponentInterface
             }
         }
 
-        $this->log("Scheduling done");
+        $this->log("Scheduling done. Total count of timers: " . count($this->eventTimers));
     }
 }
