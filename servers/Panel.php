@@ -935,6 +935,7 @@ class Panel implements MessageComponentInterface
         ]);
 
         if (!$event) {
+            $this->log("No event for this item [{$item->id}]");
             return;
         }
 
@@ -942,19 +943,18 @@ class Panel implements MessageComponentInterface
         $task = $event->task;
 
         foreach ($task->taskActions as $action) {
-            $this->doTaskAction($action, $item);
+            $this->doTaskAction($action);
         }
     }
 
     /**
      * @param TaskAction $action
-     * @param null $item
      */
-    private function doTaskAction($action, $item = null)
+    private function doTaskAction($action)
     {
         switch ($action->type) {
             case TaskAction::TYPE_CHANGE_ITEM_VALUE:
-                $item = $item ? $item : $action->item;
+                $item = $action->item;
 
                 switch ($item->type) {
                     case Item::TYPE_SWITCH:
