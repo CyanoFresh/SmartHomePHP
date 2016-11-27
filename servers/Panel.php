@@ -1087,13 +1087,28 @@ class Panel implements MessageComponentInterface
                         foreach ($days as $day) {
                             $trigTimestamp = strtotime($day . ', ' . $event->trig_time);
 
+                            if (isset($this->eventTimers[$event->id][$trigTimestamp])) {
+                                $this->log("Event [{$event->id}] already scheduled by time [$trigTimestamp]");
+                                break;
+                            }
+
                             if (time() < $trigTimestamp) {
-                                $this->eventTimers[$event->id] = $this->loop->addTimer($trigTimestamp - time(),
-                                    function () use ($event) {
+                                $timeout = $trigTimestamp - time();
+
+                                $this->log("Scheduling Event [{$event->id}] with timeout $timeout sec. for timeout [$trigTimestamp]");
+
+                                $this->eventTimers[$event->id][$trigTimestamp] = $this->loop->addTimer(
+                                    $timeout,
+                                    function () use ($event, $trigTimestamp) {
+                                        $this->log("Event [{$event->id}] triggered by time [$trigTimestamp]");
+
+                                        if (isset($this->eventTimers[$event->id][$trigTimestamp])) {
+                                            unset($this->eventTimers[$event->id][$trigTimestamp]);
+                                        }
+
                                         return $this->trigTimeEvent($event);
-                                    });
-                            } elseif (time() == $trigTimestamp) {
-                                $this->trigTimeEvent($event);
+                                    }
+                                );
                             }
                         }
                     } else {    // Everyday events
