@@ -1087,6 +1087,10 @@ class Panel implements MessageComponentInterface
                         foreach ($days as $day) {
                             $trigTimestamp = strtotime($day . ', ' . $event->trig_time);
 
+                            if (strtolower(date('w')) == $day) {
+                                $trigTimestamp = strtotime('+1 week, ' . $event->trig_time);
+                            }
+
                             if (isset($this->eventTimers[$event->id][$trigTimestamp])) {
                                 $this->log("Event [{$event->id}] already scheduled by time [$trigTimestamp]");
                                 break;
@@ -1110,7 +1114,7 @@ class Panel implements MessageComponentInterface
                                     }
                                 );
                             } else {
-                                $this->log("Trigger time $trigTimestamp is bigger than current time " . time());
+                                $this->log("Trigger time $trigTimestamp is lower than current time " . time());
                             }
                         }
                     } else {    // Everyday events
