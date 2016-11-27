@@ -59,6 +59,11 @@ class Panel implements MessageComponentInterface
     protected $awaitingPong;
 
     /**
+     * @var TimerInterface[]
+     */
+    protected $eventTimers;
+
+    /**
      * Class constructor.
      *
      * Init variables, etc.
@@ -111,6 +116,8 @@ class Panel implements MessageComponentInterface
                     break;
             }
         }
+
+        $this->scheduleEvents();
 
         $this->log('Server started');
     }
@@ -935,16 +942,10 @@ class Panel implements MessageComponentInterface
         ]);
 
         if (!$event) {
-            $this->log("No event for this item [{$item->id}]");
             return;
         }
 
-        // Do the tasks
-        $task = $event->task;
-
-        foreach ($task->taskActions as $action) {
-            $this->doTaskAction($action);
-        }
+        $this->trigEvent($event);
     }
 
     /**
@@ -969,7 +970,7 @@ class Panel implements MessageComponentInterface
                         $red = $rgbData[0];
                         $green = $rgbData[1];
                         $blue = $rgbData[2];
-                        $fade = $rgbData[3];
+                        $fade = (bool)$rgbData[3];
 
                         $data = [
                             'type' => 'rgb',
@@ -999,5 +1000,150 @@ class Panel implements MessageComponentInterface
     private function valueToRgbData($value)
     {
         return explode(',', $value);
+    }
+
+    /**
+     * @param Event $event
+     */
+    private function trigEvent($event)
+    {
+        $this->log("Event [{$event->id}] triggered. Doing the tasks...");
+
+        // Do the tasks
+        $task = $event->task;
+
+        foreach ($task->taskActions as $action) {
+            $this->doTaskAction($action);
+        }
+
+        $this->log("Tasks for Event [{$event->id}] done!");
+    }
+
+    /**
+     * @param Event $event
+     */
+    private function trigDateEvent($event)
+    {
+        $this->trigEvent($event);
+    }
+
+    /**
+     * @param Event $event
+     */
+    private function trigTimeEvent($event)
+    {
+        $this->trigEvent($event);
+
+        $this->scheduleEvents();
+    }
+
+    protected function scheduleEvents()
+    {
+        $this->log("Scheduling Events...");
+
+        /** @var Event[] $events */
+        $events = Event::find()->where([
+            'type' => [
+                Event::TYPE_BY_DATE,
+                Event::TYPE_BY_TIME,
+            ],
+        ])->all();
+
+        foreach ($events as $event) {
+            switch ($event->type) {
+                case Event::TYPE_BY_DATE:
+                    if (isset($this->eventTimers[$event->id])) {
+                        $this->log("Event [{$event->id}] already scheduled");
+                        break;
+                    }
+
+                    if ($event->trig_date and $event->trig_date > time()) {
+                        $timeout = $event->trig_date - time();
+
+                        $this->log("Scheduling Event [{$event->id}] with timeout $timeout sec.");
+
+                        $this->eventTimers[$event->id] = $this->loop->addTimer(
+                            $timeout,
+                            function () use ($event) {
+                                $this->log("Event [{$event->id}] triggered by date");
+
+                                if (isset($this->eventTimers[$event->id])) {
+                                    unset($this->eventTimers[$event->id]);
+                                }
+
+                                return $this->trigDateEvent($event);
+                            });
+                    } else {
+                        $this->log("Event [{$event->id}] expired by date");
+                    }
+
+                    break;
+                case Event::TYPE_BY_TIME:
+                    if ($event->trig_time_wdays) {  // Every week events
+                        $days = explode(',', $event->trig_time_wdays);
+
+                        foreach ($days as $day) {
+                            $trigTimestamp = strtotime($day . ', ' . $event->trig_time);
+
+                            if (time() < $trigTimestamp) {
+                                $this->eventTimers[$event->id] = $this->loop->addTimer($trigTimestamp - time(),
+                                    function () use ($event) {
+                                        return $this->trigTimeEvent($event);
+                                    });
+                            } elseif (time() == $trigTimestamp) {
+                                $this->trigTimeEvent($event);
+                            }
+                        }
+                    } else {    // Everyday events
+                        if (isset($this->eventTimers[$event->id])) {
+                            $this->log("Event [{$event->id}] already scheduled by time");
+                            break;
+                        }
+
+                        // Schedule event for today
+                        $trigTimestamp = strtotime('today, ' . $event->trig_time);
+
+                        if (time() < $trigTimestamp) {
+                            $this->eventTimers[$event->id] = $this->loop->addTimer(
+                                $trigTimestamp - time(),
+                                function () use ($event) {
+                                    $this->log("Event [{$event->id}] triggered by time");
+
+                                    if (isset($this->eventTimers[$event->id])) {
+                                        unset($this->eventTimers[$event->id]);
+                                    }
+
+                                    return $this->trigTimeEvent($event);
+                                }
+                            );
+                        } elseif (time() === $trigTimestamp) {
+                            $this->trigTimeEvent($event);
+                        } else {
+                            $trigTimestamp = strtotime('tomorrow, ' . $event->trig_time);
+
+                            $timeout = $trigTimestamp - time();
+
+                            $this->log("Event [{$event->id}] expired by time. Scheduling for the next day ($timeout sec.)...");
+
+                            $this->eventTimers[$event->id] = $this->loop->addTimer(
+                                $timeout,
+                                function () use ($event) {
+                                    $this->log("Event [{$event->id}] triggered by time");
+
+                                    if (isset($this->eventTimers[$event->id])) {
+                                        unset($this->eventTimers[$event->id]);
+                                    }
+
+                                    return $this->trigTimeEvent($event);
+                                }
+                            );
+                        }
+                    }
+
+                    break;
+            }
+        }
+
+        $this->log("Scheduling done");
     }
 }

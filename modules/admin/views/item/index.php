@@ -43,6 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->getTypeLabel();
                 },
             ],
+            'pin',
 
             ['class' => 'app\components\ActionButtonColumn'],
         ],
