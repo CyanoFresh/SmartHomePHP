@@ -422,9 +422,9 @@ class Panel implements MessageComponentInterface
                     } elseif ($item->type === Item::TYPE_RGB) {
                         $value = explode(',', $value);
 
-                        // Convert from 10 bit to 8 bit
-                        foreach ($value as $item) {
-                            $item = round($item / 4);
+                        // Convert R,G,B from 10 bit to 8 bit
+                        for ($i = 0; $i < 3; $i++) {
+                            $value[$i] = round($value[$i] / 4);
                         }
                     }
 
