@@ -1087,7 +1087,7 @@ class Panel implements MessageComponentInterface
                         foreach ($days as $day) {
                             $trigTimestamp = strtotime($day . ', ' . $event->trig_time);
 
-                            if (strtolower(date('w')) == $day) {
+                            if (strtolower(date('l')) == $day) {
                                 $trigTimestamp = strtotime('+1 week, ' . $event->trig_time);
                             }
 
