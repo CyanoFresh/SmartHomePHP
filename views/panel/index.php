@@ -19,7 +19,6 @@ WSClientAsset::register($this);
         <span></span>
         <span></span>
     </div>
-    <?= date('d.m.Y H:i:s', strtotime('tomorrow, 09:00')) ?>
     <div class="loader-text text-danger"></div>
 </div>
 
