@@ -1124,8 +1124,6 @@ class Panel implements MessageComponentInterface
                                     return $this->trigTimeEvent($event);
                                 }
                             );
-                        } elseif (time() === $trigTimestamp) {
-                            $this->trigTimeEvent($event);
                         } else {
                             $trigTimestamp = strtotime('tomorrow, ' . $event->trig_time);
 
