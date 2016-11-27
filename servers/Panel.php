@@ -1109,6 +1109,8 @@ class Panel implements MessageComponentInterface
                                         return $this->trigTimeEvent($event);
                                     }
                                 );
+                            } else {
+                                $this->log("Trigger time $trigTimestamp is bigger than current time " . time());
                             }
                         }
                     } else {    // Everyday events
