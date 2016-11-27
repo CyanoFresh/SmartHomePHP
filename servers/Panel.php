@@ -377,6 +377,11 @@ class Panel implements MessageComponentInterface
 
                 if ($item->type === Item::TYPE_RGB) {
                     $value = explode(',', $value);
+
+                    // Convert R,G,B from 10 bit to 8 bit
+                    for ($i = 0; $i < 3; $i++) {
+                        $value[$i] = round($value[$i] / 4);
+                    }
                 }
 
                 $this->items[$item->id]['value'] = $value;
@@ -416,6 +421,11 @@ class Panel implements MessageComponentInterface
                         $value = $value === 0 ? false : true;
                     } elseif ($item->type === Item::TYPE_RGB) {
                         $value = explode(',', $value);
+
+                        // Convert from 10 bit to 8 bit
+                        foreach ($value as $item) {
+                            $item = round($item / 4);
+                        }
                     }
 
                     $this->items[$item->id]['value'] = $value;
@@ -611,7 +621,7 @@ class Panel implements MessageComponentInterface
                     ]));
                 }
 
-                $fade = isset($data['fade']) ? (bool) $data['fade'] : false;
+                $fade = isset($data['fade']) ? (bool)$data['fade'] : false;
 
                 $this->sendToBoard($board->id, [
                     'type' => 'rgb',
@@ -632,12 +642,12 @@ class Panel implements MessageComponentInterface
 
         $this->items[$item->id]['value'] = $rgbArray;
 
-        $this->sendUsers([
-            'type' => 'value',
-            'item_id' => $item->id,
-            'item_type' => Item::TYPE_RGB,
-            'value' => $rgbArray,
-        ]);
+//        $this->sendUsers([
+//            'type' => 'value',
+//            'item_id' => $item->id,
+//            'item_type' => Item::TYPE_RGB,
+//            'value' => $rgbArray,
+//        ]);
 
         $history = new History();
         $history->type = History::TYPE_USER_ACTION;
