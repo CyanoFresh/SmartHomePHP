@@ -1079,7 +1079,9 @@ class Panel implements MessageComponentInterface
 
                     break;
                 case Event::TYPE_BY_TIME:
-                    if ($event->trig_time_wdays) {  // Every week events
+                    if ($event->trig_time_wdays != '') {  // Every week events
+                        $this->log("Event [{$event->id}] runs every week");
+
                         $days = explode(',', $event->trig_time_wdays);
 
                         foreach ($days as $day) {
@@ -1095,6 +1097,8 @@ class Panel implements MessageComponentInterface
                             }
                         }
                     } else {    // Everyday events
+                        $this->log("Event [{$event->id}] runs every day");
+
                         if (isset($this->eventTimers[$event->id])) {
                             $this->log("Event [{$event->id}] already scheduled by time");
                             break;
@@ -1104,8 +1108,12 @@ class Panel implements MessageComponentInterface
                         $trigTimestamp = strtotime('today, ' . $event->trig_time);
 
                         if (time() < $trigTimestamp) {
+                            $timeout = $trigTimestamp - time();
+
+                            $this->log("Scheduling Event [{$event->id}] with timeout $timeout sec.");
+
                             $this->eventTimers[$event->id] = $this->loop->addTimer(
-                                $trigTimestamp - time(),
+                                $timeout,
                                 function () use ($event) {
                                     $this->log("Event [{$event->id}] triggered by time");
 
