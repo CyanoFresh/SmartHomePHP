@@ -74,6 +74,9 @@ return [
         'admin' => [
             'class' => 'app\modules\admin\Module',
         ],
+        'api' => [
+            'class' => 'app\modules\api\Module',
+        ],
     ],
     'params' => $params,
     'defaultRoute' => ['panel/index'],
