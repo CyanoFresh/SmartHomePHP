@@ -4,6 +4,7 @@
 /* @var $searchModel app\models\BoardSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+use app\models\Board;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
@@ -25,11 +26,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'filterModel' => $searchModel,
         'columns' => [
-            'id',
+            [
+                'attribute' => 'id',
+                'contentOptions' => ['style' => 'width: 5%']
+            ],
             'name',
             [
                 'attribute' => 'type',
-                'value' => function (\app\models\Board $model) {
+                'filter' => Board::getTypesArray(),
+                'value' => function (Board $model) {
                     return $model->getTypeLabel();
                 }
             ],

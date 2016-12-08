@@ -5,7 +5,7 @@
 
 use yii\helpers\Html;
 
-$this->title = 'Добавить Item';
+$this->title = 'Добавить Элемент';
 $this->params['breadcrumbs'][] = ['label' => 'Элементы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

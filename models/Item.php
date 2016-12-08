@@ -14,6 +14,7 @@ use yii\helpers\ArrayHelper;
  * @property boolean $active
  * @property integer $type
  * @property integer $update_interval
+ * @property boolean $enable_log
  * @property integer $save_history_interval
  * @property integer $room_id
  * @property integer $board_id
@@ -71,8 +72,8 @@ class Item extends ActiveRecord
             [['room_id'], 'exist', 'skipOnError' => true, 'targetClass' => Room::className(), 'targetAttribute' => ['room_id' => 'id']],
             [['board_id'], 'exist', 'skipOnError' => true, 'targetClass' => Board::className(), 'targetAttribute' => ['board_id' => 'id']],
             [['sort_order', 'update_interval', 'save_history_interval'], 'default', 'value' => 0],
-            [['active'], 'default', 'value' => true],
-            [['active'], 'boolean'],
+            [['active', 'enable_log'], 'default', 'value' => true],
+            [['active', 'enable_log'], 'boolean'],
         ];
     }
 
@@ -84,6 +85,7 @@ class Item extends ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'active' => Yii::t('app', 'Активно'),
+            'enable_log' => Yii::t('app', 'Логирование'),
             'type' => Yii::t('app', 'Тип'),
             'update_interval' => Yii::t('app', 'Интервал обновления'),
             'save_history_interval' => Yii::t('app', 'Интервал сохранения в историю'),
@@ -93,8 +95,8 @@ class Item extends ActiveRecord
             'pin' => Yii::t('app', 'Pin'),
             'name' => Yii::t('app', 'Название'),
             'icon' => Yii::t('app', 'Иконка'),
-            'bg' => Yii::t('app', 'Фон'),
-            'class' => Yii::t('app', 'Кастомный Класс'),
+            'bg' => Yii::t('app', 'CSS Background'),
+            'class' => Yii::t('app', 'CSS Класс'),
             'sort_order' => Yii::t('app', 'Порядок сортировки'),
         ];
     }

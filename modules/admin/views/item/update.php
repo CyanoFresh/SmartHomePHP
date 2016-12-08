@@ -5,8 +5,8 @@
 
 use yii\helpers\Html;
 
-$this->title = 'Изменить Item: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index']];
+$this->title = 'Изменить Элемент: ' . $model->name;
+$this->params['breadcrumbs'][] = ['label' => 'Элементы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Редактирование';
 ?>

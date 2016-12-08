@@ -7,6 +7,11 @@
 use app\models\Board;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+
+if ($model->isNewRecord) {
+    $model->secret = md5(time());
+}
+
 ?>
 
 <div class="board-form">
@@ -15,9 +20,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'type')->dropDownList(Board::getTypesArray()) ?>
+    <?= $form->field($model, 'type')->dropDownList(Board::getTypesArray(), [
+        'prompt' => '--- выберите тип ---',
+    ]) ?>
 
-    <?= $form->field($model, 'secret')->textInput() ?>
+    <?= $form->field($model, 'secret')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'baseUrl')->textInput(['maxlength' => true]) ?>
 

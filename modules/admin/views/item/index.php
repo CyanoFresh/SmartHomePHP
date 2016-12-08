@@ -4,6 +4,7 @@
 /* @var $searchModel app\models\ItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+use app\models\Board;
 use app\models\Item;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -26,10 +27,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'filterModel' => $searchModel,
         'columns' => [
-            'id',
+            [
+                'attribute' => 'id',
+                'contentOptions' => ['style' => 'width: 5%']
+            ],
             'name',
             [
                 'attribute' => 'board_id',
+                'filter' => Board::getList(),
                 'value' => function ($model) {
                     /** @var $model Item */
                     return $model->board->name;

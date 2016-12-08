@@ -11,6 +11,10 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+if ($model->isNewRecord) {
+    $model->active = true;
+    $model->enable_log = true;
+}
 ?>
 
 <div class="item-form">
@@ -23,11 +27,13 @@ use yii\widgets\ActiveForm;
 
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-            <?= $form->field($model, 'type')->dropDownList(Item::getTypesArray()) ?>
+            <?= $form->field($model, 'type')->dropDownList(Item::getTypesArray(), [
+                'prompt' => '--- выберите тип ---',
+            ]) ?>
 
-            <?= $form->field($model, 'board_id')->dropDownList(
-                ArrayHelper::map(Board::find()->all(), 'id', 'name')
-            ) ?>
+            <?= $form->field($model, 'board_id')->dropDownList(Board::getList(), [
+                'prompt' => '--- выберите плату ---',
+            ]) ?>
 
             <div class="row">
                 <div class="col-sm-6">
@@ -43,7 +49,7 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'save_history_interval')->input('number') ?>
         </div>
         <div class="col-md-6">
-            <h2>Дизайн</h2>
+            <h2>Сниппет</h2>
 
             <?= $form->field($model, 'icon')->textInput(['maxlength' => true]) ?>
 
@@ -69,10 +75,12 @@ use yii\widgets\ActiveForm;
             ) ?>
 
             <?= $form->field($model, 'sort_order')->input('number') ?>
-
-            <?= $form->field($model, 'active')->checkbox() ?>
         </div>
     </div>
+
+    <?= $form->field($model, 'active')->checkbox() ?>
+
+    <?= $form->field($model, 'enable_log')->checkbox() ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить',

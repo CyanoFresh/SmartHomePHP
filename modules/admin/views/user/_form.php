@@ -7,6 +7,11 @@
 use app\models\User;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+
+if ($model->isNewRecord) {
+    $model->api_key = md5(time());
+}
+
 ?>
 
 <div class="user-form">
@@ -15,9 +20,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'username')->textInput() ?>
 
-    <?= $form->field($model, 'email')->input('email') ?>
-
     <?= $form->field($model, 'password')->passwordInput() ?>
+
+    <?= $form->field($model, 'email')->input('email') ?>
 
     <?= $form->field($model, 'status')->dropDownList(User::getStatusesArray()) ?>
 

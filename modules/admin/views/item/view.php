@@ -7,7 +7,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Элементы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-view">

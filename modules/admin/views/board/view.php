@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'name',
             'typeLabel',
             'secret',
-            'baseUrl:ntext',
+            'baseUrl',
         ],
     ]) ?>
 

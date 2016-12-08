@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "board".
@@ -39,6 +40,7 @@ class Board extends ActiveRecord
             [['type'], 'integer'],
             [['baseUrl'], 'string'],
             [['name', 'secret'], 'string', 'max' => 255],
+            [['secret'], 'default', 'value' => md5(time())],
         ];
     }
 
@@ -52,7 +54,7 @@ class Board extends ActiveRecord
             'type' => Yii::t('app', 'Тип'),
             'name' => Yii::t('app', 'Название'),
             'secret' => Yii::t('app', 'Ключ'),
-            'baseUrl' => Yii::t('app', 'Base Url'),
+            'baseUrl' => Yii::t('app', 'API URL'),
         ];
     }
 
@@ -90,6 +92,14 @@ class Board extends ActiveRecord
     public function getTypeLabel()
     {
         return self::getTypesArray()[$this->type];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getList()
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'name');
     }
 
     /**
