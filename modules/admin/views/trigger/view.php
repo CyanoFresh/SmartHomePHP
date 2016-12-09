@@ -1,16 +1,16 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Event */
+/* @var $model app\models\Trigger */
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Events', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Triggers', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="event-view">
+<div class="trigger-view">
 
     <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -27,13 +27,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'type',
-            'trig_date',
-            'trig_time',
+            [
+                'attribute' => 'type',
+                'value' => $model->getTypeLabel(),
+            ],
+            'trig_date:datetime',
+            'trig_time:time',
             'trig_time_wdays',
             'trig_item_id',
             'trig_item_value',
-            'task_id',
             'name',
         ],
     ]) ?>

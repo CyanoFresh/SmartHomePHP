@@ -1,21 +1,22 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\modules\admin\models\EventSearch */
+/* @var $searchModel app\modules\admin\models\TriggerSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+use app\models\Trigger;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-$this->title = 'Events';
+
+$this->title = 'Triggers';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="event-index">
+<div class="trigger-index">
 
     <p>
         <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?php Pjax::begin(); ?>
     <?= GridView::widget([
@@ -25,16 +26,21 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             'id',
-            'type',
-            'trig_date',
-            'trig_time',
-            'trig_time_wdays',
-            // 'trig_item_id',
-            // 'trig_item_value',
-            // 'task_id',
-            // 'name',
+            'name',
+            [
+                'filter' => Trigger::getTypes(),
+                'attribute' => 'type',
+                'value' => function (Trigger $model) {
+                    return $model->getTypeLabel();
+                },
+            ],
+//            'trig_date',
+//            'trig_time',
+//            'trig_time_wdays',
+//            'trig_item_id',
+//            'trig_item_value',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'app\components\ActionButtonColumn'],
         ],
     ]); ?>
     <?php Pjax::end(); ?>

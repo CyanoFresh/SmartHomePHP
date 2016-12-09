@@ -5,12 +5,12 @@ namespace app\modules\admin\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\TaskAction;
+use app\models\Trigger;
 
 /**
- * TaskActionSearch represents the model behind the search form about `app\models\TaskAction`.
+ * TriggerSearch represents the model behind the search form about `app\models\Trigger`.
  */
-class TaskActionSearch extends TaskAction
+class TriggerSearch extends Trigger
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class TaskActionSearch extends TaskAction
     public function rules()
     {
         return [
-            [['id', 'type', 'item_id'], 'integer'],
-            [['item_value', 'name'], 'safe'],
+            [['id', 'type', 'trig_item_id'], 'integer'],
+            [['trig_date', 'trig_time', 'trig_time_wdays', 'trig_item_value', 'name'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class TaskActionSearch extends TaskAction
      */
     public function search($params)
     {
-        $query = TaskAction::find();
+        $query = Trigger::find();
 
         // add conditions that should always apply here
 
@@ -61,10 +61,13 @@ class TaskActionSearch extends TaskAction
         $query->andFilterWhere([
             'id' => $this->id,
             'type' => $this->type,
-            'item_id' => $this->item_id,
+            'trig_item_id' => $this->trig_item_id,
         ]);
 
-        $query->andFilterWhere(['like', 'item_value', $this->item_value])
+        $query->andFilterWhere(['like', 'trig_date', $this->trig_date])
+            ->andFilterWhere(['like', 'trig_time', $this->trig_time])
+            ->andFilterWhere(['like', 'trig_time_wdays', $this->trig_time_wdays])
+            ->andFilterWhere(['like', 'trig_item_value', $this->trig_item_value])
             ->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;

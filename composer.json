@@ -14,10 +14,13 @@
     "dmstr/yii2-adminlte-asset": "2.*",
     "linslin/yii2-curl": "1.0.8",
     "shifrin/yii2-noty": "^1.0",
-    "ratchet/pawl": "^0.2.2"
+    "ratchet/pawl": "^0.2.2",
+    "voskobovich/yii2-many-many-behavior": "^3.2",
+    "kartik-v/yii2-widgets": "^3.4",
+    "kartik-v/yii2-datecontrol": "^1.9",
+    "voskobovich/yii2-linker-behavior": "4.0.1-rc"
   },
   "require-dev": {
-    "yiisoft/yii2-codeception": "*",
     "yiisoft/yii2-debug": "*",
     "yiisoft/yii2-gii": "*",
     "yiisoft/yii2-faker": "*"
@@ -25,12 +28,6 @@
   "config": {
     "process-timeout": 1800
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/Devristo/phpws"
-    }
-  ],
   "extra": {
     "asset-installer-paths": {
       "npm-asset-library": "vendor/npm",

@@ -141,8 +141,8 @@
     position: absolute;
     top: 50px;
     display: block;
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     background: #605ca8;
     border-radius: 50%;
 }
@@ -184,4 +184,8 @@
         -webkit-transform: translateY(-25px);
         transform: translateY(-25px);
     }
+}
+
+.select2-container--krajee .select2-selection--single {
+    line-height: 2;
 }

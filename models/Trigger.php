@@ -2,26 +2,26 @@
 
 namespace app\models;
 
+use voskobovich\linker\LinkerBehavior;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "event".
+ * This is the model class for table "trigger".
  *
  * @property integer $id
  * @property integer $type
- * @property string $trig_date
+ * @property integer $trig_date
  * @property string $trig_time
  * @property string $trig_time_wdays
  * @property integer $trig_item_id
  * @property string $trig_item_value
- * @property integer $task_id
  * @property string $name
  *
- * @property Task $task
+ * @property Task[] $tasks
  */
-class Event extends ActiveRecord
+class Trigger extends ActiveRecord
 {
     const TYPE_BY_ITEM_VALUE = 10;
     const TYPE_BY_USER_ITEM_CHANGE = 20;
@@ -33,7 +33,7 @@ class Event extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'event';
+        return 'trigger';
     }
 
     /**
@@ -43,9 +43,26 @@ class Event extends ActiveRecord
     {
         return [
             [['type', 'name'], 'required'],
-            [['type', 'trig_item_id', 'task_id'], 'integer'],
-            [['type'], 'in', 'range' => self::getStatusesArray()],
-            [['trig_date', 'trig_item_value', 'name', 'trig_time', 'trig_time_wdays'], 'string', 'max' => 255],
+            [['type', 'trig_item_id', 'trig_date'], 'integer'],
+            [['type'], 'in', 'range' => self::getTypesArray()],
+            [['trig_item_value', 'name', 'trig_time', 'trig_time_wdays'], 'string', 'max' => 255],
+            [['trig_time', 'trig_time_wdays', 'trig_date'], 'default', 'value' => null],
+            [['task_ids'], 'each', 'rule' => ['integer']],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => LinkerBehavior::className(),
+                'relations' => [
+                    'task_ids' => 'tasks',
+                ],
+            ],
         ];
     }
 
@@ -62,7 +79,7 @@ class Event extends ActiveRecord
             'trig_time_wdays' => 'Дни срабатывания',
             'trig_item_id' => 'Элемент срабатывания',
             'trig_item_value' => 'Значение элемента срабатывания',
-            'task_id' => 'Задача',
+            'task_ids' => 'Задачи',
             'name' => 'Имя',
         ];
     }
@@ -70,7 +87,7 @@ class Event extends ActiveRecord
     /**
      * @return array
      */
-    public static function getStatuses()
+    public static function getTypes()
     {
         return [
             self::TYPE_BY_ITEM_VALUE => 'Значение Элемента',
@@ -83,26 +100,33 @@ class Event extends ActiveRecord
     /**
      * @return array
      */
-    public static function getStatusesArray()
+    public static function getTypesArray()
     {
-        return [
-            self::TYPE_BY_ITEM_VALUE,
-            self::TYPE_BY_USER_ITEM_CHANGE,
-            self::TYPE_BY_DATE,
-            self::TYPE_BY_TIME,
-        ];
+        return array_keys(self::getTypes());
+    }
+
+    /**
+     * @return string
+     */
+    public function getTypeLabel()
+    {
+        return self::getTypes()[$this->type];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getList()
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'name');
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTask()
+    public function getTasks()
     {
-        return $this->hasOne(Task::className(), ['id' => 'task_id']);
-    }
-
-    public static function getList()
-    {
-        return ArrayHelper::map(self::find()->all(), 'id', 'name');
+        return $this->hasMany(Task::className(), ['id' => 'task_id'])
+            ->viaTable('trigger_task', ['trigger_id' => 'id']);
     }
 }

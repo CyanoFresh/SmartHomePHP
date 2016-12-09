@@ -5,8 +5,8 @@ $params = require(__DIR__ . '/params.php');
 return [
     'id' => 'basic',
     'name' => 'SmartHome',
-    'sourceLanguage' => 'ru',
     'language' => 'ru',
+    'sourceLanguage' => 'ru',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'components' => [
@@ -76,6 +76,9 @@ return [
         ],
         'api' => [
             'class' => 'app\modules\api\Module',
+        ],
+        'datecontrol' => [
+            'class' => '\kartik\datecontrol\Module'
         ],
     ],
     'params' => $params,

@@ -3,16 +3,16 @@
 namespace app\modules\admin\controllers;
 
 use Yii;
-use app\models\TaskAction;
-use app\modules\admin\models\TaskActionSearch;
+use app\models\Trigger;
+use app\modules\admin\models\TriggerSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * TaskActionController implements the CRUD actions for TaskAction model.
+ * TriggerController implements the CRUD actions for Trigger model.
  */
-class TaskActionController extends Controller
+class TriggerController extends Controller
 {
     /**
      * @inheritdoc
@@ -30,12 +30,12 @@ class TaskActionController extends Controller
     }
 
     /**
-     * Lists all TaskAction models.
+     * Lists all Trigger models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new TaskActionSearch();
+        $searchModel = new TriggerSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -45,7 +45,7 @@ class TaskActionController extends Controller
     }
 
     /**
-     * Displays a single TaskAction model.
+     * Displays a single Trigger model.
      * @param integer $id
      * @return mixed
      */
@@ -57,13 +57,13 @@ class TaskActionController extends Controller
     }
 
     /**
-     * Creates a new TaskAction model.
+     * Creates a new Trigger model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new TaskAction();
+        $model = new Trigger();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -75,7 +75,7 @@ class TaskActionController extends Controller
     }
 
     /**
-     * Updates an existing TaskAction model.
+     * Updates an existing Trigger model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -94,7 +94,7 @@ class TaskActionController extends Controller
     }
 
     /**
-     * Deletes an existing TaskAction model.
+     * Deletes an existing Trigger model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -107,15 +107,15 @@ class TaskActionController extends Controller
     }
 
     /**
-     * Finds the TaskAction model based on its primary key value.
+     * Finds the Trigger model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return TaskAction the loaded model
+     * @return Trigger the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = TaskAction::findOne($id)) !== null) {
+        if (($model = Trigger::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
