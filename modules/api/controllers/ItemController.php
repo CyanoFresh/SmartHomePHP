@@ -71,6 +71,43 @@ class ItemController extends Controller
     }
 
     /**
+     * @param int $item_id
+     * @return array
+     * @throws BadRequestHttpException
+     * @throws NotSupportedException
+     */
+    public function actionTurnOff($item_id)
+    {
+        $item = $this->findItem($item_id);
+
+        if ($item->type !== Item::TYPE_SWITCH) {
+            throw new BadRequestHttpException();
+        }
+
+        $board = $item->board;
+
+        switch ($board->type) {
+            case Board::TYPE_AREST:
+                throw new NotSupportedException();
+                break;
+            case Board::TYPE_WEBSOCKET:
+                $api = new WebSocketAPI(Yii::$app->user->identity);
+
+                if (!$api->turnOff($item_id)) {
+                    return [
+                        'success' => false,
+                    ];
+                }
+
+                break;
+        }
+
+        return [
+            'success' => true,
+        ];
+    }
+
+    /**
      * @param int $id
      * @return Item
      * @throws NotFoundHttpException

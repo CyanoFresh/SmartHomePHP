@@ -7,7 +7,6 @@ use app\models\Task;
 use app\models\Trigger;
 use app\models\History;
 use app\models\Item;
-use app\models\TaskAction;
 use app\models\User;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
