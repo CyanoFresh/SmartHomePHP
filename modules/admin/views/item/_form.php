@@ -44,6 +44,8 @@ if ($model->isNewRecord) {
                 </div>
             </div>
 
+            <?= $form->field($model, 'default_value')->textInput(['maxlength' => true]) ?>
+
             <?= $form->field($model, 'update_interval')->input('number') ?>
 
             <?= $form->field($model, 'save_history_interval')->input('number') ?>

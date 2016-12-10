@@ -208,6 +208,38 @@ class Panel implements MessageComponentInterface
                     }
                 );
 
+                // Set default values to board's items
+                foreach ($board->items as $item) {
+                    if ($item->default_value and !is_null($item->default_value)) {
+                        switch ($item->type) {
+                            case Item::TYPE_SWITCH:
+                                $this->sendToBoard($board->id, [
+                                    'type' => $item->default_value == 1 ? 'turnON' : 'turnOFF',
+                                    'pin' => $item->pin,
+                                ]);
+
+                                break;
+                            case Item::TYPE_RGB:
+                                $rgbData = $this->valueToRgbData($item->default_value);
+
+                                $red = $rgbData[0];
+                                $green = $rgbData[1];
+                                $blue = $rgbData[2];
+                                $fade = (bool)$rgbData[3];
+
+                                $this->sendToBoard($board->id, [
+                                    'type' => 'rgb',
+                                    'red' => $red * 4,
+                                    'green' => $green * 4,
+                                    'blue' => $blue * 4,
+                                    'fade' => $fade,
+                                ]);
+
+                                break;
+                        }
+                    }
+                }
+
                 $this->logBoardConnection($board, true);
 
                 return $this->log("Connected board [{$board->id}]");

@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
  * @property string $bg
  * @property string $class
  * @property integer $sort_order
+ * @property string $default_value
  *
  * @property History[] $histories
  * @property Room $room
@@ -68,12 +69,13 @@ class Item extends ActiveRecord
         return [
             [['active', 'type', 'room_id', 'name', 'icon', 'bg', 'board_id'], 'required'],
             [['type', 'update_interval', 'save_history_interval', 'room_id', 'sort_order', 'board_id', 'pin'], 'integer'],
-            [['url', 'name', 'icon', 'bg', 'class'], 'string', 'max' => 255],
+            [['url', 'name', 'icon', 'bg', 'class', 'default_value'], 'string', 'max' => 255],
             [['room_id'], 'exist', 'skipOnError' => true, 'targetClass' => Room::className(), 'targetAttribute' => ['room_id' => 'id']],
             [['board_id'], 'exist', 'skipOnError' => true, 'targetClass' => Board::className(), 'targetAttribute' => ['board_id' => 'id']],
             [['sort_order', 'update_interval', 'save_history_interval'], 'default', 'value' => 0],
             [['active', 'enable_log'], 'default', 'value' => true],
             [['active', 'enable_log'], 'boolean'],
+            [['default_value'], 'default', 'value' => null],
         ];
     }
 
@@ -98,6 +100,7 @@ class Item extends ActiveRecord
             'bg' => Yii::t('app', 'CSS Background'),
             'class' => Yii::t('app', 'CSS Класс'),
             'sort_order' => Yii::t('app', 'Порядок сортировки'),
+            'default_value' => Yii::t('app', 'Значение по умолчанию'),
         ];
     }
 
@@ -134,6 +137,9 @@ class Item extends ActiveRecord
         return new ItemQuery(get_called_class());
     }
 
+    /**
+     * @return array
+     */
     public static function getTypesArray()
     {
         return [
@@ -147,11 +153,17 @@ class Item extends ActiveRecord
         ];
     }
 
+    /**
+     * @return string
+     */
     public function getTypeLabel()
     {
         return self::getTypesArray()[$this->type];
     }
 
+    /**
+     * @return array
+     */
     public static function getList()
     {
         return ArrayHelper::map(self::find()->all(), 'id', 'name');
