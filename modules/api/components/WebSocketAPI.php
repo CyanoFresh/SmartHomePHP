@@ -41,7 +41,7 @@ class WebSocketAPI
      */
     protected function getWSSUrl()
     {
-        return $this->localWSSUrl . '/?type=user&id=' . $this->user->id . '&auth_key=' . $this->user->auth_key;
+        return $this->localWSSUrl . '/?type=user&id=' . $this->user->id . '&auth_token=' . $this->user->getAuthToken();
     }
 
     /**
@@ -65,6 +65,27 @@ class WebSocketAPI
         return $this->send([
             'type' => 'turnOFF',
             'item_id' => $itemID,
+        ]);
+    }
+
+    /**
+     * @param int $itemID
+     * @param int $red
+     * @param int $green
+     * @param int $blue
+     * @param boolean $fade
+     * @return bool
+     * @internal param array $rgbData
+     */
+    public function rgb($itemID, $red, $green, $blue, $fade)
+    {
+        return $this->send([
+            'type' => 'rgb',
+            'item_id' => $itemID,
+            'red' => $red,
+            'green' => $green,
+            'blue' => $blue,
+            'fade' => $fade,
         ]);
     }
 

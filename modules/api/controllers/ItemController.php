@@ -10,6 +10,7 @@ use yii\base\NotSupportedException;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 class ItemController extends Controller
 {
@@ -105,6 +106,42 @@ class ItemController extends Controller
         return [
             'success' => true,
         ];
+    }
+
+    /**
+     * @param int $item_id
+     * @param int $red
+     * @param int $green
+     * @param int $blue
+     * @param bool $fade
+     * @return array
+     * @throws BadRequestHttpException
+     * @throws NotSupportedException
+     * @throws ServerErrorHttpException
+     */
+    public function actionRgb($item_id, $red = 0, $green = 0, $blue = 0, $fade = false)
+    {
+        $item = $this->findItem($item_id);
+
+        if ($item->type !== Item::TYPE_RGB) {
+            throw new BadRequestHttpException();
+        }
+
+        $board = $item->board;
+
+        switch ($board->type) {
+            case Board::TYPE_AREST:
+                throw new NotSupportedException();
+
+            case Board::TYPE_WEBSOCKET:
+                $api = new WebSocketAPI(Yii::$app->user->identity);
+
+                return [
+                    'success' => $api->rgb($item_id, $red, $green, $blue, $fade),
+                ];
+            default:
+                throw new ServerErrorHttpException();
+        }
     }
 
     /**
