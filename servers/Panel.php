@@ -150,13 +150,21 @@ class Panel implements MessageComponentInterface
                     return $conn->close();
                 }
 
+                // API request
+                $api = false;
+
+                if ($conn->remoteAddress && $conn->remoteAddress == '127.0.0.1') {
+                    $api = true;
+                }
+
                 // Close previous connection
-                if (isset($this->user_clients[$user->id])) {
+                if (isset($this->user_clients[$user->id]) && !$api) {
                     $this->user_clients[$user->id]->close();
                 }
 
                 // Attach to users
                 $conn->User = $user;
+                $conn->api = $api;
                 $this->user_clients[$user->id] = $conn;
 
                 $conn->send(Json::encode([
@@ -203,29 +211,6 @@ class Panel implements MessageComponentInterface
                 $this->logBoardConnection($board, true);
 
                 return $this->log("Connected board [{$board->id}]");
-            case 'api_user':
-                $this->log('Connection type is API User. Authenticating...');
-
-                $userID = $query->get('id');
-                $userAuthKey = $query->get('auth_key');
-
-                if (!$userID or !$userAuthKey) {
-                    return $conn->close();
-                }
-
-                $user = User::findOne([
-                    'id' => $userID,
-                    'auth_key' => $userAuthKey,
-                ]);
-
-                if (!$user) {
-                    return $conn->close();
-                }
-
-                $conn->api_user = true;
-                $conn->User = $user;
-
-                return $this->log("Connected API User [{$user->id}]");
         }
 
         return $this->log('Connection has unknown type. Disconnect');
@@ -249,10 +234,6 @@ class Panel implements MessageComponentInterface
     public function onClose(ConnectionInterface $conn)
     {
         if (isset($conn->User)) {
-            if (!$conn->api_user) {
-                unset($this->user_clients[$conn->User->id]);
-            }
-
             $conn->User->generateAuthKey();
             $conn->User->save();
 
@@ -317,6 +298,8 @@ class Panel implements MessageComponentInterface
                 return $this->handleRgb($from, $user, $data);
             case 'rgbMode':
                 return $this->handleRgbMode($from, $user, $data);
+            case 'schedule-triggers':
+                return $this->handleScheduleTriggers($from, $user, $data);
         }
 
         return $this->log("Unknown command from user: $msg");
@@ -362,24 +345,6 @@ class Panel implements MessageComponentInterface
                     Item::TYPE_VARIABLE_BOOLEAN_DOOR,
                 ])) {
                     $value = $this->valueToBoolean($data['value']);
-                }
-
-                if ($item->type === Item::TYPE_VARIABLE_BOOLEAN_DOOR) {
-                    curl_setopt_array($ch = curl_init(), array(
-                        CURLOPT_URL => 'https://pushall.ru/api.php',
-                        CURLOPT_POSTFIELDS => array(
-                            'type' => 'self',
-                            'id' => Yii::$app->params['pushAllID'],
-                            'key' => Yii::$app->params['pushAllKey'],
-                            'text' => $value ? 'Дверь открыта' : 'Дверь закрыта',
-                            'title' => 'Сигнализация на двери'
-                        ),
-                        CURLOPT_RETURNTRANSFER => true
-                    ));
-                    $return = curl_exec($ch); //получить ответ или ошибку
-                    curl_close($ch);
-
-                    $this->log($return);
                 }
 
                 if ($item->type === Item::TYPE_RGB) {
@@ -649,13 +614,6 @@ class Panel implements MessageComponentInterface
 
         $this->items[$item->id]['value'] = $rgbArray;
 
-//        $this->sendUsers([
-//            'type' => 'value',
-//            'item_id' => $item->id,
-//            'item_type' => Item::TYPE_RGB,
-//            'value' => $rgbArray,
-//        ]);
-
         $history = new History();
         $history->type = History::TYPE_USER_ACTION;
         $history->user_id = $user->id;
@@ -742,6 +700,16 @@ class Panel implements MessageComponentInterface
         }
 
         return true;
+    }
+
+    /**
+     * @param ConnectionInterface $from
+     * @param User $user
+     * @param array $data
+     */
+    private function handleScheduleTriggers($from, $user, $data)
+    {
+        return $this->scheduleTriggers();
     }
 
     /**
@@ -879,6 +847,11 @@ class Panel implements MessageComponentInterface
      */
     protected function logItemValue($item, $value)
     {
+        if (!$item->enable_log) {
+            $this->log("Logging for this item is disabled");
+            return;
+        }
+
         if ($item->type === Item::TYPE_RGB) {
             $value = implode(',', $value);
         }

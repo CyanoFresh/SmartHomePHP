@@ -11,6 +11,7 @@ function showErrorMessage(message) {
     return noty({
         layout: 'bottomRight',
         text: message,
+        timeout: 5000,
         type: 'error',
         theme: 'relax'
     });
@@ -20,6 +21,7 @@ function showSuccessMessage(message) {
     return noty({
         layout: 'bottomRight',
         text: message,
+        timeout: 5000,
         type: 'success',
         theme: 'relax'
     });

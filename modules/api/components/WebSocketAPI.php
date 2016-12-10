@@ -19,7 +19,7 @@ class WebSocketAPI
     /**
      * @var string
      */
-    public $localWSSUrl;
+    protected $localWSSUrl;
 
     /**
      * WebSocketAPI constructor.
@@ -72,31 +72,30 @@ class WebSocketAPI
      * @param array $data
      * @return bool
      */
-    protected function send($data)
+    public function send($data)
     {
         $loop = Factory::create();
         $connector = new Connector($loop);
 
-        $afterConnect = function (WebSocket $conn) use ($data) {
-            // Send data
-            $conn->send(Json::encode($data));
-
-            // Job done. Close the connection
-            $conn->close();
-
-            return true;
-        };
-
-        $afterDisconnect = function(\Exception $e) use ($loop) {
-            echo "Could not connect: {$e->getMessage()}\n";
-            $loop->stop();
-        };
+        $success = false;
 
         $connector($this->getWSSUrl(), [], ['Origin' => 'origin'])
-            ->then($afterConnect, $afterDisconnect);
+            ->then(function (WebSocket $conn) use ($data, &$success) {
+                // Send data
+                $conn->send(Json::encode($data));
+
+                // Job done. Close the connection
+                $conn->close();
+
+                $success = true;
+            }, function(\Exception $e) use ($loop) {
+                echo "Could not connect: {$e->getMessage()}\n";
+
+                $loop->stop();
+            });
 
         $loop->run();
 
-        return ($afterConnect == true and $afterDisconnect == false);
+        return $success;
     }
 }
