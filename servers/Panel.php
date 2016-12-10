@@ -321,6 +321,10 @@ class Panel implements MessageComponentInterface
         $user = $from->User;
         $data = Json::decode($msg);
 
+        if (!isset($data['type']) or $data['type'] == '') {
+            return $this->log("Unknown command from user: $msg");
+        }
+
         switch ($data['type']) {
             case 'turnON':
                 return $this->handleTurnOn($from, $user, $data);
@@ -674,26 +678,26 @@ class Panel implements MessageComponentInterface
         $item = Item::findOne($item_id);
 
         if (!$item) {
-            return $from->send([
+            return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Такое устройство не существует',
-            ]);
+            ]));
         }
 
         if ($item->type !== Item::TYPE_RGB) {
-            return $from->send([
+            return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Данный тип устройства не является RGB',
-            ]);
+            ]));
         }
 
         $mode = $data['mode'];
 
         if (!in_array($mode, [Item::MODE_BREATH, Item::MODE_RAINBOW])) {
-            return $from->send([
+            return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Неизвестный режим',
-            ]);
+            ]));
         }
 
         $board = $item->board;
