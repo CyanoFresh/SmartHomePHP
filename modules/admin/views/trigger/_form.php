@@ -12,6 +12,10 @@ use kartik\time\TimePicker;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+if ($model->isNewRecord) {
+    $model->active = true;
+}
+
 ?>
 
 <div class="trigger-form">
@@ -27,6 +31,8 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'type')->dropDownList(Trigger::getTypes(), [
                 'prompt' => '--- выберите тип ---'
             ]) ?>
+
+            <?= $form->field($model, 'active')->checkbox() ?>
         </div>
         <div class="col-sm-5">
 

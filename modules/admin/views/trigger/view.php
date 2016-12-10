@@ -27,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
+            'active:boolean',
             [
                 'attribute' => 'type',
                 'value' => $model->getTypeLabel(),

@@ -34,6 +34,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             'id',
+            [
+                'filter' => [
+                    0 => 'Нет',
+                    1 => 'Да',
+                ],
+                'format' => 'boolean',
+                'attribute' => 'active',
+            ],
             'name',
             [
                 'filter' => Trigger::getTypes(),

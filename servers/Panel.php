@@ -942,6 +942,7 @@ class Panel implements MessageComponentInterface
     {
         // Find event
         $event = Trigger::findOne([
+            'active' => true,
             'trig_item_id' => $item->id,
             'trig_item_value' => $value,
         ]);
@@ -1051,6 +1052,7 @@ class Panel implements MessageComponentInterface
 
         /** @var Trigger[] $triggers */
         $triggers = Trigger::find()->where([
+            'active' => true,
             'type' => [
                 Trigger::TYPE_BY_DATE,
                 Trigger::TYPE_BY_TIME,

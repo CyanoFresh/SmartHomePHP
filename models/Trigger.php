@@ -11,6 +11,7 @@ use yii\helpers\ArrayHelper;
  * This is the model class for table "trigger".
  *
  * @property integer $id
+ * @property boolean $active
  * @property integer $type
  * @property integer $trig_date
  * @property string $trig_time
@@ -42,12 +43,14 @@ class Trigger extends ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'name'], 'required'],
+            [['type', 'name', 'active'], 'required'],
             [['type', 'trig_item_id', 'trig_date'], 'integer'],
             [['type'], 'in', 'range' => self::getTypesArray()],
             [['trig_item_value', 'name', 'trig_time', 'trig_time_wdays'], 'string', 'max' => 255],
             [['trig_time', 'trig_time_wdays', 'trig_date'], 'default', 'value' => null],
             [['task_ids'], 'each', 'rule' => ['integer']],
+            [['active'], 'boolean'],
+            [['active'], 'default', 'value' => true],
         ];
     }
 
@@ -73,6 +76,7 @@ class Trigger extends ActiveRecord
     {
         return [
             'id' => 'ID',
+            'active' => 'Включен',
             'type' => 'Тип',
             'trig_date' => 'Дата срабатывания',
             'trig_time' => 'Время срабатывания',

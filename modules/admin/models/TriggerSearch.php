@@ -18,7 +18,7 @@ class TriggerSearch extends Trigger
     public function rules()
     {
         return [
-            [['id', 'type', 'trig_item_id'], 'integer'],
+            [['id', 'type', 'trig_item_id', 'active'], 'integer'],
             [['trig_date', 'trig_time', 'trig_time_wdays', 'trig_item_value', 'name'], 'safe'],
         ];
     }
@@ -62,6 +62,7 @@ class TriggerSearch extends Trigger
             'id' => $this->id,
             'type' => $this->type,
             'trig_item_id' => $this->trig_item_id,
+            'active' => $this->active,
         ]);
 
         $query->andFilterWhere(['like', 'trig_date', $this->trig_date])
