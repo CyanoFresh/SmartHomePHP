@@ -18,7 +18,7 @@ class BoardSearch extends Board
     public function rules()
     {
         return [
-            [['id', 'type'], 'integer'],
+            [['id', 'type', 'remote_connection'], 'integer'],
             [['name', 'baseUrl', 'secret'], 'safe'],
         ];
     }
@@ -61,6 +61,7 @@ class BoardSearch extends Board
         $query->andFilterWhere([
             'id' => $this->id,
             'type' => $this->type,
+            'remote_connection' => $this->remote_connection,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])

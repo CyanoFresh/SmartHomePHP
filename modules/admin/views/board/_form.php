@@ -10,6 +10,7 @@ use yii\widgets\ActiveForm;
 
 if ($model->isNewRecord) {
     $model->secret = md5(time());
+    $model->remote_connection = false;
 }
 
 ?>
@@ -27,6 +28,8 @@ if ($model->isNewRecord) {
     <?= $form->field($model, 'secret')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'baseUrl')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'remote_connection')->checkbox() ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

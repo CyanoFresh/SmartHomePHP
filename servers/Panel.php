@@ -158,7 +158,7 @@ class Panel implements MessageComponentInterface
                 // API request
                 $api = false;
 
-                if ($conn->remoteAddress && $conn->remoteAddress == '127.0.0.1') {
+                if ($conn->remoteAddress == '127.0.0.1') {
                     $api = true;
                 }
 
@@ -190,7 +190,7 @@ class Panel implements MessageComponentInterface
                 $boardSecret = $query->get('secret');
 
                 if (!$boardID or !$boardSecret) {
-                    $this->log('Wrong login data!');
+                    $this->log('Wrong login data');
                     return $conn->close();
                 }
 
@@ -202,6 +202,11 @@ class Panel implements MessageComponentInterface
 
                 if (!$board) {
                     $this->log('Not found!');
+                    return $conn->close();
+                }
+
+                if ($conn->remoteAddress != '127.0.0.1' && !$board->remote_connection) {
+                    $this->log("Remote connection blocked for board [$board->id]");
                     return $conn->close();
                 }
 

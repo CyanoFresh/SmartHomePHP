@@ -22,11 +22,11 @@
                     ['label' => 'Панель Управления', 'icon' => 'fa fa-sliders', 'url' => ['/panel/index']],
 
                     ['label' => 'Информация', 'options' => ['class' => 'header']],
-                    ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/history/index']],
+                    ['label' => 'История', 'icon' => 'fa fa-th-list', 'url' => ['/history/index']],
 
                     ['label' => 'Настройки', 'options' => ['class' => 'header']],
-                    ['label' => 'Элементы', 'icon' => 'fa fa-cubes', 'url' => ['/admin/item/index']],
-                    ['label' => 'Платы', 'icon' => 'fa fa-cogs', 'url' => ['/admin/board/index']],
+                    ['label' => 'Элементы', 'icon' => 'fa fa-toggle-on', 'url' => ['/admin/item/index']],
+                    ['label' => 'Платы', 'icon' => 'fa fa-hdd-o', 'url' => ['/admin/board/index']],
                     ['label' => 'Triggers', 'icon' => 'fa fa-feed', 'url' => ['/admin/trigger/index']],
                     ['label' => 'Задачи', 'icon' => 'fa fa-check', 'url' => ['/admin/task/index']],
                     ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/admin/room/index']],

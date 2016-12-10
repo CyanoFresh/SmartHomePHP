@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'typeLabel',
             'secret',
             'baseUrl',
+            'remote_connection:boolean',
         ],
     ]) ?>
 

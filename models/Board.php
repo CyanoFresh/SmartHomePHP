@@ -14,6 +14,7 @@ use yii\helpers\ArrayHelper;
  * @property string $name
  * @property string $secret
  * @property string $baseUrl
+ * @property boolean $remote_connection
  *
  * @property Item[] $items
  */
@@ -41,6 +42,8 @@ class Board extends ActiveRecord
             [['baseUrl'], 'string'],
             [['name', 'secret'], 'string', 'max' => 255],
             [['secret'], 'default', 'value' => md5(time())],
+            [['remote_connection'], 'boolean'],
+            [['remote_connection'], 'default', 'value' => false],
         ];
     }
 
@@ -55,6 +58,7 @@ class Board extends ActiveRecord
             'name' => Yii::t('app', 'Название'),
             'secret' => Yii::t('app', 'Ключ'),
             'baseUrl' => Yii::t('app', 'API URL'),
+            'remote_connection' => Yii::t('app', 'Удаленное подключение'),
         ];
     }
 

@@ -17,7 +17,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?php Pjax::begin(); ?>
     <?= GridView::widget([
@@ -37,6 +36,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function (Board $model) {
                     return $model->getTypeLabel();
                 }
+            ],
+            [
+                'filter' => [
+                    0 => 'Нет',
+                    1 => 'Да',
+                ],
+                'format' => 'boolean',
+                'attribute' => 'remote_connection',
             ],
 
             ['class' => 'app\components\ActionButtonColumn'],
