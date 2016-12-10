@@ -16,6 +16,7 @@ use yii\web\IdentityInterface;
  * @property string $password_hash
  * @property string $email
  * @property string $auth_key
+ * @property string $auth_token
  * @property string $api_key
  * @property integer $status
  * @property integer $group
@@ -59,9 +60,10 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['username', 'email'], 'required'],
-            [['api_key'], 'string'],
+            [['api_key', 'auth_token'], 'string'],
             [['group'], 'integer'],
             [['password_hash'], 'required', 'on' => 'create'],
+            [['auth_token'], 'default', 'value' => null],
             [['status'], 'default', 'value' => self::STATUS_ACTIVE],
             [['status'], 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
         ];
@@ -79,7 +81,8 @@ class User extends ActiveRecord implements IdentityInterface
             'email' => 'Email',
             'status' => 'Статус',
             'group' => 'Группа',
-            'api_key' => 'API ключ',
+            'api_token' => 'API ключ',
+            'auth_token' => 'Auth токен',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата изменения',
         ];
@@ -184,6 +187,39 @@ class User extends ActiveRecord implements IdentityInterface
         $this->auth_key = Yii::$app->security->generateRandomString();
     }
 
+    /**
+     * @return string
+     */
+    public function getAuthToken()
+    {
+        if (is_null($this->auth_token)) {
+            $this->reGenerateAuthToken();
+        }
+
+        return $this->auth_token;
+    }
+
+    /**
+     * Generates authentication token
+     */
+    public function generateAuthToken()
+    {
+        $this->auth_token = Yii::$app->security->generateRandomString();
+    }
+
+    /**
+     * Generates authentication token
+     */
+    public function reGenerateAuthToken()
+    {
+        $this->generateAuthToken();
+
+        return $this->save(false);
+    }
+
+    /**
+     * @return string
+     */
     public function getAvatar()
     {
         $hash = md5($this->email);

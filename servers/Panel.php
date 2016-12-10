@@ -135,19 +135,24 @@ class Panel implements MessageComponentInterface
                 $this->log('Connection type is User. Authenticating...');
 
                 $userID = $query->get('id');
-                $userAuthKey = $query->get('auth_key');
+                $userAuthToken = $query->get('auth_token');
 
-                if (!$userID or !$userAuthKey) {
+                if (!$userID or !$userAuthToken) {
                     return $conn->close();
                 }
 
                 $user = User::findOne([
                     'id' => $userID,
-                    'auth_key' => $userAuthKey,
                 ]);
 
                 if (!$user) {
-                    return $conn->close();
+                    $conn->close();
+                    return $this->log("User was not found with id $userID");
+                }
+
+                if ($user->getAuthToken() != $userAuthToken) {
+                    $conn->close();
+                    return $this->log("User [$user->id] wrong auth token ($userAuthToken and {$user->getAuthToken()})");
                 }
 
                 // API request
@@ -161,6 +166,9 @@ class Panel implements MessageComponentInterface
                 if (isset($this->user_clients[$user->id]) && !$api) {
                     $this->user_clients[$user->id]->close();
                 }
+
+                // Regenerate auth key
+                $user->reGenerateAuthToken();
 
                 // Attach to users
                 $conn->User = $user;
@@ -266,9 +274,6 @@ class Panel implements MessageComponentInterface
     public function onClose(ConnectionInterface $conn)
     {
         if (isset($conn->User)) {
-            $conn->User->generateAuthKey();
-            $conn->User->save();
-
             $this->logUserConnection($conn->User, false);
 
             $this->log("User [{$conn->User->id}] disconnected");
