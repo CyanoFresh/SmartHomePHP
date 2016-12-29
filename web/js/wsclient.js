@@ -114,9 +114,15 @@ function updateItemValue(id, type, value) {
 
             break;
         case 30:    // RGB
-            var $colorPicker = $('#colorpicker-' + id);
+            if (typeof value === 'string') {
+                $('.item-rgb[data-item-id="' + id + '"]')
+                    .find('.rgb-mode[data-mode="' + value + '"]')
+                    .addClass('active');
+            } else {
+                var $colorPicker = $('#colorpicker-' + id);
 
-            $colorPicker.spectrum('set', 'rgb(' + value[0] + ', ' + value[1] + ', ' + value[2] + ')');
+                $colorPicker.spectrum('set', 'rgb(' + value[0] + ', ' + value[1] + ', ' + value[2] + ')');
+            }
 
             break;
     }
@@ -127,15 +133,18 @@ $(document).ready(function () {
         showInput: true,
         showButtons: false,
         preferredFormat: 'rgb',
-        change: function(color) {
+        change: function (color) {
             var item_id = $(this).data('item-id');
             var red = Math.round(color._r);
             var green = Math.round(color._g);
             var blue = Math.round(color._b);
 
+            var fade = ($('.fade-checkbox[data-item-id="' + item_id + '"]:checked').length > 0);
+
             send({
                 'type': 'rgb',
                 'item_id': item_id,
+                'fade': fade,
                 'red': red,
                 'green': green,
                 'blue': blue
@@ -165,6 +174,25 @@ $(document).ready(function () {
             }
 
             $(this).find('.item-switch-checkbox').click();
+        });
+
+        $('.rgb-mode').click(function (e) {
+            e.preventDefault();
+
+            var mode = $(this).data('mode');
+            var start = true;
+            var item_id = $(this).parents('.item-rgb').data('item-id');
+
+            if ($(this).hasClass('active')) {
+                start = false
+            }
+
+            send({
+                "type": "rgbMode",
+                "item_id": item_id,
+                "mode": mode,
+                "start": start
+            });
         });
     });
 });

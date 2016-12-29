@@ -26,20 +26,6 @@ class m160922_192435_init extends Migration
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
 
-        // Register admin account
-        $user = new User([
-            'scenario' => 'create',
-        ]);
-
-        $user->username = 'admin';
-        $user->email = 'admin@domain.com';
-        $user->setPassword('admin');
-        $user->generateAuthKey();
-
-        if (!$user->save()) {
-            echo 'Cannot create admin account' . PHP_EOL;
-        }
-
         $this->createTable('board', [
             'id' => $this->primaryKey(),
             'type' => $this->smallInteger()->notNull(),

@@ -168,4 +168,12 @@ class Item extends ActiveRecord
     {
         return ArrayHelper::map(self::find()->all(), 'id', 'name');
     }
+
+    public static function getModesArray()
+    {
+        return [
+            self::MODE_RAINBOW,
+            self::MODE_BREATH,
+        ];
+    }
 }

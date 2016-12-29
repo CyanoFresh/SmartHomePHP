@@ -415,6 +415,42 @@ class Panel implements MessageComponentInterface
                 $this->logItemValue($item, $value);
 
                 break;
+            case 'rgbMode':
+                $value = $data['mode'];
+                $pin = (integer)$data['pin'];
+                $start = (bool)$data['start'];
+
+                $item = Item::findOne([
+                    'board_id' => $board->id,
+                    'pin' => $pin,
+                ]);
+
+                if (!$item) {
+                    return $this->log('Trying to use unknown item');
+                }
+
+                // Trig event
+                // TODO
+//                $this->triggerItemValue($item, $value);
+
+                if ($start) {
+                    $this->items[$item->id]['value'] = $value;
+                } else {
+                    $this->items[$item->id]['value'] = [0,0,0];
+                }
+
+                $this->sendUsers([
+                    'type' => 'value',
+                    'item_id' => $item->id,
+                    'item_type' => $item->type,
+                    'value' => $value,
+                ]);
+
+                // Save to history
+                // TODO
+//                $this->logItemValue($item, $value);
+
+                break;
             case 'values':
                 unset($data['type']);
 
@@ -702,8 +738,9 @@ class Panel implements MessageComponentInterface
         }
 
         $mode = $data['mode'];
+        $start = (bool)$data['start'];
 
-        if (!in_array($mode, [Item::MODE_BREATH, Item::MODE_RAINBOW])) {
+        if (!in_array($mode, Item::getModesArray())) {
             return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Неизвестный режим',
@@ -716,7 +753,6 @@ class Panel implements MessageComponentInterface
             case Board::TYPE_AREST:
                 throw new NotSupportedException();
 
-                break;
             case Board::TYPE_WEBSOCKET:
                 if (!$this->isBoardConnected($board->id)) {
                     return $from->send(Json::encode([
@@ -728,6 +764,7 @@ class Panel implements MessageComponentInterface
                 $this->sendToBoard($board->id, [
                     'type' => 'rgbMode',
                     'mode' => $mode,
+                    'action' => $start ? 'start' : 'stop',
                 ]);
 
                 break;
@@ -738,7 +775,7 @@ class Panel implements MessageComponentInterface
         $history->user_id = $user->id;
         $history->item_id = $item->id;
         $history->commited_at = time();
-        $history->value = $mode;
+        $history->value = $mode . ', ' . $start ? 'start' : 'stop';
 
         if (!$history->save()) {
             $this->log("Cannot log: ");
@@ -755,7 +792,9 @@ class Panel implements MessageComponentInterface
      */
     private function handleScheduleTriggers($from, $user, $data)
     {
-        return $this->scheduleTriggers();
+        $this->scheduleTriggers();
+
+        return;
     }
 
     /**

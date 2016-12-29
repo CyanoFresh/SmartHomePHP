@@ -33,56 +33,23 @@ WSClientAsset::register($this);
             <div class="box-body control-panel-items">
                 <div class="row items-variable">
                     <?php foreach ($room->getItems()->variables()->active()->all() as $item): ?>
-                        <div class="col-md-3 col-sm-4 control-panel-item item-variable"
-                             data-item-id="<?= $item->id ?>">
-                            <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
-                                <span class="info-box-icon"><i class="fa fa-<?= $item->icon ?>"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text"><?= $item->name ?></span>
-                                    <span
-                                        class="info-box-number item-value <?= ($item->type === Item::TYPE_VARIABLE_TEMPERATURE or $item->type === Item::TYPE_VARIABLE_HUMIDITY) ? 'temperature' : '' ?>">
-                                        НЕИЗВЕСТНО
-                                    </span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                        </div>
+                        <?= $this->render('_variable', [
+                            'item' => $item,
+                        ]) ?>
                     <?php endforeach; ?>
                 </div>
                 <div class="row items-switch">
                     <?php foreach ($room->getItems()->switches()->active()->all() as $item): ?>
-                        <div class="col-md-3 col-sm-4 control-panel-item item-switch"
-                             data-item-id="<?= $item->id ?>">
-                            <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
-                                <div class="info-box-action material-switch">
-                                    <input id="switch-for-item-<?= $item->id ?>" class="item-switch-checkbox"
-                                           type="checkbox" data-item-id="<?= $item->id ?>">
-                                    <label for="switch-for-item-<?= $item->id ?>" class="label-default"></label>
-                                </div>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text"><?= $item->name ?></span>
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                        </div>
+                        <?= $this->render('_switch', [
+                            'item' => $item,
+                        ]) ?>
                     <?php endforeach; ?>
                 </div>
                 <div class="row items-rgb">
                     <?php foreach ($room->getItems()->rgb()->all() as $item): ?>
-                        <div class="col-md-3 col-sm-4 control-panel-item item-rgb"
-                             data-item-id="<?= $item->id ?>">
-                            <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
-                                <span class="info-box-icon"><i class="fa fa-<?= $item->icon ?>"></i></span>
-
-                                <div class="info-box-content">
-                                    <span class="info-box-text"><?= $item->name ?></span>
-                                    <input type="text" id="colorpicker-<?= $item->id ?>" class="rgb-colorpicker" data-item-id="<?= $item->id ?>">
-                                </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                        </div>
+                        <?= $this->render('_rgb', [
+                            'item' => $item,
+                        ]) ?>
                     <?php endforeach; ?>
                 </div>
             </div>
