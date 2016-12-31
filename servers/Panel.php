@@ -16,6 +16,7 @@ use React\EventLoop\Timer\TimerInterface;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\helpers\Json;
+use yii\helpers\VarDumper;
 
 /**
  * Class Panel
@@ -1013,6 +1014,19 @@ class Panel implements MessageComponentInterface
 
                 $this->sendToBoard($item->board_id, $data);
 
+                break;
+            case Task::TYPE_NOTIFICATION_TELEGRAM:
+                $result = $task->sendNotificationTelegram();
+
+                if (!$result) {
+                    $this->log("Cannot send telegram message");
+                } else {
+                    $this->log("Message sent");
+                }
+
+                break;
+            default:
+                $this->log("Unknown task type: {$task->type}");
                 break;
         }
     }

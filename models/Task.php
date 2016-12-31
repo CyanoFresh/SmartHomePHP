@@ -6,6 +6,7 @@ use voskobovich\linker\LinkerBehavior;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "task".
@@ -14,6 +15,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $type
  * @property integer $item_id
  * @property string $item_value
+ * @property string $text
  * @property string $name
  *
  * @property Item $item
@@ -22,6 +24,7 @@ use yii\helpers\ArrayHelper;
 class Task extends ActiveRecord
 {
     const TYPE_ITEM_VALUE = 10;
+    const TYPE_NOTIFICATION_TELEGRAM = 20;
 
     /**
      * @inheritdoc
@@ -40,7 +43,9 @@ class Task extends ActiveRecord
             [['name', 'type'], 'required'],
             [['type', 'item_id'], 'integer'],
             [['item_value', 'name'], 'string', 'max' => 255],
+            [['text'], 'string'],
             [['trigger_ids'], 'each', 'rule' => ['integer']],
+            [['type'], 'in', 'range' => self::getTypesArray()],
         ];
     }
 
@@ -56,6 +61,7 @@ class Task extends ActiveRecord
             'item_value' => 'Значение Элемента',
             'trigger_ids' => 'Triggers',
             'name' => 'Название',
+            'text' => 'Текст',
         ];
     }
 
@@ -89,7 +95,16 @@ class Task extends ActiveRecord
     {
         return [
             self::TYPE_ITEM_VALUE => 'Изменить значение Элемента',
+            self::TYPE_NOTIFICATION_TELEGRAM => 'Сообщение Telegram',
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getTypesArray()
+    {
+        return array_keys(self::getTypes());
     }
 
     /**
@@ -115,5 +130,24 @@ class Task extends ActiveRecord
     public function getItem()
     {
         return $this->hasOne(Item::className(), ['id' => 'item_id']);
+    }
+
+    /**
+     * @return bool
+     */
+    public function sendNotificationTelegram()
+    {
+        $url = 'https://api.telegram.org/bot' . Yii::$app->params['telegramBotApiKey']
+            . '/sendMessage?chat_id=' . Yii::$app->params['telegramBotChatId']
+            . '&text=' . $this->text;
+
+        $result = file_get_contents($url);
+        $data = Json::decode($result);
+
+        if (isset($data['ok']) and $data['ok']) {
+            return true;
+        }
+
+        return false;
     }
 }

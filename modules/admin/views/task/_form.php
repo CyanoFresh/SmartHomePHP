@@ -37,6 +37,8 @@ use yii\widgets\ActiveForm;
             ]) ?>
 
             <?= $form->field($model, 'item_value')->textInput(['maxlength' => true]) ?>
+
+            <?= $form->field($model, 'text')->textarea(['rows' => 3]) ?>
         </div>
         <div class="col-sm-4">
             <h2>Активируется через</h2>
