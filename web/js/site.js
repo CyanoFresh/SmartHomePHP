@@ -27,5 +27,7 @@ $('.schedule-triggers').click(function (e) {
         } else {
             showErrorMessage('Не удалось обновить');
         }
+    }).fail(function () {
+        showErrorMessage('Не удалось обновить');
     });
 });

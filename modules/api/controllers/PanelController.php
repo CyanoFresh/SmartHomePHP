@@ -42,4 +42,20 @@ class PanelController extends Controller
             'success' => $result,
         ];
     }
+
+    /**
+     * @return array|bool
+     */
+    public function actionUpdateItems()
+    {
+        $api = new WebSocketAPI(Yii::$app->user->identity);
+
+        $result = $api->send([
+            'type' => 'update-items',
+        ]);
+
+        return [
+            'success' => $result,
+        ];
+    }
 }

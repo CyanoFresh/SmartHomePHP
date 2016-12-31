@@ -21,8 +21,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'access-token' => Yii::$app->user->identity->api_key
         ], [
             'class' => 'btn btn-default schedule-triggers',
-        ], [
-            'sdfsdfsd' => 'sdfsdf',
         ]) ?>
     </p>
 

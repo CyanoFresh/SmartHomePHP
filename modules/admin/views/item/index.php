@@ -17,6 +17,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Обновить', [
+            '/api/panel/update-items',
+            'access-token' => Yii::$app->user->identity->api_key,
+        ], [
+            'class' => 'btn btn-default schedule-triggers',
+        ]) ?>
     </p>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 

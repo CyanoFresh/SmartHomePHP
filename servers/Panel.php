@@ -84,38 +84,7 @@ class Panel implements MessageComponentInterface
             Yii::$app->db->createCommand('SHOW TABLES;')->execute();
         });
 
-        /** @var Item[] $items */
-        $items = Item::find()->asArray()->all();
-
-        foreach ($items as $item) {
-            switch ($item['type']) {
-                case Item::TYPE_SWITCH:
-                case Item::TYPE_VARIABLE_BOOLEAN:
-                case Item::TYPE_VARIABLE_BOOLEAN_DOOR:
-                    $item['value'] = false;
-
-                    $this->items[$item['id']] = $item;
-
-                    break;
-                case Item::TYPE_VARIABLE_TEMPERATURE:
-                case Item::TYPE_VARIABLE_HUMIDITY:
-                    $item['value'] = 0;
-
-                    $this->items[$item['id']] = $item;
-
-                    break;
-                case Item::TYPE_RGB:
-                    $item['value'] = [
-                        0,
-                        0,
-                        0,
-                    ];
-
-                    $this->items[$item['id']] = $item;
-
-                    break;
-            }
-        }
+        $this->updateItems();
 
         $this->scheduleTriggers();
 
@@ -345,7 +314,9 @@ class Panel implements MessageComponentInterface
             case 'rgbMode':
                 return $this->handleRgbMode($from, $user, $data);
             case 'schedule-triggers':
-                return $this->handleScheduleTriggers($from, $user, $data);
+                return $this->scheduleTriggers();
+            case 'update-items':
+                return $this->updateItems();
         }
 
         return $this->log("Unknown command from user: $msg");
@@ -436,7 +407,7 @@ class Panel implements MessageComponentInterface
                 if ($start) {
                     $this->items[$item->id]['value'] = $value;
                 } else {
-                    $this->items[$item->id]['value'] = [0,0,0];
+                    $this->items[$item->id]['value'] = [0, 0, 0];
                 }
 
                 $this->sendUsers([
@@ -783,18 +754,6 @@ class Panel implements MessageComponentInterface
         }
 
         return true;
-    }
-
-    /**
-     * @param ConnectionInterface $from
-     * @param User $user
-     * @param array $data
-     */
-    private function handleScheduleTriggers($from, $user, $data)
-    {
-        $this->scheduleTriggers();
-
-        return;
     }
 
     /**
@@ -1235,5 +1194,51 @@ class Panel implements MessageComponentInterface
         }
 
         $this->log("Scheduling done. Total count of timers: " . count($this->eventTimers));
+    }
+
+    protected function updateItems()
+    {
+        $this->log("Loading items...");
+
+        /** @var Item[] $items */
+        $items = Item::find()->asArray()->all();
+
+        foreach ($items as $item) {
+            switch ($item['type']) {
+                case Item::TYPE_SWITCH:
+                case Item::TYPE_VARIABLE_BOOLEAN:
+                case Item::TYPE_VARIABLE_BOOLEAN_DOOR:
+                    $item['value'] = isset($this->items[$item['id']]['value']) ?
+                        $this->items[$item['id']]['value'] :
+                        false;
+
+                    $this->items[$item['id']] = $item;
+
+                    break;
+                case Item::TYPE_VARIABLE_TEMPERATURE:
+                case Item::TYPE_VARIABLE_HUMIDITY:
+                    $item['value'] = isset($this->items[$item['id']]['value']) ?
+                        $this->items[$item['id']]['value'] :
+                        0;
+
+                    $this->items[$item['id']] = $item;
+
+                    break;
+                case Item::TYPE_RGB:
+                    $item['value'] = isset($this->items[$item['id']]['value']) ?
+                        $this->items[$item['id']]['value'] :
+                        [
+                            0,
+                            0,
+                            0,
+                        ];
+
+                    $this->items[$item['id']] = $item;
+
+                    break;
+            }
+        }
+
+        $this->log("Loaded " . count($this->items) . " items");
     }
 }
