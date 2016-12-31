@@ -2,6 +2,7 @@
 
 namespace app\servers;
 
+use app\helpers\IPHelper;
 use app\models\Board;
 use app\models\Task;
 use app\models\Trigger;
@@ -174,8 +175,8 @@ class Panel implements MessageComponentInterface
                     return $conn->close();
                 }
 
-                if ($conn->remoteAddress != '127.0.0.1' && !$board->remote_connection) {
-                    $this->log("Remote connection blocked for board [$board->id]");
+                if (!IPHelper::isLocal($conn->remoteAddress) and !$board->remote_connection) {
+                    $this->log("Remote connection blocked for board [$board->id]; IP: {$conn->remoteAddress}");
                     return $conn->close();
                 }
 
