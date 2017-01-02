@@ -26,6 +26,7 @@ class History extends \yii\db\ActiveRecord
     const TYPE_BOARD_CONNECTION = 30;
     const TYPE_USER_ACTION = 40;
     const TYPE_USER_CONNECTION = 50;
+    const TYPE_API_TRIGGER = 60;
 
     /**
      * @inheritdoc
@@ -109,6 +110,7 @@ class History extends \yii\db\ActiveRecord
             self::TYPE_BOARD_CONNECTION => 'Состояние платы',
             self::TYPE_USER_ACTION => 'Действия пользователя',
             self::TYPE_USER_CONNECTION => 'Состояние пользователя',
+            self::TYPE_API_TRIGGER => 'API Trig',
         ];
     }
 

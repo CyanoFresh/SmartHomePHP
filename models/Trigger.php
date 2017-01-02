@@ -15,7 +15,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $type
  * @property integer $trig_date
  * @property string $trig_time
- * @property string $trig_time_wdays
+ * @property mixed $trig_time_wdays
  * @property integer $trig_item_id
  * @property string $trig_item_value
  * @property string $name
@@ -28,6 +28,7 @@ class Trigger extends ActiveRecord
     const TYPE_BY_USER_ITEM_CHANGE = 20;
     const TYPE_BY_DATE = 30;
     const TYPE_BY_TIME = 40;
+    const TYPE_MANUAL = 50;
 
     /**
      * @inheritdoc
@@ -46,8 +47,9 @@ class Trigger extends ActiveRecord
             [['type', 'name', 'active'], 'required'],
             [['type', 'trig_item_id', 'trig_date'], 'integer'],
             [['type'], 'in', 'range' => self::getTypesArray()],
-            [['trig_item_value', 'name', 'trig_time', 'trig_time_wdays'], 'string', 'max' => 255],
-            [['trig_time', 'trig_time_wdays', 'trig_date'], 'default', 'value' => null],
+            [['trig_item_value', 'name', 'trig_time'], 'string', 'max' => 255],
+            [['trig_time', 'trig_time_wdays', 'trig_item_value', 'trig_date'], 'default', 'value' => null],
+            [['trig_time_wdays'], 'each', 'rule' => ['in', 'range' => self::getWeekDaysArray()]],
             [['task_ids'], 'each', 'rule' => ['integer']],
             [['active'], 'boolean'],
             [['active'], 'default', 'value' => true],
@@ -84,7 +86,7 @@ class Trigger extends ActiveRecord
             'trig_item_id' => 'Элемент срабатывания',
             'trig_item_value' => 'Значение элемента срабатывания',
             'task_ids' => 'Задачи',
-            'name' => 'Имя',
+            'name' => 'Название',
         ];
     }
 
@@ -94,11 +96,36 @@ class Trigger extends ActiveRecord
     public static function getTypes()
     {
         return [
-            self::TYPE_BY_ITEM_VALUE => 'Значение Элемента',
-            self::TYPE_BY_USER_ITEM_CHANGE => 'Изменение Значение Элемента',
+            self::TYPE_BY_ITEM_VALUE => 'Изменение Значения Элемента',
+            self::TYPE_BY_USER_ITEM_CHANGE => 'Изменение Пользователем Значения Элемента',
             self::TYPE_BY_DATE => 'Дата',
             self::TYPE_BY_TIME => 'Время',
+            self::TYPE_MANUAL => 'Вручную (API)',
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getWeekDays()
+    {
+        return [
+            'Monday' => 'Понедельник',
+            'Tuesday' => 'Вторник',
+            'Wednesday' => 'Среда',
+            'Thursday' => 'Четверг',
+            'Friday' => 'Пятница',
+            'Saturday' => 'Суббота',
+            'Sunday' => 'Воскресенье',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getWeekDaysArray()
+    {
+        return array_keys(self::getWeekDays());
     }
 
     /**
@@ -132,5 +159,21 @@ class Trigger extends ActiveRecord
     {
         return $this->hasMany(Task::className(), ['id' => 'task_id'])
             ->viaTable('trigger_task', ['trigger_id' => 'id']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if (is_array($this->trig_time_wdays)) {
+                $this->trig_time_wdays = implode($this->trig_time_wdays, ', ');
+            }
+
+            return true;
+        } else {
+            return false;
+        }
     }
 }

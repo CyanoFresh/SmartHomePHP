@@ -90,6 +90,35 @@ class WebSocketAPI
     }
 
     /**
+     * @param int $itemID
+     * @param string $mode
+     * @param bool $start
+     * @return bool
+     * @internal param array $rgbData
+     */
+    public function rgbMode($itemID, $mode, $start)
+    {
+        return $this->send([
+            'type' => 'rgbMode',
+            'item_id' => $itemID,
+            'mode' => $mode,
+            'start' => $start,
+        ]);
+    }
+
+    /**
+     * @param int $triggerID
+     * @return bool
+     */
+    public function trig($triggerID)
+    {
+        return $this->send([
+            'type' => 'trig',
+            'trigger_id' => $triggerID,
+        ]);
+    }
+
+    /**
      * @param array $data
      * @return bool
      */
