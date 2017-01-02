@@ -5,8 +5,8 @@
 
 use yii\helpers\Html;
 
-$this->title = 'Изменить Trigger: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Triggers', 'url' => ['index']];
+$this->title = 'Изменить Триггер: ' . $model->name;
+$this->params['breadcrumbs'][] = ['label' => 'Триггеры', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Редактирование';
 ?>

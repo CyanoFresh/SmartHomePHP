@@ -65,7 +65,8 @@ class User extends ActiveRecord implements IdentityInterface
             [['password_hash'], 'required', 'on' => 'create'],
             [['auth_token'], 'default', 'value' => null],
             [['status'], 'default', 'value' => self::STATUS_ACTIVE],
-            [['status'], 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+            [['status'], 'in', 'range' => self::getStatuses()],
+            [['group'], 'in', 'range' => self::getGroupsArray()],
         ];
     }
 
@@ -81,7 +82,7 @@ class User extends ActiveRecord implements IdentityInterface
             'email' => 'Email',
             'status' => 'Статус',
             'group' => 'Группа',
-            'api_token' => 'API ключ',
+            'api_key' => 'API ключ',
             'auth_token' => 'Auth токен',
             'created_at' => 'Дата создания',
             'updated_at' => 'Дата изменения',
@@ -91,7 +92,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @return array
      */
-    public static function getStatusesArray()
+    public static function getStatuses()
     {
         return [
             self::STATUS_ACTIVE => 'Активен',
@@ -100,11 +101,46 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @return array
+     */
+    public static function getStatusesArray()
+    {
+        return array_keys(self::getStatuses());
+    }
+
+    /**
+     * @return array
+     */
+    public static function getGroups()
+    {
+        return [
+            self::GROUP_ADMIN => 'Администратор',
+            self::GROUP_USER => 'Пользователь',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getGroupsArray()
+    {
+        return array_keys(self::getGroups());
+    }
+
+    /**
      * @return string
      */
     public function getStatusLabel()
     {
-        return self::getStatusesArray()[$this->status];
+        return self::getStatuses()[$this->status];
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroupLabel()
+    {
+        return self::getGroups()[$this->group];
     }
 
     /**

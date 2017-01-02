@@ -4,6 +4,7 @@ namespace app\servers;
 
 use app\helpers\IPHelper;
 use app\models\Board;
+use app\models\Setting;
 use app\models\Task;
 use app\models\Trigger;
 use app\models\History;
@@ -837,6 +838,10 @@ class Panel implements MessageComponentInterface
      */
     protected function logBoardConnection($board, $connected)
     {
+        if (!Setting::getValueByKey('log.board_connection')) {
+            return;
+        }
+
         $model = new History();
         $model->type = History::TYPE_BOARD_CONNECTION;
         $model->board_id = $board->id;
@@ -855,6 +860,10 @@ class Panel implements MessageComponentInterface
      */
     protected function logUserConnection($user, $connected)
     {
+        if (!Setting::getValueByKey('log.user_connection')) {
+            return;
+        }
+
         $model = new History();
         $model->type = History::TYPE_USER_CONNECTION;
         $model->user_id = $user->id;

@@ -21,15 +21,26 @@ $this->params['breadcrumbs'][] = $this->title;
         'summaryOptions' => ['class' => 'alert alert-info'],
         'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'columns' => [
-            'id',
+            [
+                'attribute' => 'id',
+                'contentOptions' => ['style' => 'width: 5%']
+            ],
             'username',
             'email',
             [
-                'filter' => User::getStatusesArray(),
+                'filter' => User::getStatuses(),
                 'attribute' => 'status',
                 'value' => function ($model) {
                     /** @var $model User */
                     return $model->getStatusLabel();
+                },
+            ],
+            [
+                'filter' => User::getGroups(),
+                'attribute' => 'group',
+                'value' => function ($model) {
+                    /** @var $model User */
+                    return $model->getGroupLabel();
                 },
             ],
 

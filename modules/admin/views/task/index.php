@@ -25,7 +25,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'filterModel' => $searchModel,
         'columns' => [
-            'id',
+            [
+                'attribute' => 'id',
+                'contentOptions' => ['style' => 'width: 5%']
+            ],
             [
                 'filter' => Task::getTypes(),
                 'attribute' => 'type',

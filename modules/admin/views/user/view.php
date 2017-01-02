@@ -6,7 +6,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
-$this->title = $model->username;
+$this->title = 'Пользователь ' . $model->username;
 $this->params['breadcrumbs'][] = ['label' => 'Пользователи', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -33,6 +33,10 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'status',
                 'value' => $model->getStatusLabel(),
+            ],
+            [
+                'attribute' => 'group',
+                'value' => $model->getGroupLabel(),
             ],
             'api_key',
             'created_at:datetime',

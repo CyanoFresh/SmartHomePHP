@@ -9,7 +9,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 
-$this->title = 'Triggers';
+$this->title = 'Триггеры';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="trigger-index">
@@ -31,7 +31,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'filterModel' => $searchModel,
         'columns' => [
-            'id',
+            [
+                'attribute' => 'id',
+                'contentOptions' => ['style' => 'width: 5%']
+            ],
             [
                 'filter' => [
                     0 => 'Нет',

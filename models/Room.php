@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "room".
@@ -61,5 +62,13 @@ class Room extends \yii\db\ActiveRecord
     public static function find()
     {
         return new RoomQuery(get_called_class());
+    }
+
+    /**
+     * @return array
+     */
+    public static function getList()
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'name');
     }
 }

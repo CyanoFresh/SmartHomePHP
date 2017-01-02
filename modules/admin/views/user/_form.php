@@ -24,7 +24,9 @@ if ($model->isNewRecord) {
 
     <?= $form->field($model, 'email')->input('email') ?>
 
-    <?= $form->field($model, 'status')->dropDownList(User::getStatusesArray()) ?>
+    <?= $form->field($model, 'status')->dropDownList(User::getStatuses()) ?>
+
+    <?= $form->field($model, 'group')->dropDownList(User::getGroups()) ?>
 
     <?= $form->field($model, 'api_key')->textInput() ?>
 

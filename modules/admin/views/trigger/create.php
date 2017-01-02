@@ -5,8 +5,8 @@
 
 use yii\helpers\Html;
 
-$this->title = 'Добавить Trigger';
-$this->params['breadcrumbs'][] = ['label' => 'Triggers', 'url' => ['index']];
+$this->title = 'Добавить Триггер';
+$this->params['breadcrumbs'][] = ['label' => 'Триггеры', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="trigger-create">

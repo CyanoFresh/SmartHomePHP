@@ -6,6 +6,7 @@
 
 use app\models\Board;
 use app\models\Item;
+use app\models\Room;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
@@ -38,6 +39,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'contentOptions' => ['style' => 'width: 5%']
             ],
             'name',
+            [
+                'attribute' => 'room_id',
+                'filter' => Room::getList(),
+                'value' => function ($model) {
+                    /** @var $model Item */
+                    return $model->room->name;
+                },
+            ],
             [
                 'attribute' => 'board_id',
                 'filter' => Board::getList(),

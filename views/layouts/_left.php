@@ -27,7 +27,7 @@
                     ['label' => 'Настройки', 'options' => ['class' => 'header']],
                     ['label' => 'Элементы', 'icon' => 'fa fa-toggle-on', 'url' => ['/admin/item/index']],
                     ['label' => 'Платы', 'icon' => 'fa fa-hdd-o', 'url' => ['/admin/board/index']],
-                    ['label' => 'Triggers', 'icon' => 'fa fa-feed', 'url' => ['/admin/trigger/index']],
+                    ['label' => 'Триггеры', 'icon' => 'fa fa-feed', 'url' => ['/admin/trigger/index']],
                     ['label' => 'Задачи', 'icon' => 'fa fa-check', 'url' => ['/admin/task/index']],
                     ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/admin/room/index']],
 //                    ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/admin/history/index']],
