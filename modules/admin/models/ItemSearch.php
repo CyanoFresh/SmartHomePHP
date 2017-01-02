@@ -62,6 +62,7 @@ class ItemSearch extends Item
             'id' => $this->id,
             'type' => $this->type,
             'room_id' => $this->room_id,
+            'board_id' => $this->board_id,
             'sort_order' => $this->sort_order,
             'pin' => $this->pin,
         ]);
