@@ -17,7 +17,6 @@ use React\EventLoop\Timer\TimerInterface;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\helpers\Json;
-use yii\helpers\VarDumper;
 
 /**
  * Class Panel
@@ -47,9 +46,13 @@ class Panel implements MessageComponentInterface
     protected $board_clients;
 
     /**
-     * @var Item[]
+     * Format like this:
+     *
+     * `item_id => item_value`
+     *
+     * @var array
      */
-    protected $items;
+    protected $item_values;
 
     /**
      * @var TimerInterface[]
@@ -79,7 +82,7 @@ class Panel implements MessageComponentInterface
         $this->loop = $loop;
         $this->user_clients = [];
         $this->board_clients = [];
-        $this->items = [];
+        $this->item_values = [];
 
         // Database driver hack: Prevent MySQL for disconnecting by timeout
         Yii::$app->db->createCommand('SET SESSION wait_timeout = 2147483;')->execute();
@@ -130,12 +133,12 @@ class Panel implements MessageComponentInterface
                 // API request
                 $api = false;
 
-                if ($conn->remoteAddress == '127.0.0.1') {
+                if ($conn->remoteAddress == '127.0.0.1' and $conn->WebSocket->request->getHeader('Origin') == 'origin') {
                     $api = true;
                 }
 
-                // Close previous connection
-                if (isset($this->user_clients[$user->id]) && !$api) {
+                // Close previous connection if it is not an API connection
+                if (isset($this->user_clients[$user->id]) and !$api) {
                     $this->user_clients[$user->id]->close();
                 }
 
@@ -147,9 +150,20 @@ class Panel implements MessageComponentInterface
                 $conn->api = $api;
                 $this->user_clients[$user->id] = $conn;
 
+                // Prepare Items for User
+                $items = Item::find()
+                    ->active()
+                    ->select(['id', 'type', 'room_id', 'board_id', 'default_value'])
+                    ->asArray()
+                    ->all();
+
+                for ($i = 0; $i < count($items); $i++) {
+                    $items[$i]['value'] = $this->getItemSavedValue($items[$i]['id'], $items[$i]['default_value']);
+                }
+
                 $conn->send(Json::encode([
                     'type' => 'init',
-                    'items' => $this->items,
+                    'items' => $items,
                 ]));
 
                 $this->logUserConnection($user, true);
@@ -320,6 +334,8 @@ class Panel implements MessageComponentInterface
                 return $this->scheduleTriggers();
             case 'update-items':
                 return $this->updateItems();
+            case 'trig':
+                return $this->handleTrig($from, $user, $data);
         }
 
         return $this->log("Unknown command from user: $msg");
@@ -359,24 +375,7 @@ class Panel implements MessageComponentInterface
                 // Trig event
                 $this->triggerItemValue($item, $value);
 
-                if (in_array($item->type, [
-                    Item::TYPE_SWITCH,
-                    Item::TYPE_VARIABLE_BOOLEAN,
-                    Item::TYPE_VARIABLE_BOOLEAN_DOOR,
-                ])) {
-                    $value = $this->valueToBoolean($data['value']);
-                }
-
-                if ($item->type === Item::TYPE_RGB) {
-                    $value = explode(',', $value);
-
-                    // Convert R,G,B from 10 bit to 8 bit
-                    for ($i = 0; $i < 3; $i++) {
-                        $value[$i] = round($value[$i] / 4);
-                    }
-                }
-
-                $this->items[$item->id]['value'] = $value;
+                $value = $this->saveItemValue($item->id, $value, $item->type);
 
                 $this->sendUsers([
                     'type' => 'value',
@@ -408,9 +407,9 @@ class Panel implements MessageComponentInterface
 //                $this->triggerItemValue($item, $value);
 
                 if ($start) {
-                    $this->items[$item->id]['value'] = $value;
+                    $this->saveItemValue($item->id, $value, $item->type);
                 } else {
-                    $this->items[$item->id]['value'] = [0, 0, 0];
+                    $this->saveItemValue($item->id, $item->getDefaultValue(), $item->type);
                 }
 
                 $this->sendUsers([
@@ -418,6 +417,7 @@ class Panel implements MessageComponentInterface
                     'item_id' => $item->id,
                     'item_type' => $item->type,
                     'value' => $value,
+                    'start' => $start,
                 ]);
 
                 // Save to history
@@ -441,22 +441,7 @@ class Panel implements MessageComponentInterface
                     // Trig event
                     $this->triggerItemValue($item, $value);
 
-                    if (in_array($item->type, [
-                        Item::TYPE_SWITCH,
-                        Item::TYPE_VARIABLE_BOOLEAN,
-                        Item::TYPE_VARIABLE_BOOLEAN_DOOR,
-                    ])) {
-                        $value = $value === 0 ? false : true;
-                    } elseif ($item->type === Item::TYPE_RGB) {
-                        $value = explode(',', $value);
-
-                        // Convert R,G,B from 10 bit to 8 bit
-                        for ($i = 0; $i < 3; $i++) {
-                            $value[$i] = round($value[$i] / 4);
-                        }
-                    }
-
-                    $this->items[$item->id]['value'] = $value;
+                    $value = $this->saveItemValue($item->id, $value, $item->type);
 
                     $this->sendUsers([
                         'type' => 'value',
@@ -471,8 +456,7 @@ class Panel implements MessageComponentInterface
 
                 break;
             case 'pong':
-                $this->log("Received pong from board [$board->id]");
-
+                $this->log("Pong from board [$board->id]");
                 break;
             default:
                 $this->log("Unknown command: \"{$data['type']}\"");
@@ -640,7 +624,6 @@ class Panel implements MessageComponentInterface
             case Board::TYPE_AREST:
                 throw new NotSupportedException();
 
-                break;
             case Board::TYPE_WEBSOCKET:
                 if (!$this->isBoardConnected($board->id)) {
                     return $from->send(Json::encode([
@@ -662,13 +645,13 @@ class Panel implements MessageComponentInterface
                 break;
         }
 
-        $rgbArray = [
-            $red,
-            $green,
-            $blue
-        ];
+//        $rgbArray = [
+//            $red,
+//            $green,
+//            $blue
+//        ];
 
-        $this->items[$item->id]['value'] = $rgbArray;
+//        $this->item_values[$item->id]['value'] = $rgbArray;
 
         $history = new History();
         $history->type = History::TYPE_USER_ACTION;
@@ -750,6 +733,49 @@ class Panel implements MessageComponentInterface
         $history->item_id = $item->id;
         $history->commited_at = time();
         $history->value = $mode . ', ' . $start ? 'start' : 'stop';
+
+        if (!$history->save()) {
+            $this->log("Cannot log: ");
+            var_dump($history->errors);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param ConnectionInterface $from
+     * @param User $user
+     * @param array $data
+     * @return bool|mixed
+     * @throws NotSupportedException
+     */
+    private function handleTrig($from, $user, $data)
+    {
+        $trigger_id = (int)$data['trigger_id'];
+        $trigger = Trigger::findOne($trigger_id);
+
+        if (!$trigger) {
+            return $from->send(Json::encode([
+                'type' => 'error',
+                'message' => 'Такое триггер не существует',
+            ]));
+        }
+
+        if ($trigger->type !== Trigger::TYPE_MANUAL) {
+            return $from->send(Json::encode([
+                'type' => 'error',
+                'message' => 'Данный тип устройства не является Manual',
+            ]));
+        }
+
+        $this->log("Trigger [$trigger->id] triggered by manual");
+
+        $this->trigger($trigger);
+
+        $history = new History();
+        $history->type = History::TYPE_API_TRIGGER;
+        $history->user_id = $user->id;
+        $history->commited_at = time();
 
         if (!$history->save()) {
             $this->log("Cannot log: ");
@@ -1050,6 +1076,24 @@ class Panel implements MessageComponentInterface
     }
 
     /**
+     * @param string $value
+     * @return array
+     */
+    private function valueToRgb($value)
+    {
+        if (!is_array($value)) {
+            $value = $this->valueToRgbData($value);
+        }
+
+        // Convert R,G,B from 10 bit to 8 bit
+        for ($i = 0; $i < 3; $i++) {
+            $value[$i] = round($value[$i] / 4);
+        }
+
+        return $value;
+    }
+
+    /**
      * @param Trigger $trigger
      */
     private function trigger($trigger)
@@ -1217,52 +1261,92 @@ class Panel implements MessageComponentInterface
             }
         }
 
-        $this->log("Scheduling done. Total count of timers: " . count($this->eventTimers));
+        $this->log("Done. Total count of timers: " . count($this->eventTimers));
     }
 
+    /**
+     * Fill with default value item values array
+     */
     protected function updateItems()
     {
         $this->log("Loading items...");
 
         /** @var Item[] $items */
-        $items = Item::find()->asArray()->all();
+        $items = Item::find()->active()->all();
 
         foreach ($items as $item) {
-            switch ($item['type']) {
-                case Item::TYPE_SWITCH:
-                case Item::TYPE_VARIABLE_BOOLEAN:
-                case Item::TYPE_VARIABLE_BOOLEAN_DOOR:
-                    $item['value'] = isset($this->items[$item['id']]['value']) ?
-                        $this->items[$item['id']]['value'] :
-                        false;
-
-                    $this->items[$item['id']] = $item;
-
-                    break;
-                case Item::TYPE_VARIABLE_TEMPERATURE:
-                case Item::TYPE_VARIABLE_HUMIDITY:
-                    $item['value'] = isset($this->items[$item['id']]['value']) ?
-                        $this->items[$item['id']]['value'] :
-                        0;
-
-                    $this->items[$item['id']] = $item;
-
-                    break;
-                case Item::TYPE_RGB:
-                    $item['value'] = isset($this->items[$item['id']]['value']) ?
-                        $this->items[$item['id']]['value'] :
-                        [
-                            0,
-                            0,
-                            0,
-                        ];
-
-                    $this->items[$item['id']] = $item;
-
-                    break;
+            if (!$this->hasItemSavedValue($item->id)) {
+                $this->saveItemValue($item->id, $item->getDefaultValue(), $item->type, false);
             }
         }
 
-        $this->log("Loaded " . count($this->items) . " items");
+        $this->log("Done");
+    }
+
+    /**
+     * @param int $item_id
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    protected function getItemSavedValue($item_id, $defaultValue = false)
+    {
+        if ($this->hasItemSavedValue($item_id)) {
+            return $this->item_values[$item_id];
+        }
+
+        return $defaultValue;
+    }
+
+    /**
+     * @param int $item_id
+     * @return bool
+     */
+    protected function hasItemSavedValue($item_id)
+    {
+        return isset($this->item_values[$item_id]);
+    }
+
+    /**
+     * Saves to value array and returns it. Normalization is on by default
+     *
+     * @param int $item_id
+     * @param mixed $value
+     * @param int $item_type
+     * @param bool $normalize
+     * @return array|bool|int
+     */
+    protected function saveItemValue($item_id, $value, $item_type, $normalize = true)
+    {
+        if ($normalize) {
+            $value = $this->normalizeItemValue($value, $item_type);
+        }
+
+        $this->item_values[$item_id] = $value;
+
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
+     * @param int $type
+     * @return array|bool|int
+     */
+    protected function normalizeItemValue($value, $type)
+    {
+        switch ($type) {
+            case Item::TYPE_SWITCH:
+            case Item::TYPE_VARIABLE_BOOLEAN:
+            case Item::TYPE_VARIABLE_BOOLEAN_DOOR:
+                return $this->valueToBoolean($value);
+
+            case Item::TYPE_VARIABLE_TEMPERATURE:
+            case Item::TYPE_VARIABLE_HUMIDITY:
+                return (int)$value;
+
+            case Item::TYPE_RGB:
+                return $this->valueToRgb($value);
+        }
+
+        return $value;
     }
 }

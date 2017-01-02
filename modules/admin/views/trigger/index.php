@@ -16,11 +16,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Обновить', [
+        <?= Html::a('Обновить на сервере', [
             '/api/panel/schedule-triggers',
             'access-token' => Yii::$app->user->identity->api_key
         ], [
-            'class' => 'btn btn-default schedule-triggers',
+            'class' => 'btn btn-default ajax-call',
         ]) ?>
     </p>
 
@@ -35,14 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'id',
                 'contentOptions' => ['style' => 'width: 5%']
             ],
-            [
-                'filter' => [
-                    0 => 'Нет',
-                    1 => 'Да',
-                ],
-                'format' => 'boolean',
-                'attribute' => 'active',
-            ],
             'name',
             [
                 'filter' => Trigger::getTypes(),
@@ -50,6 +42,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function (Trigger $model) {
                     return $model->getTypeLabel();
                 },
+            ],
+            [
+                'filter' => [
+                    0 => 'Нет',
+                    1 => 'Да',
+                ],
+                'format' => 'boolean',
+                'attribute' => 'active',
             ],
 //            'trig_date',
 //            'trig_time',

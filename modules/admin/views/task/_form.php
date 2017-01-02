@@ -55,7 +55,15 @@ use yii\widgets\ActiveForm;
     </div>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?php if ($model->isNewRecord): ?>
+            <?= Html::submitButton('Добавить и посмотреть', ['class' => 'btn btn-success', 'name' => 'after', 'value' => 'view']) ?>
+            <?= Html::submitButton('Добавить и добавить еще', ['class' => 'btn btn-success', 'name' => 'after', 'value' => 'add-another']) ?>
+            <?= Html::submitButton('Добавить и вернутся', ['class' => 'btn btn-success', 'name' => 'after', 'value' => 'return']) ?>
+        <?php else: ?>
+            <?= Html::submitButton('Сохранить и посмотреть', ['class' => 'btn btn-primary', 'name' => 'after', 'value' => 'view']) ?>
+            <?= Html::submitButton('Сохранить и добавить еще', ['class' => 'btn btn-primary', 'name' => 'after', 'value' => 'add-another']) ?>
+            <?= Html::submitButton('Сохранить и вернутся', ['class' => 'btn btn-primary', 'name' => 'after', 'value' => 'return']) ?>
+        <?php endif; ?>
     </div>
 
     <?php ActiveForm::end(); ?>

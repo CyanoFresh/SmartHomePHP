@@ -85,7 +85,7 @@ class Board extends ActiveRecord
     public static function getTypesArray()
     {
         return [
-            self::TYPE_AREST => 'aREST API',
+            self::TYPE_AREST => 'REST API',
             self::TYPE_WEBSOCKET => 'WebSocket API',
         ];
     }

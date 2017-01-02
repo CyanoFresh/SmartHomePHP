@@ -30,6 +30,7 @@
                     ['label' => 'Триггеры', 'icon' => 'fa fa-feed', 'url' => ['/admin/trigger/index']],
                     ['label' => 'Задачи', 'icon' => 'fa fa-check', 'url' => ['/admin/task/index']],
                     ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/admin/room/index']],
+                    ['label' => 'Настройки', 'icon' => 'fa fa-cogs', 'url' => ['/admin/setting/index']],
 //                    ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/admin/history/index']],
                     ['label' => 'Пользователи', 'icon' => 'fa fa-users', 'url' => ['/admin/user/index']],
 

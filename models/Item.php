@@ -68,10 +68,25 @@ class Item extends ActiveRecord
     {
         return [
             [['active', 'type', 'room_id', 'name', 'icon', 'bg', 'board_id'], 'required'],
-            [['type', 'update_interval', 'save_history_interval', 'room_id', 'sort_order', 'board_id', 'pin'], 'integer'],
+            [
+                ['type', 'update_interval', 'save_history_interval', 'room_id', 'sort_order', 'board_id', 'pin'],
+                'integer'
+            ],
             [['url', 'name', 'icon', 'bg', 'class', 'default_value'], 'string', 'max' => 255],
-            [['room_id'], 'exist', 'skipOnError' => true, 'targetClass' => Room::className(), 'targetAttribute' => ['room_id' => 'id']],
-            [['board_id'], 'exist', 'skipOnError' => true, 'targetClass' => Board::className(), 'targetAttribute' => ['board_id' => 'id']],
+            [
+                ['room_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Room::className(),
+                'targetAttribute' => ['room_id' => 'id']
+            ],
+            [
+                ['board_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Board::className(),
+                'targetAttribute' => ['board_id' => 'id']
+            ],
             [['sort_order', 'update_interval', 'save_history_interval'], 'default', 'value' => 0],
             [['active', 'enable_log'], 'default', 'value' => true],
             [['active', 'enable_log'], 'boolean'],
@@ -169,11 +184,45 @@ class Item extends ActiveRecord
         return ArrayHelper::map(self::find()->all(), 'id', 'name');
     }
 
+    /**
+     * @return array
+     */
     public static function getModesArray()
     {
         return [
             self::MODE_RAINBOW,
             self::MODE_BREATH,
         ];
+    }
+
+    /**
+     * Returns normalized default value
+     * @return mixed
+     */
+    public function getDefaultValue()
+    {
+        if (!is_null($this->default_value)) {
+            return $this->default_value;
+        }
+
+        switch ($this->type) {
+            case Item::TYPE_SWITCH:
+            case Item::TYPE_VARIABLE_BOOLEAN:
+            case Item::TYPE_VARIABLE_BOOLEAN_DOOR:
+                return false;
+
+            case Item::TYPE_VARIABLE_TEMPERATURE:
+            case Item::TYPE_VARIABLE_HUMIDITY:
+                return 0;
+
+            case Item::TYPE_RGB:
+                return [
+                    0,
+                    0,
+                    0,
+                ];
+        }
+
+        return false;
     }
 }

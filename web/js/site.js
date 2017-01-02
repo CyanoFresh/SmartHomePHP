@@ -18,7 +18,7 @@ function showSuccessMessage(message) {
     });
 }
 
-$('.schedule-triggers').click(function (e) {
+$('.ajax-call').click(function (e) {
     e.preventDefault();
 
     $.post($(this).attr('href'), function (data) {

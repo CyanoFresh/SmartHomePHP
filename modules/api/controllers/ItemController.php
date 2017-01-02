@@ -4,8 +4,10 @@ namespace app\modules\api\controllers;
 
 use app\models\Board;
 use app\models\Item;
+use app\models\Trigger;
 use app\modules\api\components\WebSocketAPI;
 use Yii;
+use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
@@ -22,6 +24,8 @@ class ItemController extends Controller
         return [
             'turn-on' => ['POST'],
             'turn-off' => ['POST'],
+            'rgb' => ['POST'],
+            'rgb-mode' => ['POST'],
             'value' => ['GET'],
         ];
     }
@@ -138,6 +142,44 @@ class ItemController extends Controller
 
                 return [
                     'success' => $api->rgb($item_id, $red, $green, $blue, $fade),
+                ];
+            default:
+                throw new ServerErrorHttpException();
+        }
+    }
+
+    /**
+     * @param int $item_id
+     * @param string $mode
+     * @param bool $start
+     * @return array
+     * @throws BadRequestHttpException
+     * @throws NotSupportedException
+     * @throws ServerErrorHttpException
+     */
+    public function actionRgbMode($item_id, $mode, $start)
+    {
+        $item = $this->findItem($item_id);
+
+        if ($item->type !== Item::TYPE_RGB) {
+            throw new BadRequestHttpException('This item is not the RGB one');
+        }
+
+        if (!in_array($mode, Item::getModesArray())) {
+            throw new InvalidParamException('Unknown mode');
+        }
+
+        $board = $item->board;
+
+        switch ($board->type) {
+            case Board::TYPE_AREST:
+                throw new NotSupportedException();
+
+            case Board::TYPE_WEBSOCKET:
+                $api = new WebSocketAPI(Yii::$app->user->identity);
+
+                return [
+                    'success' => $api->rgbMode($item_id, $mode, $start),
                 ];
             default:
                 throw new ServerErrorHttpException();
