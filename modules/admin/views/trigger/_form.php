@@ -4,6 +4,7 @@
 /* @var $model app\models\Trigger */
 /* @var $form yii\widgets\ActiveForm */
 
+use app\models\Board;
 use app\models\Item;
 use app\models\Task;
 use app\models\Trigger;
@@ -93,6 +94,27 @@ if ($model->isNewRecord) {
                 </div>
                 <div class="col-sm-6">
                     <?= $form->field($model, 'trig_item_value')->textInput(['maxlength' => true]) ?>
+                </div>
+            </div>
+
+            <p>или</p>
+
+            <div class="row type-10 type-20">
+                <div class="col-sm-6">
+                    <?= $form->field($model, 'trig_board_id')->widget(Select2::className(), [
+                        'data' => Board::getList(),
+                        'options' => [
+                            'placeholder' => 'Выберите устройство ...',
+                        ],
+                    ]) ?>
+                </div>
+                <div class="col-sm-6">
+                    <?= $form->field($model, 'trig_connection_value')->widget(Select2::className(), [
+                        'data' => Trigger::getConnectionValues(),
+                        'options' => [
+                            'placeholder' => 'Выберите значение ...',
+                        ],
+                    ]) ?>
                 </div>
             </div>
         </div>

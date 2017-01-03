@@ -18,9 +18,13 @@ use yii\helpers\ArrayHelper;
  * @property mixed $trig_time_wdays
  * @property integer $trig_item_id
  * @property string $trig_item_value
+ * @property integer $trig_board_id
+ * @property string $trig_connection_value
  * @property string $name
  *
  * @property Task[] $tasks
+ * @property Item $item
+ * @property Board $board
  */
 class Trigger extends ActiveRecord
 {
@@ -29,6 +33,10 @@ class Trigger extends ActiveRecord
     const TYPE_BY_DATE = 30;
     const TYPE_BY_TIME = 40;
     const TYPE_MANUAL = 50;
+    const TYPE_BOARD_CONNECTION = 60;
+
+    const CONNECTION_VALUE_DISCONNECTED = 0;
+    const CONNECTION_VALUE_CONNECTED = 1;
 
     /**
      * @inheritdoc
@@ -45,10 +53,11 @@ class Trigger extends ActiveRecord
     {
         return [
             [['type', 'name', 'active'], 'required'],
-            [['type', 'trig_item_id', 'trig_date'], 'integer'],
+            [['type', 'trig_item_id', 'trig_board_id', 'trig_date'], 'integer'],
             [['type'], 'in', 'range' => self::getTypesArray()],
+            [['trig_connection_value'], 'in', 'range' => self::getConnectionValuesArray()],
             [['trig_item_value', 'name', 'trig_time'], 'string', 'max' => 255],
-            [['trig_time', 'trig_time_wdays', 'trig_item_value', 'trig_date'], 'default', 'value' => null],
+            [['trig_time', 'trig_time_wdays', 'trig_item_value', 'trig_item_id', 'trig_board_id', 'trig_connection_value', 'trig_date'], 'default', 'value' => null],
             [['trig_time_wdays'], 'each', 'rule' => ['in', 'range' => self::getWeekDaysArray()]],
             [['task_ids'], 'each', 'rule' => ['integer']],
             [['active'], 'boolean'],
@@ -86,6 +95,8 @@ class Trigger extends ActiveRecord
             'trig_item_id' => 'Элемент срабатывания',
             'trig_item_value' => 'Значение элемента срабатывания',
             'task_ids' => 'Задачи',
+            'trig_board_id' => 'Устройство',
+            'trig_connection_value' => 'Значение состояния',
             'name' => 'Название',
         ];
     }
@@ -101,7 +112,35 @@ class Trigger extends ActiveRecord
             self::TYPE_BY_DATE => 'Дата',
             self::TYPE_BY_TIME => 'Время',
             self::TYPE_MANUAL => 'Вручную (API)',
+            self::TYPE_BOARD_CONNECTION => 'Состояние подключения платы',
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getTypesArray()
+    {
+        return array_keys(self::getTypes());
+    }
+
+    /**
+     * @return array
+     */
+    public static function getConnectionValues()
+    {
+        return [
+            self::CONNECTION_VALUE_CONNECTED => 'Подключено',
+            self::CONNECTION_VALUE_DISCONNECTED => 'Отключено',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getConnectionValuesArray()
+    {
+        return array_keys(self::getConnectionValues());
     }
 
     /**
@@ -129,14 +168,6 @@ class Trigger extends ActiveRecord
     }
 
     /**
-     * @return array
-     */
-    public static function getTypesArray()
-    {
-        return array_keys(self::getTypes());
-    }
-
-    /**
      * @return string
      */
     public function getTypeLabel()
@@ -159,6 +190,22 @@ class Trigger extends ActiveRecord
     {
         return $this->hasMany(Task::className(), ['id' => 'task_id'])
             ->viaTable('trigger_task', ['trigger_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItem()
+    {
+        return $this->hasOne(Item::className(), ['item_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBoard()
+    {
+        return $this->hasOne(Board::className(), ['board_id' => 'id']);
     }
 
     /**

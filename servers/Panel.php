@@ -239,6 +239,8 @@ class Panel implements MessageComponentInterface
                     }
                 }
 
+                $this->triggerBoardConnection($board, true);
+
                 $this->logBoardConnection($board, true);
 
                 return $this->log("Connected board [{$board->id}]");
@@ -292,6 +294,8 @@ class Panel implements MessageComponentInterface
             }
 
             unset($this->board_clients[$boardId]);
+
+            $this->triggerBoardConnection($conn->Board, false);
 
             $this->logBoardConnection($boardId, false);
 
@@ -989,18 +993,43 @@ class Panel implements MessageComponentInterface
      */
     private function triggerItemValue($item, $value)
     {
-        // Find event
-        $event = Trigger::findOne([
+        // Find Triggers
+        /** @var Trigger[] $triggers */
+        $triggers = Trigger::findAll([
             'active' => true,
             'trig_item_id' => $item->id,
             'trig_item_value' => $value,
         ]);
 
-        if (!$event) {
+        if (!$triggers) {
             return;
         }
 
-        $this->trigger($event);
+        foreach ($triggers as $trigger) {
+            $this->trigger($trigger);
+        }
+    }
+
+    /**
+     * @param Board $board
+     * @param bool $connected
+     */
+    private function triggerBoardConnection(Board $board, bool $connected)
+    {
+        /** @var Trigger[] $triggers */
+        $triggers = Trigger::findAll([
+            'active' => true,
+            'trig_board_id' => $board->id,
+            'trig_connection_value' => $connected ? Trigger::CONNECTION_VALUE_CONNECTED : Trigger::CONNECTION_VALUE_DISCONNECTED,
+        ]);
+
+        if (!$triggers) {
+            return;
+        }
+
+        foreach ($triggers as $trigger) {
+            $this->trigger($trigger);
+        }
     }
 
     /**
@@ -1096,21 +1125,6 @@ class Panel implements MessageComponentInterface
     /**
      * @param Trigger $trigger
      */
-    private function trigger($trigger)
-    {
-        $this->log("Trigger [{$trigger->id}] triggered. Doing the tasks...");
-
-        // Do the tasks
-        foreach ($trigger->tasks as $task) {
-            $this->doTask($task);
-        }
-
-        $this->log("Tasks for Trigger [{$trigger->id}] done!");
-    }
-
-    /**
-     * @param Trigger $trigger
-     */
     private function triggerDate($trigger)
     {
         $this->trigger($trigger);
@@ -1126,6 +1140,24 @@ class Panel implements MessageComponentInterface
         $this->scheduleTriggers();
     }
 
+    /**
+     * @param Trigger $trigger
+     */
+    private function trigger($trigger)
+    {
+        $this->log("Trigger [{$trigger->id}] triggered. Doing the tasks...");
+
+        // Do the tasks
+        foreach ($trigger->tasks as $task) {
+            $this->doTask($task);
+        }
+
+        $this->log("Tasks for Trigger [{$trigger->id}] done!");
+    }
+
+    /**
+     * Schedule Trigger's triggering by time or date
+     */
     protected function scheduleTriggers()
     {
         $this->log("Scheduling Triggers...");
