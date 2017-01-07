@@ -2,7 +2,14 @@ Solomaha Home
 ============================
 
 This is core center for Solomaha Home system. Includes Web Panel and API.
-Main server built over WebSocket Server and references to [SmartHome Message Protocol](https://github.com/CyanoFresh/SHMP)
+
+Site built on Yii2 Framework, WebSocket server on Ratchet PHP
+
+Main server built over WebSocket Server and references to [SmartHome Message Protocol](https://github.com/CyanoFresh/SHMP).
+
+Author: Alex Solomaha <cyanofresh@gmail.com>
+
+Feel free to contribute!
 
 ![Screen of Panel](http://image.prntscr.com/image/6e4e6e725328456e960e4a384e3bccba.png)
 
