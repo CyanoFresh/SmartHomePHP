@@ -121,6 +121,8 @@ function updateItemValue(id, type, value) {
                 var $colorPicker = $('#colorpicker-' + id);
 
                 $colorPicker.spectrum('set', 'rgb(' + value[0] + ', ' + value[1] + ', ' + value[2] + ')');
+
+                $('.item-rgb .rgb-mode').removeClass('active');
             }
 
             break;
@@ -149,6 +151,14 @@ $(document).ready(function () {
                 'blue': blue
             });
         }
+    });
+
+    $('.fade-checkbox').each(function () {
+        var localStorageValue = window.localStorage.getItem('fade-checkbox-' + $(this).data('item-id'));
+
+        console.log(localStorageValue);
+
+        this.checked = localStorageValue != null && localStorageValue != 'false';
     });
 
     initWebSocket(function () {
@@ -192,6 +202,10 @@ $(document).ready(function () {
                 "mode": mode,
                 "start": start
             });
+        });
+
+        $('.fade-checkbox').change(function (e) {
+            window.localStorage.setItem('fade-checkbox-' + $(this).data('item-id'), this.checked);
         });
     });
 });
