@@ -1,29 +1,35 @@
-SmartHome Web Panel & API
+Solomaha Home
 ============================
 
-This is controller for SmartHome project.
+This is core center for Solomaha Home system. Includes Web Panel and API.
+Main server built over WebSocket Server and references to [SmartHome Message Protocol](https://github.com/CyanoFresh/SHMP)
 
 
-DIRECTORY STRUCTURE
--------------------
+FEATURES
+------------
 
-      assets/             contains assets definition
-      commands/           contains console commands (controllers)
-      config/             contains application configurations
-      controllers/        contains Web controller classes
-      mail/               contains view files for e-mails
-      models/             contains model classes
-      runtime/            contains files generated during runtime
-      vendor/             contains dependent 3rd-party packages
-      views/              contains view files for the Web application
-      web/                contains the entry script and Web resources
+- Real time updates via WebSocket protocol
+- Universal Admin Panel for creating Items, managing Boards, configure application, etc
+- Triggers (Events) with tasks (when triggered - doing tasks)
+- API
+- Web Panel
 
+
+DEVICES & ROMS
+------------
+
+I've selected ESP8266 NodeMCU boards for low price and websocket module support. It uses lua firmaware
+
+- [NodeMCU #2](https://github.com/CyanoFresh/SmartHome-NodeMCU-2)
+- [NodeMCU #3](https://github.com/CyanoFresh/SmartHome-NodeMCU-3)
+- [Wemos D1 Mini #1](https://github.com/CyanoFresh/SmartHome-Wemos-1)
 
 
 REQUIREMENTS
 ------------
 
-The minimum requirement by this project template that your Web server supports PHP 5.4.0.
+- PHP >= 5.4.0
+- At lest 1 open port (8081)
 
 
 INSTALLATION
@@ -48,7 +54,7 @@ php yii migrate
 - Check and edit the other files in the `config/` directory to customize your application as required.
 
 
-To start the server:
+To start the Main server:
 
 ~~~
 php yii panel
