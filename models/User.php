@@ -27,6 +27,9 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
+    const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
+
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
@@ -62,7 +65,8 @@ class User extends ActiveRecord implements IdentityInterface
             [['username', 'email'], 'required'],
             [['api_key', 'auth_token'], 'string'],
             [['group'], 'integer'],
-            [['password_hash'], 'required', 'on' => 'create'],
+            [['password'], 'required', 'on' => self::SCENARIO_CREATE],
+            [['password'], 'safe', 'on' => self::SCENARIO_UPDATE],
             [['auth_token'], 'default', 'value' => null],
             [['status'], 'default', 'value' => self::STATUS_ACTIVE],
             [['status'], 'in', 'range' => self::getStatusesArray()],
@@ -101,6 +105,14 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @return string
+     */
+    public function getStatusLabel()
+    {
+        return self::getStatuses()[$this->status];
+    }
+
+    /**
      * @return array
      */
     public static function getStatusesArray()
@@ -114,8 +126,8 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getGroups()
     {
         return [
-            self::GROUP_ADMIN => 'Администратор',
             self::GROUP_USER => 'Пользователь',
+            self::GROUP_ADMIN => 'Администратор',
         ];
     }
 
@@ -125,14 +137,6 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getGroupsArray()
     {
         return array_keys(self::getGroups());
-    }
-
-    /**
-     * @return string
-     */
-    public function getStatusLabel()
-    {
-        return self::getStatuses()[$this->status];
     }
 
     /**

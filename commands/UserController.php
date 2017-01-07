@@ -4,13 +4,14 @@ namespace app\commands;
 
 use app\models\User;
 use yii\console\Controller;
+use yii\helpers\Console;
 
 class UserController extends Controller
 {
     public function actionRegister($username, $password, $email)
     {
         $user = new User([
-            'scenario' => 'create',
+            'scenario' => User::SCENARIO_CREATE,
         ]);
 
         $user->username = $username;
@@ -25,6 +26,7 @@ class UserController extends Controller
 
         echo 'Errors:' . PHP_EOL;
         var_dump($user->errors);
+
         return 0;
     }
 
@@ -37,6 +39,7 @@ class UserController extends Controller
             return 0;
         }
 
+        $user->scenario = User::SCENARIO_UPDATE;
         $user->setPassword($newPassword);
         $user->generateAuthKey();
 
@@ -57,16 +60,17 @@ class UserController extends Controller
         $user = User::findOne($id);
 
         if (!$user) {
-            echo 'User was not found' . PHP_EOL;
+            echo $this->ansiFormat('User was not found' . PHP_EOL, Console::FG_RED);
             return 0;
         }
 
         if ($user->validatePassword($password)) {
-            echo 'Password is valid' . PHP_EOL;
+            echo $this->ansiFormat('Password is valid' . PHP_EOL, Console::FG_GREEN);
             return 1;
         }
 
-        echo 'Password is invalid' . PHP_EOL;
-        return 0;
+        echo $this->ansiFormat('Password is invalid' . PHP_EOL, Console::FG_RED);
+
+        return 1;
     }
 }

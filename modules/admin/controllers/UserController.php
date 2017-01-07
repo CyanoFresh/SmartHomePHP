@@ -73,7 +73,9 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
-        $model = new User();
+        $model = new User([
+            'scenario' => User::SCENARIO_CREATE,
+        ]);
 
         if ($model->load(Yii::$app->request->post())) {
             $model->setPassword($model->password);
@@ -97,6 +99,7 @@ class UserController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->scenario = User::SCENARIO_UPDATE;
 
         if ($model->load(Yii::$app->request->post())) {
             $model->setPassword($model->password);

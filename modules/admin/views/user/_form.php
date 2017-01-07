@@ -8,8 +8,10 @@ use app\models\User;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+$randomApiKey = false;
+
 if ($model->isNewRecord) {
-    $model->api_key = md5(time());
+    $randomApiKey = md5(time());
 }
 
 ?>
@@ -28,7 +30,7 @@ if ($model->isNewRecord) {
 
     <?= $form->field($model, 'group')->dropDownList(User::getGroups()) ?>
 
-    <?= $form->field($model, 'api_key')->textInput() ?>
+    <?= $form->field($model, 'api_key')->textInput()->hint($randomApiKey) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить', [
