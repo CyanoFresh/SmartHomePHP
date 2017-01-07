@@ -160,11 +160,11 @@ class Item extends ActiveRecord
         return [
             self::TYPE_SWITCH => 'Переключатель',
             self::TYPE_VARIABLE => 'Переменная',
-            self::TYPE_VARIABLE_BOOLEAN => 'Переменная булев',
-            self::TYPE_VARIABLE_BOOLEAN_DOOR => 'Переменная булев дверь',
+            self::TYPE_VARIABLE_BOOLEAN => 'Переменная boolean',
+            self::TYPE_VARIABLE_BOOLEAN_DOOR => 'Переменная boolean дверь',
             self::TYPE_VARIABLE_TEMPERATURE => 'Переменная температура',
             self::TYPE_VARIABLE_HUMIDITY => 'Переменная влажность',
-            self::TYPE_RGB => 'RGB',
+            self::TYPE_RGB => 'RGB LED',
         ];
     }
 

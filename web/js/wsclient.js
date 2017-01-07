@@ -1,7 +1,7 @@
 var wsURL;
 
 var WS;
-var WSopened;
+var WSConnectionOpened;
 
 function log(msg) {
     console.log(msg);
@@ -13,8 +13,7 @@ function initWebSocket(callback) {
     WS.onmessage = onMessage;
     WS.onopen = callback;
     WS.onclose = function () {
-        if (WSopened) {
-            log(1);
+        if (WSConnectionOpened) {
             $('.loader-text').html('Отключен от сервера').fadeIn();
 
             $('.control-panel').fadeOut(function () {
@@ -56,7 +55,7 @@ function onMessage(e) {
 }
 
 function afterConnected() {
-    WSopened = true;
+    WSConnectionOpened = true;
 
     $('#loader').fadeOut(function () {
         $('.control-panel').fadeIn();

@@ -393,6 +393,10 @@ class Panel implements MessageComponentInterface
 
                 break;
             case 'rgbMode':
+                /**
+                 * Message structure:
+                 * {"start":true,"type":"rgbMode","mode":"rainbow","pin":1}
+                 */
                 $value = $data['mode'];
                 $pin = (integer)$data['pin'];
                 $start = (bool)$data['start'];
@@ -406,15 +410,13 @@ class Panel implements MessageComponentInterface
                     return $this->log('Trying to use unknown item');
                 }
 
-                // Trig event
-                // TODO
-//                $this->triggerItemValue($item, $value);
-
                 if ($start) {
-                    $this->saveItemValue($item->id, $value, $item->type);
+                    $value = $this->saveItemValue($item->id, $value, $item->type, false);
                 } else {
-                    $this->saveItemValue($item->id, $item->getDefaultValue(), $item->type);
+                    $value = $this->saveItemValue($item->id, $item->getDefaultValue(), $item->type);
                 }
+
+                // TODO: trigger
 
                 $this->sendUsers([
                     'type' => 'value',
@@ -424,9 +426,7 @@ class Panel implements MessageComponentInterface
                     'start' => $start,
                 ]);
 
-                // Save to history
-                // TODO
-//                $this->logItemValue($item, $value);
+                // TODO: save to history
 
                 break;
             case 'values':
