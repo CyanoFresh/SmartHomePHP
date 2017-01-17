@@ -26,18 +26,18 @@ FEATURES
 DEVICES & ROMS
 ------------
 
-I've selected ESP8266 NodeMCU boards for low price and websocket module support. It uses lua firmaware
+I've selected ESP8266 NodeMCU boards for low price and websocket module support. It uses lua firmware
 
 - [NodeMCU #2](https://github.com/CyanoFresh/SmartHome-NodeMCU-2)
 - [NodeMCU #3](https://github.com/CyanoFresh/SmartHome-NodeMCU-3)
-- [Wemos D1 Mini #1](https://github.com/CyanoFresh/SmartHome-Wemos-1)
+- [WeMos D1 Mini #1](https://github.com/CyanoFresh/SmartHome-Wemos-1)
 
 
 REQUIREMENTS
 ------------
 
 - PHP >= 5.4.0
-- At lest 1 open port (8081)
+- At least 1 open port (8081)
 
 
 INSTALLATION
