@@ -1,4 +1,5 @@
 <?php
+
 /* @var $this \yii\web\View */
 /* @var $content string */
 
@@ -9,7 +10,7 @@ use yii\helpers\Url;
 
 <header class="main-header">
 
-    <?= Html::a('<span class="logo-mini product-font">SH</span><span class="logo-lg product-font"><span>Smart</span> Home</span>',
+    <?= Html::a('<span class="logo-mini product-font">SH</span><span class="logo-lg product-font"><span>Solomaha</span> Home</span>',
         Yii::$app->homeUrl, ['class' => 'logo']) ?>
 
     <nav class="navbar navbar-static-top" role="navigation">

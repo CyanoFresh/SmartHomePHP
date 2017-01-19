@@ -3,10 +3,8 @@
 /* @var $this yii\web\View */
 /* @var $model app\models\Task */
 
-use yii\helpers\Html;
-
-$this->title = 'Добавить Task';
-$this->params['breadcrumbs'][] = ['label' => 'Tasks', 'url' => ['index']];
+$this->title = 'Добавить Задачу';
+$this->params['breadcrumbs'][] = ['label' => 'Задачи', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="task-create">

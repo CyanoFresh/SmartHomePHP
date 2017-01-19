@@ -3,8 +3,8 @@
 $params = require(__DIR__ . '/params.php');
 
 return [
-    'id' => 'basic',
-    'name' => 'SmartHome',
+    'id' => 'solomaha-home',
+    'name' => 'Solomaha Home',
     'language' => 'ru',
     'sourceLanguage' => 'ru',
     'basePath' => dirname(__DIR__),
@@ -41,9 +41,10 @@ return [
             'rules' => [
                 '' => 'panel/index',
                 'login' => 'auth/login',
-                '<controller>/<id:\d+>/<action:(create|update|delete)>' => '<controller>/<action>',
-                '<controller>/<id:\d+>' => '<controller>/view',
                 '<controller>' => '<controller>/index',
+                'admin/<controller>/<id:\d+>/<action:(create|update|delete)>' => 'admin/<controller>/<action>',
+                'admin/<controller>/<id:\d+>' => 'admin/<controller>/view',
+                'admin/<controller>s' => 'admin/<controller>/index',
             ],
         ],
         'view' => [

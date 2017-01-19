@@ -177,11 +177,37 @@ class Item extends ActiveRecord
     }
 
     /**
+     * @param bool $prependId
+     * @param bool $appendRoomName
      * @return array
      */
-    public static function getList()
+    public static function getList($prependId = false, $appendRoomName = false)
     {
-        return ArrayHelper::map(self::find()->all(), 'id', 'name');
+        /** @var self[] $models */
+        $models = self::find()->all();
+        $result = [];
+
+        if (!$appendRoomName and !$prependId) {
+            return ArrayHelper::map($models, 'id', 'name');
+        }
+
+        foreach ($models as $model) {
+            $title = '';
+
+            if ($prependId) {
+                $title .= '#' . $model->id . ' ';
+            }
+
+            $title .= $model->name;
+
+            if ($appendRoomName) {
+                $title .= ' - ' . $model->room->name;
+            }
+
+            $result[$model->id] .= $title;
+        }
+
+        return $result;
     }
 
     /**

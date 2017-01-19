@@ -10,21 +10,23 @@ use app\models\Trigger;
 use app\models\History;
 use app\models\Item;
 use app\models\User;
+use MongoDB\Driver\Exception\AuthenticationException;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use Yii;
+use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
 use yii\helpers\Json;
+use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
+use yii\web\UnauthorizedHttpException;
 
 /**
  * Class Panel
  *
- * WebSockets handler
- *
- * @package app\components
- * @author CyanoFresh <cyanofresh@gmail.com>
+ * Web Panel WebSockets handler
  */
 class Panel implements MessageComponentInterface
 {
@@ -55,14 +57,16 @@ class Panel implements MessageComponentInterface
     protected $item_values;
 
     /**
+     * `item_id` => TimerInterface
      * @var TimerInterface[]
      */
-    protected $isConnectedTimers;
+    protected $connectionCheckTimers;
 
     /**
+     * `item_id` => iteration count
      * @var array
      */
-    protected $awaitingPong;
+    protected $connectionCheckIteration;
 
     /**
      * @var TimerInterface[]
@@ -83,6 +87,9 @@ class Panel implements MessageComponentInterface
         $this->user_clients = [];
         $this->board_clients = [];
         $this->item_values = [];
+        $this->connectionCheckTimers = [];
+        $this->connectionCheckIteration = [];
+        $this->eventTimers = [];
 
         // Database driver hack: Prevent MySQL for disconnecting by timeout
         Yii::$app->db->createCommand('SET SESSION wait_timeout = 2147483;')->execute();
@@ -113,7 +120,9 @@ class Panel implements MessageComponentInterface
                 $userAuthToken = $query->get('auth_token');
 
                 if (!$userID or !$userAuthToken) {
-                    return $conn->close();
+                    $this->log("Invalid credentials: '$userID', '$userAuthToken'");
+
+                    throw new InvalidParamException("Required fields does not exist");
                 }
 
                 $user = User::findOne([
@@ -121,13 +130,15 @@ class Panel implements MessageComponentInterface
                 ]);
 
                 if (!$user) {
-                    $conn->close();
-                    return $this->log("User was not found with id $userID");
+                    $this->log("User was not found with id '$userID'");
+
+                    throw new NotFoundHttpException("User was not found with id '$userID'");
                 }
 
                 if ($user->getAuthToken() != $userAuthToken) {
-                    $conn->close();
-                    return $this->log("User [$user->id] wrong auth token ($userAuthToken and {$user->getAuthToken()})");
+                    $this->log("User [$user->id] wrong auth token ($userAuthToken and {$user->getAuthToken()})");
+
+                    throw new AuthenticationException("Wrong credentials");
                 }
 
                 // API request
@@ -176,8 +187,9 @@ class Panel implements MessageComponentInterface
                 $boardSecret = $query->get('secret');
 
                 if (!$boardID or !$boardSecret) {
-                    $this->log('Wrong login data');
-                    return $conn->close();
+                    $this->log("Wrong login data: '$boardID' and '$boardSecret'");
+
+                    throw new UnauthorizedHttpException('Wrong credentials');
                 }
 
                 $board = Board::findOne([
@@ -187,23 +199,25 @@ class Panel implements MessageComponentInterface
                 ]);
 
                 if (!$board) {
-                    $this->log('Not found!');
-                    return $conn->close();
+                    $this->log("Board [$boardID] not found!");
+
+                    throw new NotFoundHttpException("Board with given ID does not exists");
                 }
 
-                if (!IPHelper::isLocal($conn->remoteAddress) and !$board->remote_connection) {
-                    $this->log("Remote connection blocked for board [$board->id]; IP: {$conn->remoteAddress}");
-                    return $conn->close();
+                if (!$board->remote_connection and !IPHelper::isLocal($conn->remoteAddress)) {
+                    $this->log("Remote connection blocked for board [$boardID]; IP: {$conn->remoteAddress}");
+
+                    throw new ForbiddenHttpException("Remote connection is not allowed for this Board");
                 }
 
                 // Attach to boards
                 $conn->Board = $board;
                 $this->board_clients[$board->id] = $conn;
 
-                $this->isConnectedTimers[$board->id] = $this->loop->addTimer(
+                $this->connectionCheckTimers[$board->id] = $this->loop->addPeriodicTimer(
                     Yii::$app->params['server']['connectionCheckTimeout'],
-                    function () use ($board) {
-                        return $this->doConnectionCheckTimer($board);
+                    function () use ($boardID) {
+                        $this->doConnectionCheckTimer($boardID);
                     }
                 );
 
@@ -275,22 +289,22 @@ class Panel implements MessageComponentInterface
 
             $this->log("Disconnecting Board [{$boardId}]...");
 
-            // Remove timer
-            if (isset($this->isConnectedTimers[$boardId])) {
-                $this->log("Disabling timeout timer...");
+            // Cancel connection check timer
+            if (isset($this->connectionCheckTimers[$boardId])) {
+                $this->log("Cancel connection check timer...");
 
-                $this->isConnectedTimers[$boardId]->cancel();
-                unset($this->isConnectedTimers[$boardId]);
+                if ($this->connectionCheckTimers[$boardId] instanceof TimerInterface) {
+                    $this->connectionCheckTimers[$boardId]->cancel();
+                }
 
-                $this->log("Disabled");
+                unset($this->connectionCheckTimers[$boardId]);
             }
 
-            if (isset($this->awaitingPong[$boardId])) {
-                $this->log("Removing from awaiting pong list...");
+            // Reset connection check iteration count
+            if (isset($this->connectionCheckIteration[$boardId])) {
+                $this->log("Reset connection check iteration count...");
 
-                unset($this->awaitingPong[$boardId]);
-
-                $this->log("Removed");
+                unset($this->connectionCheckIteration[$boardId]);
             }
 
             unset($this->board_clients[$boardId]);
@@ -356,10 +370,10 @@ class Panel implements MessageComponentInterface
         $board = $from->Board;
         $data = Json::decode($msg);
 
-        if (isset($this->awaitingPong[$board->id])) {
-            unset($this->awaitingPong[$board->id]);
+        if (isset($this->connectionCheckIteration[$board->id])) {
+            unset($this->connectionCheckIteration[$board->id]);
 
-            $this->log("Removed board [$board->id] from timeout queue");
+            $this->log("Reset connection check iteration count for Board [$board->id]");
         }
 
         switch ($data['type']) {
@@ -953,38 +967,41 @@ class Panel implements MessageComponentInterface
         }
     }
 
-    public function doConnectionCheckTimer($board)
+    /**
+     * Do the Connection Check Timer job
+     *
+     * @param int $boardID
+     */
+    public function doConnectionCheckTimer($boardID)
     {
-        $this->log("Checking for timeout [$board->id] board...");
+        $this->log("Connection check for Board [$boardID]...");
 
-        if (!isset($this->board_clients[$board->id])) {
-            $this->logBoardConnection($board, false);
+        // Check if it is already disconnected
+        if (!isset($this->board_clients[$boardID])) {
+            $this->logBoardConnection($boardID, false);
 
-            return $this->log("Board [$board->id] has already been disconnected!");
+            $this->log("Board [$boardID] has already been disconnected");
+
+            return;
         }
 
-        if (isset($this->awaitingPong[$board->id])) {
-            $this->log("There was no pong from last ping! Disconnecting...");
+        if (isset($this->connectionCheckIteration[$boardID])) {
+            if ($this->connectionCheckIteration[$boardID] >= Yii::$app->params['server']['connectionCheckMaxIteration']) {
+                $this->log("Maximum ignored ping commands reached. Disconnecting...");
 
-            return $this->board_clients[$board->id]->close();
+                $this->board_clients[$boardID]->close();
+
+                return;
+            }
+
+            $this->connectionCheckIteration[$boardID]++;
+        } else {
+            $this->connectionCheckIteration[$boardID] = 1;
         }
 
-        $this->awaitingPong[$board->id] = true;
-
-        $this->sendToBoard($board->id, [
+        $this->sendToBoard($boardID, [
             'type' => 'ping',
         ]);
-
-        $this->isConnectedTimers[$board->id]->cancel();
-
-        $this->isConnectedTimers[$board->id] = $this->loop->addTimer(
-            Yii::$app->params['server']['connectionCheckTimeout'],
-            function () use ($board) {
-                return $this->doConnectionCheckTimer($board);
-            }
-        );
-
-        return true;
     }
 
     /**

@@ -10,6 +10,7 @@ use app\models\Trigger;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+
 ?>
 
 <div class="task-form">
@@ -30,13 +31,15 @@ use yii\widgets\ActiveForm;
             <h2>Выполнить</h2>
 
             <?= $form->field($model, 'item_id')->widget(Select2::className(), [
-                'data' => Item::getList(),
+                'data' => Item::getList(false, true),
                 'options' => [
                     'placeholder' => 'Выберите элемент ...',
                 ],
             ]) ?>
 
             <?= $form->field($model, 'item_value')->textInput(['maxlength' => true]) ?>
+
+            <p>или:</p>
 
             <?= $form->field($model, 'text')->textarea(['rows' => 3]) ?>
         </div>

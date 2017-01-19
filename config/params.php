@@ -10,6 +10,7 @@ $params = [
     'loginFailTimeout' => 600,
     'server' => [
         'connectionCheckTimeout' => 180,
+        'connectionCheckMaxIteration' => 2,
     ],
     'telegramBotApiKey' => '',
     'telegramBotChatId' => '',

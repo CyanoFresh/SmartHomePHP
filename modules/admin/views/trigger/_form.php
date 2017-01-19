@@ -86,7 +86,7 @@ if ($model->isNewRecord) {
             <div class="row type-10 type-20">
                 <div class="col-sm-6">
                     <?= $form->field($model, 'trig_item_id')->widget(Select2::className(), [
-                        'data' => Item::getList(),
+                        'data' => Item::getList(false, true),
                         'options' => [
                             'placeholder' => 'Выберите элемент ...',
                         ],
