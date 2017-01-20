@@ -16,6 +16,7 @@ class PanelController extends Controller
     {
         return [
             'schedule-triggers' => ['POST'],
+            'update-items' => ['POST'],
         ];
     }
 

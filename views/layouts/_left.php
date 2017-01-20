@@ -18,19 +18,19 @@
             [
                 'options' => ['class' => 'sidebar-menu'],
                 'items' => [
-                    ['label' => 'Smart Home', 'options' => ['class' => 'header']],
+                    ['label' => 'Управление', 'options' => ['class' => 'header']],
                     ['label' => 'Панель Управления', 'icon' => 'fa fa-sliders', 'url' => ['/panel/index']],
                     ['label' => 'История', 'icon' => 'fa fa-th-list', 'url' => ['/history/index']],
 
-                    ['label' => 'Администрирование', 'options' => ['class' => 'header']],
-                    ['label' => 'Элементы', 'icon' => 'fa fa-toggle-on', 'url' => ['/admin/item/index']],
-                    ['label' => 'Устройства', 'icon' => 'fa fa-hdd-o', 'url' => ['/admin/board/index']],
-                    ['label' => 'Триггеры', 'icon' => 'fa fa-feed', 'url' => ['/admin/trigger/index']],
-                    ['label' => 'Задачи', 'icon' => 'fa fa-check', 'url' => ['/admin/task/index']],
-                    ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/admin/room/index']],
-                    ['label' => 'Параметры', 'icon' => 'fa fa-cogs', 'url' => ['/admin/setting/index']],
-//                    ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/admin/history/index']],
-                    ['label' => 'Пользователи', 'icon' => 'fa fa-users', 'url' => ['/admin/user/index']],
+                    ['label' => 'Администрирование', 'options' => ['class' => 'header'], 'visible' => Yii::$app->user->identity->isAdmin],
+                    ['label' => 'Элементы', 'icon' => 'fa fa-toggle-on', 'url' => ['/admin/item/index'], 'visible' => Yii::$app->user->identity->isAdmin],
+                    ['label' => 'Устройства', 'icon' => 'fa fa-hdd-o', 'url' => ['/admin/board/index'], 'visible' => Yii::$app->user->identity->isAdmin],
+                    ['label' => 'Триггеры', 'icon' => 'fa fa-feed', 'url' => ['/admin/trigger/index'], 'visible' => Yii::$app->user->identity->isAdmin],
+                    ['label' => 'Задачи', 'icon' => 'fa fa-check', 'url' => ['/admin/task/index'], 'visible' => Yii::$app->user->identity->isAdmin],
+                    ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/admin/room/index'], 'visible' => Yii::$app->user->identity->isAdmin],
+                    ['label' => 'Параметры', 'icon' => 'fa fa-cogs', 'url' => ['/admin/setting/index'], 'visible' => Yii::$app->user->identity->isAdmin],
+//                    ['label' => 'История', 'icon' => 'fa fa-bar-chart', 'url' => ['/admin/history/index'], 'visible' => Yii::$app->user->identity->isAdmin],
+                    ['label' => 'Пользователи', 'icon' => 'fa fa-users', 'url' => ['/admin/user/index'], 'visible' => Yii::$app->user->identity->isAdmin],
                 ],
             ]
         ) ?>

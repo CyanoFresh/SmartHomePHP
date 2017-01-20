@@ -4,7 +4,6 @@ namespace app\modules\api\controllers;
 
 use app\models\Board;
 use app\models\Item;
-use app\models\Trigger;
 use app\modules\api\components\WebSocketAPIBridge;
 use Yii;
 use yii\base\InvalidParamException;

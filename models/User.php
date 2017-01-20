@@ -23,6 +23,8 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  *
+ * @property boolean $isAdmin
+ *
  * @property string $password write-only password
  */
 class User extends ActiveRecord implements IdentityInterface
@@ -272,5 +274,13 @@ class User extends ActiveRecord implements IdentityInterface
     public function getHistories()
     {
         return $this->hasMany(History::className(), ['user_id' => 'id'])->inverseOf('user');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsAdmin()
+    {
+        return $this->group === self::GROUP_ADMIN;
     }
 }

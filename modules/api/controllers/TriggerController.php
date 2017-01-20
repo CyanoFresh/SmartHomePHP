@@ -55,7 +55,7 @@ class TriggerController extends Controller
      * @return Trigger
      * @throws NotFoundHttpException
      */
-    private function findTrigger($id)
+    protected function findTrigger($id)
     {
         $item = Trigger::findOne($id);
 
