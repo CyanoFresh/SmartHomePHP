@@ -9,7 +9,7 @@ use React\EventLoop\Factory;
 use Yii;
 use yii\helpers\Json;
 
-class WebSocketAPI
+class WebSocketAPIBridge
 {
     /**
      * @var User
@@ -42,6 +42,31 @@ class WebSocketAPI
     protected function getWSSUrl()
     {
         return $this->localWSSUrl . '/?type=user&id=' . $this->user->id . '&auth_token=' . $this->user->getAuthToken();
+    }
+
+    /**
+     * @param integer $itemID
+     * @return array
+     */
+    public function getValue($itemID)
+    {
+        $response = $this->sendAndReceive([]);
+
+        if ($response['type'] == 'init' and count($response['items']) > 0) {
+            foreach ($response['items'] as $item) {
+                if ($item['id'] == $itemID and !is_null($item['value'])) {
+                    return [
+                        'success' => true,
+                        'value' => $item['value'],
+                        'item' => $item,
+                    ];
+                }
+            }
+        }
+
+        return [
+            'success' => false,
+        ];
     }
 
     /**
@@ -134,11 +159,10 @@ class WebSocketAPI
                 // Send data
                 $conn->send(Json::encode($data));
 
-                // Job done. Close the connection
-                $conn->close();
-
                 $success = true;
-            }, function(\Exception $e) use ($loop) {
+
+                $conn->close();
+            }, function (\Exception $e) use ($loop) {
                 echo "Could not connect: {$e->getMessage()}\n";
 
                 $loop->stop();
@@ -147,5 +171,40 @@ class WebSocketAPI
         $loop->run();
 
         return $success;
+    }
+
+    /**
+     * Send message and get response
+     *
+     * @param array $data Message to send
+     * @return array|bool
+     */
+    public function sendAndReceive($data)
+    {
+        $loop = Factory::create();
+        $connector = new Connector($loop);
+
+        $result = false;
+
+        $connector($this->getWSSUrl(), [], ['Origin' => 'origin'])
+            ->then(function (WebSocket $conn) use ($data, &$result) {
+                // Send data if not empty
+                if (count($data) > 0) {
+                    $conn->send(Json::encode($data));
+                }
+
+                $conn->on('message', function ($msg) use ($conn, &$result) {
+                    $result = Json::decode($msg);
+                    $conn->close();
+                });
+            }, function (\Exception $e) use ($loop) {
+                echo "Could not connect: {$e->getMessage()}\n";
+
+                $loop->stop();
+            });
+
+        $loop->run();
+
+        return $result;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace app\modules\api\controllers;
 
-use app\modules\api\components\WebSocketAPI;
+use app\modules\api\components\WebSocketAPIBridge;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\rest\Controller;
@@ -32,7 +32,7 @@ class PanelController extends Controller
      */
     public function actionScheduleTriggers()
     {
-        $api = new WebSocketAPI(Yii::$app->user->identity);
+        $api = new WebSocketAPIBridge(Yii::$app->user->identity);
 
         $result = $api->send([
             'type' => 'schedule-triggers',
@@ -48,7 +48,7 @@ class PanelController extends Controller
      */
     public function actionUpdateItems()
     {
-        $api = new WebSocketAPI(Yii::$app->user->identity);
+        $api = new WebSocketAPIBridge(Yii::$app->user->identity);
 
         $result = $api->send([
             'type' => 'update-items',

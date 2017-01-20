@@ -3,7 +3,7 @@
 namespace app\modules\api\controllers;
 
 use app\models\Trigger;
-use app\modules\api\components\WebSocketAPI;
+use app\modules\api\components\WebSocketAPIBridge;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
@@ -43,7 +43,7 @@ class TriggerController extends Controller
             throw new InvalidParamException('This Trigger cannot be triggered by API call');
         }
 
-        $api = new WebSocketAPI(Yii::$app->user->identity);
+        $api = new WebSocketAPIBridge(Yii::$app->user->identity);
 
         return [
             'success' => $api->trig($trigger_id),

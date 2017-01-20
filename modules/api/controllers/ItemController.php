@@ -5,7 +5,7 @@ namespace app\modules\api\controllers;
 use app\models\Board;
 use app\models\Item;
 use app\models\Trigger;
-use app\modules\api\components\WebSocketAPI;
+use app\modules\api\components\WebSocketAPIBridge;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
@@ -39,6 +39,31 @@ class ItemController extends Controller
     }
 
     /**
+     * @param $item_id
+     * @return array
+     * @throws NotSupportedException
+     */
+    public function actionValue($item_id)
+    {
+        $item = $this->findItem($item_id);
+
+        $board = $item->board;
+
+        switch ($board->type) {
+            case Board::TYPE_AREST:
+                throw new NotSupportedException();
+            case Board::TYPE_WEBSOCKET:
+                $api = new WebSocketAPIBridge(Yii::$app->user->identity);
+
+                return $api->getValue($item_id);
+        }
+
+        return [
+            'success' => false,
+        ];
+    }
+
+    /**
      * @param int $item_id
      * @return array
      * @throws BadRequestHttpException
@@ -59,7 +84,7 @@ class ItemController extends Controller
                 throw new NotSupportedException();
                 break;
             case Board::TYPE_WEBSOCKET:
-                $api = new WebSocketAPI(Yii::$app->user->identity);
+                $api = new WebSocketAPIBridge(Yii::$app->user->identity);
 
                 if (!$api->turnOn($item_id)) {
                     return [
@@ -96,7 +121,7 @@ class ItemController extends Controller
                 throw new NotSupportedException();
                 break;
             case Board::TYPE_WEBSOCKET:
-                $api = new WebSocketAPI(Yii::$app->user->identity);
+                $api = new WebSocketAPIBridge(Yii::$app->user->identity);
 
                 if (!$api->turnOff($item_id)) {
                     return [
@@ -138,7 +163,7 @@ class ItemController extends Controller
                 throw new NotSupportedException();
 
             case Board::TYPE_WEBSOCKET:
-                $api = new WebSocketAPI(Yii::$app->user->identity);
+                $api = new WebSocketAPIBridge(Yii::$app->user->identity);
 
                 return [
                     'success' => $api->rgb($item_id, $red, $green, $blue, $fade),
@@ -176,7 +201,7 @@ class ItemController extends Controller
                 throw new NotSupportedException();
 
             case Board::TYPE_WEBSOCKET:
-                $api = new WebSocketAPI(Yii::$app->user->identity);
+                $api = new WebSocketAPIBridge(Yii::$app->user->identity);
 
                 return [
                     'success' => $api->rgbMode($item_id, $mode, $start),
