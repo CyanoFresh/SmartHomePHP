@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "93b039facde77e73e4fa37dec8dcedaa",
-    "content-hash": "06c2ad7f9fe21fa14444b1ff254ecdf3",
+    "hash": "87c8d87131a5bfba1bfd212e32223bc6",
+    "content-hash": "662fe9c5133c13341bcddbe8b1f55bfc",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
-            "version": "v2.3.8",
+            "version": "v2.3.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/almasaeed2010/AdminLTE.git",
-                "reference": "ced14b133daed8c163863a497c43dcf69eea4340"
+                "reference": "2be703222af2edcb87e562d3da2299e4352bff8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/almasaeed2010/AdminLTE/zipball/ced14b133daed8c163863a497c43dcf69eea4340",
-                "reference": "ced14b133daed8c163863a497c43dcf69eea4340",
+                "url": "https://api.github.com/repos/almasaeed2010/AdminLTE/zipball/2be703222af2edcb87e562d3da2299e4352bff8a",
+                "reference": "2be703222af2edcb87e562d3da2299e4352bff8a",
                 "shasum": ""
             },
             "type": "library",
@@ -45,7 +45,7 @@
                 "theme",
                 "web"
             ],
-            "time": "2016-11-04 14:42:55"
+            "time": "2017-01-08 21:03:57"
         },
         {
             "name": "bower-asset/bootstrap",
@@ -197,16 +197,16 @@
         },
         {
             "name": "bower-asset/noty",
-            "version": "v2.3.11",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/needim/noty.git",
-                "reference": "d03d12f3e712253ef06184b85e5629b1aef43acb"
+                "reference": "5a558f57b2619a9c24063faa11cef07d77d65a78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/needim/noty/zipball/d03d12f3e712253ef06184b85e5629b1aef43acb",
-                "reference": "d03d12f3e712253ef06184b85e5629b1aef43acb",
+                "url": "https://api.github.com/repos/needim/noty/zipball/5a558f57b2619a9c24063faa11cef07d77d65a78",
+                "reference": "5a558f57b2619a9c24063faa11cef07d77d65a78",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -316,16 +316,16 @@
         },
         {
             "name": "cboden/ratchet",
-            "version": "v0.3.5",
+            "version": "v0.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ratchetphp/Ratchet.git",
-                "reference": "b5ccecad9390db85d2c8df7cbeb047292fbbf4b8"
+                "reference": "84df35d2a6576985b9e81b564d3c25809f8d647e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ratchetphp/Ratchet/zipball/b5ccecad9390db85d2c8df7cbeb047292fbbf4b8",
-                "reference": "b5ccecad9390db85d2c8df7cbeb047292fbbf4b8",
+                "url": "https://api.github.com/repos/ratchetphp/Ratchet/zipball/84df35d2a6576985b9e81b564d3c25809f8d647e",
+                "reference": "84df35d2a6576985b9e81b564d3c25809f8d647e",
                 "shasum": ""
             },
             "require": {
@@ -360,7 +360,7 @@
                 "server",
                 "sockets"
             ],
-            "time": "2016-05-25 12:55:03"
+            "time": "2017-01-06 14:36:36"
         },
         {
             "name": "cebe/markdown",
@@ -573,20 +573,23 @@
         },
         {
             "name": "ezyang/htmlpurifier",
-            "version": "v4.8.0",
+            "version": "v4.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2"
+                "reference": "a1c09b09e398687deeb8e309a6305def4b43439b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
-                "reference": "d0c392f77d2f2a3dcf7fcb79e2a1e2b8804e75b2",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/a1c09b09e398687deeb8e309a6305def4b43439b",
+                "reference": "a1c09b09e398687deeb8e309a6305def4b43439b",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2"
+            },
+            "require-dev": {
+                "simpletest/simpletest": "^1.1"
             },
             "type": "library",
             "autoload": {
@@ -613,7 +616,7 @@
             "keywords": [
                 "html"
             ],
-            "time": "2016-07-16 12:58:58"
+            "time": "2017-01-13 12:31:37"
         },
         {
             "name": "fortawesome/font-awesome",
@@ -1120,19 +1123,24 @@
         },
         {
             "name": "kartik-v/php-date-formatter",
-            "version": "v1.3.3",
+            "version": "v1.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/php-date-formatter.git",
-                "reference": "38984fb614f3ebc3605a8e369eee1406feea02a4"
+                "reference": "075cabb950ad2e2b317daf424700bf0afdc1f604"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/php-date-formatter/zipball/38984fb614f3ebc3605a8e369eee1406feea02a4",
-                "reference": "38984fb614f3ebc3605a8e369eee1406feea02a4",
+                "url": "https://api.github.com/repos/kartik-v/php-date-formatter/zipball/075cabb950ad2e2b317daf424700bf0afdc1f604",
+                "reference": "075cabb950ad2e2b317daf424700bf0afdc1f604",
                 "shasum": ""
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.3.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "kartik\\plugins\\dateformatter\\": ""
@@ -1160,20 +1168,20 @@
                 "php-date-formatter.js",
                 "time"
             ],
-            "time": "2015-12-21 18:22:51"
+            "time": "2017-01-08 09:13:05"
         },
         {
             "name": "kartik-v/yii2-datecontrol",
-            "version": "v1.9.5",
+            "version": "v1.9.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-datecontrol.git",
-                "reference": "497b7bb438864843b450aa9ab1df20bed096b5a1"
+                "reference": "0f5d793f788c6fef9c8ba4a6242530858f2320f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-datecontrol/zipball/497b7bb438864843b450aa9ab1df20bed096b5a1",
-                "reference": "497b7bb438864843b450aa9ab1df20bed096b5a1",
+                "url": "https://api.github.com/repos/kartik-v/yii2-datecontrol/zipball/0f5d793f788c6fef9c8ba4a6242530858f2320f1",
+                "reference": "0f5d793f788c6fef9c8ba4a6242530858f2320f1",
                 "shasum": ""
             },
             "require": {
@@ -1212,7 +1220,7 @@
                 "yii",
                 "yii2"
             ],
-            "time": "2016-12-07 19:41:05"
+            "time": "2017-01-14 11:34:27"
         },
         {
             "name": "kartik-v/yii2-krajee-base",
@@ -1526,16 +1534,16 @@
         },
         {
             "name": "kartik-v/yii2-widget-datetimepicker",
-            "version": "v1.4.2",
+            "version": "v1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-widget-datetimepicker.git",
-                "reference": "f4e7024e31da40460d1b36dc880c2ec20a21bf6e"
+                "reference": "41f849f90b41e94221b1f4e4589bba19bcfed16c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-widget-datetimepicker/zipball/f4e7024e31da40460d1b36dc880c2ec20a21bf6e",
-                "reference": "f4e7024e31da40460d1b36dc880c2ec20a21bf6e",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-datetimepicker/zipball/41f849f90b41e94221b1f4e4589bba19bcfed16c",
+                "reference": "41f849f90b41e94221b1f4e4589bba19bcfed16c",
                 "shasum": ""
             },
             "require": {
@@ -1571,7 +1579,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2016-01-10 12:18:38"
+            "time": "2017-01-19 15:04:42"
         },
         {
             "name": "kartik-v/yii2-widget-depdrop",
@@ -2033,22 +2041,27 @@
         },
         {
             "name": "kartik-v/yii2-widget-timepicker",
-            "version": "v1.0.1",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-widget-timepicker.git",
-                "reference": "fa230caf281fbf6abea29a5dc1c28ebc005e4438"
+                "reference": "203aeb9123e7fa9a3c584d206793d82abe96d469"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-widget-timepicker/zipball/fa230caf281fbf6abea29a5dc1c28ebc005e4438",
-                "reference": "fa230caf281fbf6abea29a5dc1c28ebc005e4438",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-timepicker/zipball/203aeb9123e7fa9a3c584d206793d82abe96d469",
+                "reference": "203aeb9123e7fa9a3c584d206793d82abe96d469",
                 "shasum": ""
             },
             "require": {
                 "kartik-v/yii2-krajee-base": "*"
             },
             "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "kartik\\time\\": ""
@@ -2078,7 +2091,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2016-01-12 09:50:39"
+            "time": "2017-01-08 06:36:24"
         },
         {
             "name": "kartik-v/yii2-widget-touchspin",
@@ -2380,22 +2393,22 @@
         },
         {
             "name": "ratchet/pawl",
-            "version": "v0.2.2",
+            "version": "v0.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ratchetphp/Pawl.git",
-                "reference": "67acb1f21d22bcd4d152badb0564f0617263044a"
+                "reference": "55256f590ab457fc9da57aa3f88e2edb5a2386c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ratchetphp/Pawl/zipball/67acb1f21d22bcd4d152badb0564f0617263044a",
-                "reference": "67acb1f21d22bcd4d152badb0564f0617263044a",
+                "url": "https://api.github.com/repos/ratchetphp/Pawl/zipball/55256f590ab457fc9da57aa3f88e2edb5a2386c1",
+                "reference": "55256f590ab457fc9da57aa3f88e2edb5a2386c1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
                 "ratchet/rfc6455": "^0.2.1",
-                "react/socket-client": "^0.4.3|^0.5"
+                "react/socket-client": "^0.5"
             },
             "suggest": {
                 "reactivex/rxphp": "~1.1"
@@ -2421,20 +2434,20 @@
                 "websocket",
                 "websocket client"
             ],
-            "time": "2016-04-14 21:43:44"
+            "time": "2017-01-02 20:05:47"
         },
         {
             "name": "ratchet/rfc6455",
-            "version": "v0.2.1",
+            "version": "v0.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ratchetphp/RFC6455.git",
-                "reference": "055b3eca13f314fb910ea55052a9f7d4e516fbc8"
+                "reference": "56aecde679d72d7b1087bbe1d6f7d96e123d396a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ratchetphp/RFC6455/zipball/055b3eca13f314fb910ea55052a9f7d4e516fbc8",
-                "reference": "055b3eca13f314fb910ea55052a9f7d4e516fbc8",
+                "url": "https://api.github.com/repos/ratchetphp/RFC6455/zipball/56aecde679d72d7b1087bbe1d6f7d96e123d396a",
+                "reference": "56aecde679d72d7b1087bbe1d6f7d96e123d396a",
                 "shasum": ""
             },
             "require": {
@@ -2469,7 +2482,7 @@
                 "rfc6455",
                 "websocket"
             ],
-            "time": "2016-03-16 12:32:52"
+            "time": "2017-01-01 15:41:18"
         },
         {
             "name": "react/cache",
@@ -2544,35 +2557,35 @@
         },
         {
             "name": "react/event-loop",
-            "version": "v0.4.2",
+            "version": "v0.3.5",
+            "target-dir": "React/EventLoop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/event-loop.git",
-                "reference": "164799f73175e1c80bba92a220ea35df6ca371dd"
+                "reference": "13e03b17e54ea864c6653a2cf6d146dad8464e91"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/164799f73175e1c80bba92a220ea35df6ca371dd",
-                "reference": "164799f73175e1c80bba92a220ea35df6ca371dd",
+                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/13e03b17e54ea864c6653a2cf6d146dad8464e91",
+                "reference": "13e03b17e54ea864c6653a2cf6d146dad8464e91",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=5.3.3"
             },
             "suggest": {
-                "ext-event": "~1.0",
                 "ext-libev": "*",
-                "ext-libevent": ">=0.1.0"
+                "ext-libevent": ">=0.0.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.5-dev"
+                    "dev-master": "0.3-dev"
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "React\\EventLoop\\": "src"
+                "psr-0": {
+                    "React\\EventLoop": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2581,10 +2594,9 @@
             ],
             "description": "Event loop abstraction layer that libraries can use for evented I/O.",
             "keywords": [
-                "asynchronous",
                 "event-loop"
             ],
-            "time": "2016-03-08 02:09:32"
+            "time": "2016-12-28 22:48:03"
         },
         {
             "name": "react/promise",
@@ -2681,23 +2693,28 @@
         },
         {
             "name": "react/socket",
-            "version": "v0.4.4",
+            "version": "v0.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "d61930e1aefb2a704b0adbe6bb97ee4a835d6a96"
+                "reference": "32385d71f84c4a26ea577cb91f1220decb440dce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/d61930e1aefb2a704b0adbe6bb97ee4a835d6a96",
-                "reference": "d61930e1aefb2a704b0adbe6bb97ee4a835d6a96",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/32385d71f84c4a26ea577cb91f1220decb440dce",
+                "reference": "32385d71f84c4a26ea577cb91f1220decb440dce",
                 "shasum": ""
             },
             "require": {
                 "evenement/evenement": "~2.0|~1.0",
                 "php": ">=5.3.0",
                 "react/event-loop": "0.4.*|0.3.*",
-                "react/stream": "^0.4.2"
+                "react/promise": "^2.0 || ^1.1",
+                "react/stream": "^0.4.5"
+            },
+            "require-dev": {
+                "clue/block-react": "^1.1",
+                "react/socket-client": "^0.5.1"
             },
             "type": "library",
             "autoload": {
@@ -2709,11 +2726,11 @@
             "license": [
                 "MIT"
             ],
-            "description": "Library for building an evented socket server.",
+            "description": "Async, streaming plaintext TCP/IP and secure TLS socket server for React PHP",
             "keywords": [
                 "Socket"
             ],
-            "time": "2016-12-19 22:52:38"
+            "time": "2017-01-08 11:36:16"
         },
         {
             "name": "react/socket-client",
@@ -2802,21 +2819,21 @@
         },
         {
             "name": "rmrevin/yii2-fontawesome",
-            "version": "2.17.0",
+            "version": "2.17.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rmrevin/yii2-fontawesome.git",
-                "reference": "470202eace1868f1f627bf8c4ce21a17b0548c4a"
+                "reference": "65ce306da864f4d558348aeba040ed7876878090"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rmrevin/yii2-fontawesome/zipball/470202eace1868f1f627bf8c4ce21a17b0548c4a",
-                "reference": "470202eace1868f1f627bf8c4ce21a17b0548c4a",
+                "url": "https://api.github.com/repos/rmrevin/yii2-fontawesome/zipball/65ce306da864f4d558348aeba040ed7876878090",
+                "reference": "65ce306da864f4d558348aeba040ed7876878090",
                 "shasum": ""
             },
             "require": {
                 "fortawesome/font-awesome": "~4.7",
-                "php": ">=5.5.0",
+                "php": ">=5.4.0",
                 "yiisoft/yii2": "2.0.*"
             },
             "type": "yii2-extension",
@@ -2850,20 +2867,20 @@
                 "font",
                 "yii"
             ],
-            "time": "2016-10-25 15:14:55"
+            "time": "2017-01-11 14:05:47"
         },
         {
             "name": "rmrevin/yii2-minify-view",
-            "version": "1.14.1",
+            "version": "1.14.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rmrevin/yii2-minify-view.git",
-                "reference": "92395f5216145050c3194f9f5a859038236da7be"
+                "reference": "1b84c6128bfd11b3e3cd827273efa6aa6ddd7870"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rmrevin/yii2-minify-view/zipball/92395f5216145050c3194f9f5a859038236da7be",
-                "reference": "92395f5216145050c3194f9f5a859038236da7be",
+                "url": "https://api.github.com/repos/rmrevin/yii2-minify-view/zipball/1b84c6128bfd11b3e3cd827273efa6aa6ddd7870",
+                "reference": "1b84c6128bfd11b3e3cd827273efa6aa6ddd7870",
                 "shasum": ""
             },
             "require": {
@@ -2895,7 +2912,7 @@
                 "view",
                 "yii2"
             ],
-            "time": "2016-12-23 15:56:06"
+            "time": "2017-01-19 16:51:36"
         },
         {
             "name": "shifrin/yii2-noty",
@@ -2998,16 +3015,16 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v3.2.1",
+            "version": "v3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "e8f47a327c2f0fd5aa04fa60af2b693006ed7283"
+                "reference": "9137eb3a3328e413212826d63eeeb0217836e2b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/e8f47a327c2f0fd5aa04fa60af2b693006ed7283",
-                "reference": "e8f47a327c2f0fd5aa04fa60af2b693006ed7283",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/9137eb3a3328e413212826d63eeeb0217836e2b6",
+                "reference": "9137eb3a3328e413212826d63eeeb0217836e2b6",
                 "shasum": ""
             },
             "require": {
@@ -3054,20 +3071,20 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2016-10-13 06:29:04"
+            "time": "2017-01-02 20:32:22"
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v3.2.1",
+            "version": "v3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "9963bc29d7f4398b137dd8efc480efe54fdbe5f1"
+                "reference": "33eb76bf1d833c705433e5361a646c164696394b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/9963bc29d7f4398b137dd8efc480efe54fdbe5f1",
-                "reference": "9963bc29d7f4398b137dd8efc480efe54fdbe5f1",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/33eb76bf1d833c705433e5361a646c164696394b",
+                "reference": "33eb76bf1d833c705433e5361a646c164696394b",
                 "shasum": ""
             },
             "require": {
@@ -3107,7 +3124,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2016-11-27 04:21:38"
+            "time": "2017-01-08 20:47:33"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -3170,16 +3187,16 @@
         },
         {
             "name": "symfony/routing",
-            "version": "v3.2.1",
+            "version": "v3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/routing.git",
-                "reference": "3f239c0e049d8920928674cd55e21061182b0106"
+                "reference": "fda2c67d47ec801726ca888c95d701d31b27b444"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/routing/zipball/3f239c0e049d8920928674cd55e21061182b0106",
-                "reference": "3f239c0e049d8920928674cd55e21061182b0106",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/fda2c67d47ec801726ca888c95d701d31b27b444",
+                "reference": "fda2c67d47ec801726ca888c95d701d31b27b444",
                 "shasum": ""
             },
             "require": {
@@ -3241,7 +3258,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2016-11-25 12:32:42"
+            "time": "2017-01-02 20:32:22"
         },
         {
             "name": "voskobovich/yii2-linker-behavior",

@@ -7,6 +7,7 @@
     "yiisoft/yii2-bootstrap": "*",
     "yiisoft/yii2-swiftmailer": "*",
     "rmrevin/yii2-minify-view": "*",
+    "react/event-loop": "0.3.*",
     "cboden/ratchet": "^0.3.4",
     "bower-asset/handlebars": "^4.0",
     "bower-asset/spectrum": "^1.8",
