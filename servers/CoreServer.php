@@ -214,12 +214,8 @@ class CoreServer implements MessageComponentInterface
                 $conn->Board = $board;
                 $this->board_clients[$board->id] = $conn;
 
-                $this->connectionCheckTimers[$board->id] = $this->loop->addPeriodicTimer(
-                    Yii::$app->params['server']['connectionCheckTimeout'],
-                    function () use ($boardID) {
-                        $this->doConnectionCheckTimer($boardID);
-                    }
-                );
+                // Reset previous timer and start a new one
+                $this->startConnectionCheckTimer($boardID, true);
 
                 // Set default values to board's items
                 foreach ($board->items as $item) {
@@ -266,11 +262,11 @@ class CoreServer implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg)
     {
         if (isset($from->User)) {
-            $this->log("Message: '$msg' from User [{$from->User->id}]");
+            $this->log("Message '$msg' from User [{$from->User->id}]");
 
             return $this->handleUserMessage($from, $msg);
         } elseif (isset($from->Board)) {
-            $this->log("Message: '$msg' from Board [{$from->Board->id}]");
+            $this->log("Message '$msg' from Board [{$from->Board->id}]");
 
             return $this->handleBoardMessage($from, $msg);
         }
@@ -290,22 +286,7 @@ class CoreServer implements MessageComponentInterface
             $this->log("Disconnecting Board [{$boardId}]...");
 
             // Cancel connection check timer
-            if (isset($this->connectionCheckTimers[$boardId])) {
-                $this->log("Cancel connection check timer...");
-
-                if ($this->connectionCheckTimers[$boardId] instanceof TimerInterface) {
-                    $this->connectionCheckTimers[$boardId]->cancel();
-                }
-
-                unset($this->connectionCheckTimers[$boardId]);
-            }
-
-            // Reset connection check iteration count
-            if (isset($this->connectionCheckIteration[$boardId])) {
-                $this->log("Reset connection check iteration count...");
-
-                unset($this->connectionCheckIteration[$boardId]);
-            }
+            $this->stopConnectionCheckTimer($boardId);
 
             unset($this->board_clients[$boardId]);
 
@@ -370,11 +351,8 @@ class CoreServer implements MessageComponentInterface
         $board = $from->Board;
         $data = Json::decode($msg);
 
-        if (isset($this->connectionCheckIteration[$board->id])) {
-            unset($this->connectionCheckIteration[$board->id]);
-
-            $this->log("Reset connection check iteration count for Board [$board->id]");
-        }
+        // Board responds: restart connection check timer
+        $this->startConnectionCheckTimer($board->id);
 
         switch ($data['type']) {
             case 'value':
@@ -844,12 +822,27 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
+     * Logs message into console or other storage
+     *
      * @param string $message
      * @param bool $appendDate
+     * @param bool $eol Put EndOfLine symbol at the end
      */
-    protected function log($message, $appendDate = true)
+    protected function log($message, $appendDate = true, $eol = true)
     {
-        echo $appendDate ? Yii::$app->formatter->asDatetime(time()) : null . $message . PHP_EOL;
+        $output = '';
+
+        if ($appendDate) {
+            $output .= '[' . Yii::$app->formatter->asDatetime(time(), 'yyyy-MM-dd HH:mm:ss') . '] ';
+        }
+
+        $output .= $message;
+
+        if ($eol) {
+            $output .= PHP_EOL;
+        }
+
+        echo $output;
     }
 
     /**
@@ -1399,5 +1392,49 @@ class CoreServer implements MessageComponentInterface
         }
 
         return $value;
+    }
+
+    /**
+     * Start connection check periodic timer and save it.
+     * If timer for this board exists - stop it.
+     * Also resets connection check iteration count.
+     *
+     * @param int $boardID
+     * @param bool $stopPrevious
+     */
+    protected function startConnectionCheckTimer($boardID, $stopPrevious = true)
+    {
+        if ($stopPrevious) {
+            $this->stopConnectionCheckTimer($boardID);
+        }
+
+        // Start connection checks
+        $this->connectionCheckTimers[$boardID] = $this->loop->addPeriodicTimer(
+            Yii::$app->params['server']['connectionCheckTimeout'],
+            function () use ($boardID) {
+                $this->doConnectionCheckTimer($boardID);
+            }
+        );
+    }
+
+    /**
+     * Stop connection check timer and reset connection checks count, if needed
+     *
+     * @param int $boardID
+     * @param bool $resetCount
+     */
+    protected function stopConnectionCheckTimer($boardID, $resetCount = true)
+    {
+        if (isset($this->connectionCheckTimers[$boardID])) {
+            if ($this->connectionCheckTimers[$boardID] instanceof TimerInterface) {
+                $this->connectionCheckTimers[$boardID]->cancel();
+            }
+
+            unset($this->connectionCheckTimers[$boardID]);
+        }
+
+        if ($resetCount and isset($this->connectionCheckIteration[$boardID])) {
+            unset($this->connectionCheckIteration[$boardID]);
+        }
     }
 }
