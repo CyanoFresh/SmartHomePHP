@@ -2,7 +2,7 @@
 
 namespace app\commands;
 
-use app\servers\Panel;
+use app\servers\CoreServer;
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
@@ -25,7 +25,7 @@ class PanelController extends Controller
         $server = new IoServer(
             new HttpServer(
                 new WsServer(
-                    new Panel($loop)
+                    new CoreServer($loop)
                 )
             ),
             $socket,

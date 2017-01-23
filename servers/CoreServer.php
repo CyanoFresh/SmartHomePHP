@@ -24,11 +24,11 @@ use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 /**
- * Class Panel
+ * Class CoreServer
  *
- * Web Panel WebSockets handler
+ * Smart Home Websocket core handler
  */
-class Panel implements MessageComponentInterface
+class CoreServer implements MessageComponentInterface
 {
     /**
      * @var \React\EventLoop\LoopInterface
@@ -255,7 +255,7 @@ class Panel implements MessageComponentInterface
 
                 $this->triggerBoardConnection($board, true);
 
-                $this->logBoardConnection($board, true);
+                $this->logBoardConnection($board->id, true);
 
                 return $this->log("Connected board [{$board->id}]");
         }
@@ -440,7 +440,8 @@ class Panel implements MessageComponentInterface
                     'start' => $start,
                 ]);
 
-                // TODO: save to history
+                // Save to history
+                $this->logItemValue($item, $start ? 'start:' : '' . $value);
 
                 break;
             case 'values':
@@ -601,7 +602,7 @@ class Panel implements MessageComponentInterface
      * @return bool|mixed
      * @throws NotSupportedException
      */
-    private function handleRgb($from, $user, $data)
+    protected function handleRgb($from, $user, $data)
     {
         $item_id = (int)$data['item_id'];
         $item = Item::findOne($item_id);
@@ -693,7 +694,7 @@ class Panel implements MessageComponentInterface
      * @return bool|mixed
      * @throws NotSupportedException
      */
-    private function handleRgbMode($from, $user, $data)
+    protected function handleRgbMode($from, $user, $data)
     {
         $item_id = (int)$data['item_id'];
         $item = Item::findOne($item_id);
@@ -767,7 +768,7 @@ class Panel implements MessageComponentInterface
      * @return bool|mixed
      * @throws NotSupportedException
      */
-    private function handleTrig($from, $user, $data)
+    protected function handleTrig($from, $user, $data)
     {
         $trigger_id = (int)$data['trigger_id'];
         $trigger = Trigger::findOne($trigger_id);
@@ -808,7 +809,7 @@ class Panel implements MessageComponentInterface
      *
      * @param array $data
      */
-    private function sendUsers($data)
+    protected function sendUsers($data)
     {
         $msg = Json::encode($data);
 
@@ -824,7 +825,7 @@ class Panel implements MessageComponentInterface
      * @param array $data
      * @return bool|ConnectionInterface
      */
-    private function sendToBoard($board_id, $data)
+    protected function sendToBoard($board_id, $data)
     {
         if (isset($this->board_clients[$board_id])) {
             /** @var ConnectionInterface $client */
@@ -844,17 +845,18 @@ class Panel implements MessageComponentInterface
 
     /**
      * @param string $message
+     * @param bool $appendDate
      */
-    private function log($message)
+    protected function log($message, $appendDate = true)
     {
-        echo $message . PHP_EOL;
+        echo $appendDate ? Yii::$app->formatter->asDatetime(time()) : null . $message . PHP_EOL;
     }
 
     /**
      * @param integer $boardID
      * @return bool
      */
-    private function isBoardConnected($boardID)
+    protected function isBoardConnected($boardID)
     {
         return isset($this->board_clients[$boardID]);
     }
@@ -863,7 +865,7 @@ class Panel implements MessageComponentInterface
      * @param mixed $value
      * @return bool
      */
-    private function valueToBoolean($value)
+    protected function valueToBoolean($value)
     {
         if (is_bool($value)) {
             return $value;
@@ -877,10 +879,10 @@ class Panel implements MessageComponentInterface
     }
 
     /**
-     * @param Board $board
+     * @param int $boardID
      * @param boolean $connected
      */
-    protected function logBoardConnection($board, $connected)
+    protected function logBoardConnection($boardID, $connected)
     {
         if (!Setting::getValueByKey('log.board_connection')) {
             return;
@@ -888,7 +890,7 @@ class Panel implements MessageComponentInterface
 
         $model = new History();
         $model->type = History::TYPE_BOARD_CONNECTION;
-        $model->board_id = $board->id;
+        $model->board_id = $boardID;
         $model->value = $connected;
         $model->commited_at = time();
 
@@ -1008,7 +1010,7 @@ class Panel implements MessageComponentInterface
      * @param Item $item
      * @param string $value
      */
-    private function triggerItemValue($item, $value)
+    protected function triggerItemValue($item, $value)
     {
         // Find Triggers
         /** @var Trigger[] $triggers */
@@ -1031,7 +1033,7 @@ class Panel implements MessageComponentInterface
      * @param Board $board
      * @param bool $connected
      */
-    private function triggerBoardConnection(Board $board, bool $connected)
+    protected function triggerBoardConnection(Board $board, bool $connected)
     {
         /** @var Trigger[] $triggers */
         $triggers = Trigger::findAll([
@@ -1052,7 +1054,7 @@ class Panel implements MessageComponentInterface
     /**
      * @param Task $task
      */
-    private function doTask($task)
+    protected function doTask($task)
     {
         switch ($task->type) {
             case Task::TYPE_ITEM_VALUE:
@@ -1116,7 +1118,7 @@ class Panel implements MessageComponentInterface
      * @param string $value
      * @return array
      */
-    private function valueToRgbData($value)
+    protected function valueToRgbData($value)
     {
         return explode(',', $value);
     }
@@ -1125,7 +1127,7 @@ class Panel implements MessageComponentInterface
      * @param string $value
      * @return array
      */
-    private function valueToRgb($value)
+    protected function valueToRgb($value)
     {
         if (!is_array($value)) {
             $value = $this->valueToRgbData($value);
@@ -1142,7 +1144,7 @@ class Panel implements MessageComponentInterface
     /**
      * @param Trigger $trigger
      */
-    private function triggerDate($trigger)
+    protected function triggerDate($trigger)
     {
         $this->trigger($trigger);
     }
@@ -1150,7 +1152,7 @@ class Panel implements MessageComponentInterface
     /**
      * @param Trigger $trigger
      */
-    private function triggerTime($trigger)
+    protected function triggerTime($trigger)
     {
         $this->trigger($trigger);
 
@@ -1160,7 +1162,7 @@ class Panel implements MessageComponentInterface
     /**
      * @param Trigger $trigger
      */
-    private function trigger($trigger)
+    protected function trigger($trigger)
     {
         $this->log("Trigger [{$trigger->id}] triggered. Doing the tasks...");
 
