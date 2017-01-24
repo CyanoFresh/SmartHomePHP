@@ -25,6 +25,7 @@
                     ['label' => 'Администрирование', 'options' => ['class' => 'header'], 'visible' => Yii::$app->user->identity->isAdmin],
                     ['label' => 'Элементы', 'icon' => 'fa fa-toggle-on', 'url' => ['/admin/item/index'], 'visible' => Yii::$app->user->identity->isAdmin],
                     ['label' => 'Устройства', 'icon' => 'fa fa-hdd-o', 'url' => ['/admin/board/index'], 'visible' => Yii::$app->user->identity->isAdmin],
+                    ['label' => 'События', 'icon' => 'fa fa-code-fork', 'url' => ['/admin/event/index'], 'visible' => Yii::$app->user->identity->isAdmin],
                     ['label' => 'Триггеры', 'icon' => 'fa fa-feed', 'url' => ['/admin/trigger/index'], 'visible' => Yii::$app->user->identity->isAdmin],
                     ['label' => 'Задачи', 'icon' => 'fa fa-check', 'url' => ['/admin/task/index'], 'visible' => Yii::$app->user->identity->isAdmin],
                     ['label' => 'Комнаты', 'icon' => 'fa fa-folder-open', 'url' => ['/admin/room/index'], 'visible' => Yii::$app->user->identity->isAdmin],

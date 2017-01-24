@@ -5,12 +5,12 @@ namespace app\modules\admin\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Trigger;
+use app\models\Event;
 
 /**
- * TriggerSearch represents the model behind the search form about `app\models\Trigger`.
+ * EventSearch represents the model behind the search form about `app\models\Event`.
  */
-class TriggerSearch extends Trigger
+class EventSearch extends Event
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class TriggerSearch extends Trigger
     public function rules()
     {
         return [
-            [['id', 'type', 'item_id', 'active'], 'integer'],
-            [['date', 'time', 'weekdays', 'item_value', 'name'], 'safe'],
+            [['id', 'active', 'last_triggered_at'], 'integer'],
+            [['name', 'description'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class TriggerSearch extends Trigger
      */
     public function search($params)
     {
-        $query = Trigger::find();
+        $query = Event::find();
 
         // add conditions that should always apply here
 
@@ -60,16 +60,12 @@ class TriggerSearch extends Trigger
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'type' => $this->type,
-            'item_id' => $this->item_id,
             'active' => $this->active,
+            'last_triggered_at' => $this->last_triggered_at,
         ]);
 
-        $query->andFilterWhere(['like', 'date', $this->date])
-            ->andFilterWhere(['like', 'time', $this->time])
-            ->andFilterWhere(['like', 'weekdays', $this->weekdays])
-            ->andFilterWhere(['like', 'item_value', $this->item_value])
-            ->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'description', $this->description]);
 
         return $dataProvider;
     }

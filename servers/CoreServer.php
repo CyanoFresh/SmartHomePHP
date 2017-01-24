@@ -4,6 +4,7 @@ namespace app\servers;
 
 use app\helpers\IPHelper;
 use app\models\Board;
+use app\models\Event;
 use app\models\Setting;
 use app\models\Task;
 use app\models\Trigger;
@@ -71,7 +72,7 @@ class CoreServer implements MessageComponentInterface
     /**
      * @var TimerInterface[]
      */
-    protected $eventTimers;
+    protected $triggerTimers;
 
     /**
      * Class constructor.
@@ -89,7 +90,7 @@ class CoreServer implements MessageComponentInterface
         $this->item_values = [];
         $this->connectionCheckTimers = [];
         $this->connectionCheckIteration = [];
-        $this->eventTimers = [];
+        $this->triggerTimers = [];
 
         // Database driver hack: Prevent MySQL for disconnecting by timeout
         Yii::$app->db->createCommand('SET SESSION wait_timeout = 2147483;')->execute();
@@ -1153,26 +1154,45 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
+     * Trigger it's events
+     *
      * @param Trigger $trigger
      */
     protected function trigger($trigger)
     {
-        $this->log("Trigger [{$trigger->id}] triggered. Doing the tasks...");
+        /** @var Event[] $events */
+        $events = $trigger->getEvents()->andWhere(['active' => true])->all();
 
-        // Do the tasks
-        foreach ($trigger->tasks as $task) {
-            $this->doTask($task);
+        foreach ($events as $event) {
+            $this->triggerEvent($event);
         }
-
-        $this->log("Tasks for Trigger [{$trigger->id}] done!");
     }
 
     /**
-     * Schedule Trigger's triggering by time or date
+     * Do the Event's tasks
+     *
+     * @param Event $event
+     */
+    protected function triggerEvent(Event $event)
+    {
+        $this->log("Triggered Event [{$event->id}]");
+
+        /** @var Task[] $tasks */
+        $tasks = $event->getTasks()->andWhere(['active' => true])->all();
+
+        foreach ($tasks as $task) {
+            $this->doTask($task);
+        }
+
+        $this->log("Tasks for Event [{$event->id}] done");
+    }
+
+    /**
+     * Schedule Trigger's by time or date
      */
     protected function scheduleTriggers()
     {
-        $this->log("Scheduling Triggers...");
+        $this->log("Scheduling DateTime Triggers...");
 
         /** @var Trigger[] $triggers */
         $triggers = Trigger::find()->where([
@@ -1184,128 +1204,133 @@ class CoreServer implements MessageComponentInterface
         ])->all();
 
         foreach ($triggers as $trigger) {
-            switch ($trigger->type) {
-                case Trigger::TYPE_BY_DATE:
-                    if (isset($this->eventTimers[$trigger->id])) {
-                        $this->log("Trigger [{$trigger->id}] already scheduled");
-                        break;
-                    }
+            if ($trigger->type === Trigger::TYPE_BY_DATE) {
+                // Check if it was already scheduled
+                if (isset($this->triggerTimers[$trigger->id])) {
+                    $this->log("Date Trigger [{$trigger->id}] was already been scheduled");
+                    continue;
+                }
 
-                    if ($trigger->trig_date and $trigger->trig_date > time()) {
-                        $timeout = $trigger->trig_date - time();
+                // Check if it's time is future
+                if ($trigger->date and $trigger->date > time()) {
+                    $timeout = $trigger->date - time();
 
-                        $this->log("Scheduling Trigger [{$trigger->id}] with timeout $timeout sec.");
+                    $this->log("Scheduling Date Trigger [{$trigger->id}] with timeout $timeout sec.");
 
-                        $this->eventTimers[$trigger->id] = $this->loop->addTimer(
-                            $timeout,
-                            function () use ($trigger) {
-                                $this->log("Trigger [{$trigger->id}] triggered by date");
+                    $this->triggerTimers[$trigger->id] = $this->loop->addTimer(
+                        $timeout,
+                        function () use ($trigger) {
+                            $this->log("Trigger [{$trigger->id}] triggered by date");
 
-                                if (isset($this->eventTimers[$trigger->id])) {
-                                    unset($this->eventTimers[$trigger->id]);
-                                }
-
-                                return $this->triggerDate($trigger);
-                            });
-                    } else {
-                        $this->log("Trigger [{$trigger->id}] expired by date");
-                    }
-
-                    break;
-                case Trigger::TYPE_BY_TIME:
-                    if ($trigger->trig_time_wdays != '') {  // Every week triggers
-                        $this->log("Trigger [{$trigger->id}] runs every week");
-
-                        $days = explode(',', $trigger->trig_time_wdays);
-
-                        foreach ($days as $day) {
-                            $trigTimestamp = strtotime($day . ', ' . $trigger->trig_time);
-
-                            if (strtolower(date('l')) == $day) {
-                                $trigTimestamp = strtotime('+1 week, ' . $trigger->trig_time);
+                            if (isset($this->triggerTimers[$trigger->id])) {
+                                unset($this->triggerTimers[$trigger->id]);
                             }
 
-                            if (isset($this->eventTimers[$trigger->id][$trigTimestamp])) {
-                                $this->log("Trigger [{$trigger->id}] already scheduled by time [$trigTimestamp]");
-                                break;
-                            }
+                            $this->triggerDate($trigger);
+                        });
 
-                            if (time() < $trigTimestamp) {
-                                $timeout = $trigTimestamp - time();
+                    continue;
+                }
 
-                                $this->log("Scheduling Trigger [{$trigger->id}] with timeout $timeout sec. for timeout [$trigTimestamp]");
+                $this->log("Date Trigger [{$trigger->id}] has past date. Disabling it...");
 
-                                $this->eventTimers[$trigger->id][$trigTimestamp] = $this->loop->addTimer(
-                                    $timeout,
-                                    function () use ($trigger, $trigTimestamp) {
-                                        $this->log("Trigger [{$trigger->id}] triggered by time [$trigTimestamp]");
+                $trigger->active = false;
+                $trigger->save();
 
-                                        if (isset($this->eventTimers[$trigger->id][$trigTimestamp])) {
-                                            unset($this->eventTimers[$trigger->id][$trigTimestamp]);
-                                        }
+                continue;
+            } elseif ($trigger->type === Trigger::TYPE_BY_TIME) {
+                // Check if it also triggers by weekdays
+                if ($trigger->weekdays) {
+                    $this->log("Time Trigger [{$trigger->id}] runs every week");
 
-                                        return $this->triggerTime($trigger);
-                                    }
-                                );
-                            } else {
-                                $this->log("Trigger time $trigTimestamp is lower than current time " . time());
-                            }
-                        }
-                    } else {    // Everyday triggers
-                        $this->log("Trigger [{$trigger->id}] runs every day");
+                    $days = explode(',', $trigger->weekdays);
 
-                        if (isset($this->eventTimers[$trigger->id])) {
-                            $this->log("Trigger [{$trigger->id}] already scheduled by time");
-                            break;
+                    foreach ($days as $day) {
+                        $trigTimestamp = strtotime($day . ', ' . $trigger->time);
+
+                        if (strtolower(date('l')) == $day) {
+                            $trigTimestamp = strtotime('+1 week, ' . $trigger->time);
                         }
 
-                        // Schedule trigger for today
-                        $trigTimestamp = strtotime('today, ' . $trigger->trig_time);
+                        if (isset($this->triggerTimers[$trigger->id][$trigTimestamp])) {
+                            $this->log("Time Trigger [{$trigger->id}] already scheduled by time [$trigTimestamp]");
+                            continue;
+                        }
 
                         if (time() < $trigTimestamp) {
                             $timeout = $trigTimestamp - time();
 
-                            $this->log("Scheduling Trigger [{$trigger->id}] with timeout $timeout sec.");
+                            $this->log("Scheduling Time Trigger [{$trigger->id}] with timeout $timeout sec. for timeout [$trigTimestamp]");
 
-                            $this->eventTimers[$trigger->id] = $this->loop->addTimer(
+                            $this->triggerTimers[$trigger->id][$trigTimestamp] = $this->loop->addTimer(
                                 $timeout,
-                                function () use ($trigger) {
-                                    $this->log("Trigger [{$trigger->id}] triggered by time");
+                                function () use ($trigger, $trigTimestamp) {
+                                    $this->log("Trigger [{$trigger->id}] triggered by time [$trigTimestamp]");
 
-                                    if (isset($this->eventTimers[$trigger->id])) {
-                                        unset($this->eventTimers[$trigger->id]);
+                                    if (isset($this->triggerTimers[$trigger->id][$trigTimestamp])) {
+                                        unset($this->triggerTimers[$trigger->id][$trigTimestamp]);
                                     }
 
                                     return $this->triggerTime($trigger);
                                 }
                             );
                         } else {
-                            $trigTimestamp = strtotime('tomorrow, ' . $trigger->trig_time);
-
-                            $timeout = $trigTimestamp - time();
-
-                            $this->log("Trigger [{$trigger->id}] expired by time. Scheduling for the next day ($timeout sec.)...");
-
-                            $this->eventTimers[$trigger->id] = $this->loop->addTimer(
-                                $timeout,
-                                function () use ($trigger) {
-                                    $this->log("Trigger [{$trigger->id}] triggered by time");
-
-                                    if (isset($this->eventTimers[$trigger->id])) {
-                                        unset($this->eventTimers[$trigger->id]);
-                                    }
-
-                                    return $this->triggerTime($trigger);
-                                }
-                            );
+                            $this->log("Trigger time $trigTimestamp is lower than current time " . time());
                         }
                     }
+                } else {    // Everyday triggers
+                    $this->log("Time Trigger [{$trigger->id}] runs every day");
 
-                    break;
+                    if (isset($this->triggerTimers[$trigger->id])) {
+                        $this->log("Time Trigger [{$trigger->id}] already scheduled by time");
+                        continue;
+                    }
+
+                    // Schedule trigger for today
+                    $trigTimestamp = strtotime('today, ' . $trigger->time);
+
+                    if (time() < $trigTimestamp) {
+                        $timeout = $trigTimestamp - time();
+
+                        $this->log("Scheduling Time Trigger [{$trigger->id}] with timeout $timeout sec.");
+
+                        $this->triggerTimers[$trigger->id] = $this->loop->addTimer(
+                            $timeout,
+                            function () use ($trigger) {
+                                $this->log("Time Trigger [{$trigger->id}] triggered by time");
+
+                                if (isset($this->triggerTimers[$trigger->id])) {
+                                    unset($this->triggerTimers[$trigger->id]);
+                                }
+
+                                return $this->triggerTime($trigger);
+                            }
+                        );
+                    } else {
+                        $trigTimestamp = strtotime('tomorrow, ' . $trigger->time);
+
+                        $timeout = $trigTimestamp - time();
+
+                        $this->log("Time Trigger [{$trigger->id}] expired by time. Scheduling for the next day ($timeout sec.)...");
+
+                        $this->triggerTimers[$trigger->id] = $this->loop->addTimer(
+                            $timeout,
+                            function () use ($trigger) {
+                                $this->log("Time Trigger [{$trigger->id}] triggered by time");
+
+                                if (isset($this->triggerTimers[$trigger->id])) {
+                                    unset($this->triggerTimers[$trigger->id]);
+                                }
+
+                                return $this->triggerTime($trigger);
+                            }
+                        );
+                    }
+                }
             }
         }
 
-        $this->log("Done. Total count of timers: " . count($this->eventTimers));
+        $this->log("Done. Total count of timers: " . count($this->triggerTimers));
     }
 
     /**

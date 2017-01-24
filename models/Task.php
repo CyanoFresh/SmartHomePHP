@@ -19,7 +19,7 @@ use yii\helpers\Json;
  * @property string $name
  *
  * @property Item $item
- * @property Trigger[] $triggers
+ * @property Event[] $event
  */
 class Task extends ActiveRecord
 {
@@ -44,7 +44,7 @@ class Task extends ActiveRecord
             [['type', 'item_id'], 'integer'],
             [['item_value', 'name'], 'string', 'max' => 255],
             [['text'], 'string'],
-            [['trigger_ids'], 'each', 'rule' => ['integer']],
+            [['event_ids'], 'each', 'rule' => ['integer']],
             [['type'], 'in', 'range' => self::getTypesArray()],
         ];
     }
@@ -59,7 +59,7 @@ class Task extends ActiveRecord
             'type' => 'Тип',
             'item_id' => 'Элемент',
             'item_value' => 'Значение Элемента',
-            'trigger_ids' => 'Triggers',
+            'event_ids' => 'События',
             'name' => 'Название',
             'text' => 'Текст',
         ];
@@ -74,7 +74,7 @@ class Task extends ActiveRecord
             [
                 'class' => LinkerBehavior::className(),
                 'relations' => [
-                    'trigger_ids' => 'triggers',
+                    'event_ids' => 'events',
                 ],
             ],
         ];
@@ -118,10 +118,10 @@ class Task extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTriggers()
+    public function getEvents()
     {
-        return $this->hasMany(Trigger::className(), ['id' => 'trigger_id'])
-            ->viaTable('trigger_task', ['task_id' => 'id']);
+        return $this->hasMany(Event::className(), ['id' => 'event_id'])
+            ->viaTable('event_task', ['task_id' => 'id']);
     }
 
     /**
@@ -144,10 +144,6 @@ class Task extends ActiveRecord
         $result = file_get_contents($url);
         $data = Json::decode($result);
 
-        if (isset($data['ok']) and $data['ok']) {
-            return true;
-        }
-
-        return false;
+        return (isset($data['ok']) and $data['ok']);
     }
 }

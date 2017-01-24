@@ -16,8 +16,8 @@ use yii\widgets\ActiveForm;
 
 if ($model->isNewRecord) {
     $model->active = true;
-} elseif (is_string($model->trig_time_wdays)) {
-    $model->trig_time_wdays = explode(', ', $model->trig_time_wdays);
+} elseif (is_string($model->weekdays)) {
+    $model->weekdays = explode(', ', $model->weekdays);
 }
 
 ?>
@@ -47,7 +47,7 @@ if ($model->isNewRecord) {
 
             <div class="row" id="type-10">
                 <div class="col-sm-6">
-                    <?= $form->field($model, 'trig_time')->widget(TimePicker::className(), [
+                    <?= $form->field($model, 'time')->widget(TimePicker::className(), [
                         'pluginOptions' => [
                             'showMeridian' => false,
                             'defaultTime' => false,
@@ -55,7 +55,7 @@ if ($model->isNewRecord) {
                     ]) ?>
                 </div>
                 <div class="col-sm-6">
-                    <?= $form->field($model, 'trig_time_wdays')->widget(Select2::className(), [
+                    <?= $form->field($model, 'weekdays')->widget(Select2::className(), [
                         'data' => Trigger::getWeekDays(),
                         'options' => [
                             'multiple' => true,
@@ -68,7 +68,7 @@ if ($model->isNewRecord) {
             <p>или</p>
 
             <div id="type-10">
-                <?= $form->field($model, 'trig_date')->widget(DateControl::className(), [
+                <?= $form->field($model, 'date')->widget(DateControl::className(), [
                     'type' => DateControl::FORMAT_DATETIME,
                     'displayTimezone' => Yii::$app->formatter->timeZone,
                     'saveFormat' => 'php:U',
@@ -85,7 +85,7 @@ if ($model->isNewRecord) {
 
             <div class="row type-10 type-20">
                 <div class="col-sm-6">
-                    <?= $form->field($model, 'trig_item_id')->widget(Select2::className(), [
+                    <?= $form->field($model, 'item_id')->widget(Select2::className(), [
                         'data' => Item::getList(false, true),
                         'options' => [
                             'placeholder' => 'Выберите элемент ...',
@@ -93,7 +93,7 @@ if ($model->isNewRecord) {
                     ]) ?>
                 </div>
                 <div class="col-sm-6">
-                    <?= $form->field($model, 'trig_item_value')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($model, 'item_value')->textInput(['maxlength' => true]) ?>
                 </div>
             </div>
 
@@ -101,7 +101,7 @@ if ($model->isNewRecord) {
 
             <div class="row type-10 type-20">
                 <div class="col-sm-6">
-                    <?= $form->field($model, 'trig_board_id')->widget(Select2::className(), [
+                    <?= $form->field($model, 'board_id')->widget(Select2::className(), [
                         'data' => Board::getList(),
                         'options' => [
                             'placeholder' => 'Выберите устройство ...',
@@ -109,7 +109,7 @@ if ($model->isNewRecord) {
                     ]) ?>
                 </div>
                 <div class="col-sm-6">
-                    <?= $form->field($model, 'trig_connection_value')->widget(Select2::className(), [
+                    <?= $form->field($model, 'connection_value')->widget(Select2::className(), [
                         'data' => Trigger::getConnectionValues(),
                         'options' => [
                             'placeholder' => 'Выберите значение ...',

@@ -44,12 +44,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
             ],
             [
+                'attribute' => 'active',
+                'format' => 'boolean',
                 'filter' => [
                     0 => 'Нет',
                     1 => 'Да',
                 ],
-                'format' => 'boolean',
-                'attribute' => 'active',
             ],
 //            'trig_date',
 //            'trig_time',
