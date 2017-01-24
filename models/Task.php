@@ -12,6 +12,7 @@ use yii\helpers\Json;
  * This is the model class for table "task".
  *
  * @property integer $id
+ * @property boolean $active
  * @property integer $type
  * @property integer $item_id
  * @property string $item_value
@@ -40,12 +41,14 @@ class Task extends ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'type'], 'required'],
+            [['name', 'type', 'active'], 'required'],
             [['type', 'item_id'], 'integer'],
             [['item_value', 'name'], 'string', 'max' => 255],
             [['text'], 'string'],
             [['event_ids'], 'each', 'rule' => ['integer']],
             [['type'], 'in', 'range' => self::getTypesArray()],
+            [['active'], 'boolean'],
+            [['active'], 'default', 'value' => true],
         ];
     }
 
@@ -56,6 +59,7 @@ class Task extends ActiveRecord
     {
         return [
             'id' => 'ID',
+            'active' => 'Активно',
             'type' => 'Тип',
             'item_id' => 'Элемент',
             'item_value' => 'Значение Элемента',

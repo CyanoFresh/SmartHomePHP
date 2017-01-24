@@ -11,6 +11,9 @@ use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+if ($model->isNewRecord) {
+    $model->active = true;
+}
 ?>
 
 <div class="task-form">
@@ -26,6 +29,8 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'type')->dropDownList(Task::getTypes(), [
                 'prompt' => '--- выберите тип ---'
             ]) ?>
+
+            <?= $form->field($model, 'active')->checkbox() ?>
         </div>
         <div class="col-sm-4">
             <h2>Выполнить</h2>
