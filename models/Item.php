@@ -204,7 +204,7 @@ class Item extends ActiveRecord
                 $title .= ' - ' . $model->room->name;
             }
 
-            $result[$model->id] .= $title;
+            $result[$model->id] = $title;
         }
 
         return $result;
