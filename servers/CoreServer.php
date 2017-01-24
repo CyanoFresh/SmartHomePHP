@@ -1010,8 +1010,8 @@ class CoreServer implements MessageComponentInterface
         /** @var Trigger[] $triggers */
         $triggers = Trigger::findAll([
             'active' => true,
-            'trig_item_id' => $item->id,
-            'trig_item_value' => $value,
+            'item_id' => $item->id,
+            'item_value' => $value,
         ]);
 
         if (!$triggers) {
@@ -1032,8 +1032,8 @@ class CoreServer implements MessageComponentInterface
         /** @var Trigger[] $triggers */
         $triggers = Trigger::findAll([
             'active' => true,
-            'trig_board_id' => $board->id,
-            'trig_connection_value' => $connected ? Trigger::CONNECTION_VALUE_CONNECTED : Trigger::CONNECTION_VALUE_DISCONNECTED,
+            'board_id' => $board->id,
+            'connection_value' => $connected ? Trigger::CONNECTION_VALUE_CONNECTED : Trigger::CONNECTION_VALUE_DISCONNECTED,
         ]);
 
         if (!$triggers) {
