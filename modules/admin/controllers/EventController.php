@@ -66,7 +66,15 @@ class EventController extends Controller
         $model = new Event();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            switch (Yii::$app->request->post('after')) {
+                case 'add-another':
+                    return $this->redirect(['create']);
+                case 'return':
+                    return $this->redirect(['index']);
+                case 'view':
+                default:
+                    return $this->redirect(['view', 'id' => $model->id]);
+            }
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -85,7 +93,15 @@ class EventController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            switch (Yii::$app->request->post('after')) {
+                case 'add-another':
+                    return $this->redirect(['create']);
+                case 'return':
+                    return $this->redirect(['index']);
+                case 'view':
+                default:
+                    return $this->redirect(['view', 'id' => $model->id]);
+            }
         } else {
             return $this->render('update', [
                 'model' => $model,
