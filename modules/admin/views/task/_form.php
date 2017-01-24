@@ -4,9 +4,9 @@
 /* @var $model app\models\Task */
 /* @var $form yii\widgets\ActiveForm */
 
+use app\models\Event;
 use app\models\Item;
 use app\models\Task;
-use app\models\Trigger;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -44,13 +44,13 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'text')->textarea(['rows' => 3]) ?>
         </div>
         <div class="col-sm-4">
-            <h2>Активируется через</h2>
+            <h2>События</h2>
 
-            <?= $form->field($model, 'trigger_ids')->widget(Select2::className(), [
-                'data' => Trigger::getList(),
+            <?= $form->field($model, 'event_ids')->widget(Select2::className(), [
+                'data' => Event::getList(),
                 'showToggleAll' => false,
                 'options' => [
-                    'placeholder' => 'Выберите триггеры ...',
+                    'placeholder' => 'Выберите события ...',
                     'multiple' => true,
                 ],
             ]) ?>

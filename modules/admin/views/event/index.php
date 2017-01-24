@@ -7,7 +7,8 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-$this->title = 'Events';
+
+$this->title = 'События';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="event-index">
@@ -24,11 +25,21 @@ $this->params['breadcrumbs'][] = $this->title;
         'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'filterModel' => $searchModel,
         'columns' => [
-            'id',
-            'active',
+            [
+                'attribute' => 'id',
+                'contentOptions' => ['style' => 'width: 5%']
+            ],
             'name',
+            [
+                'attribute' => 'active',
+                'format' => 'boolean',
+                'filter' => [
+                    0 => 'Нет',
+                    1 => 'Да',
+                ],
+            ],
             'description:ntext',
-            'last_triggered_at',
+            'last_triggered_at:datetime',
 
             ['class' => 'app\components\ActionButtonColumn'],
         ],

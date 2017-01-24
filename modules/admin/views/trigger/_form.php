@@ -5,8 +5,8 @@
 /* @var $form yii\widgets\ActiveForm */
 
 use app\models\Board;
+use app\models\Event;
 use app\models\Item;
-use app\models\Task;
 use app\models\Trigger;
 use kartik\datecontrol\DateControl;
 use kartik\select2\Select2;
@@ -119,13 +119,13 @@ if ($model->isNewRecord) {
             </div>
         </div>
         <div class="col-sm-4">
-            <h2>Выполнить</h2>
+            <h2>События</h2>
 
-            <?= $form->field($model, 'task_ids')->widget(Select2::className(), [
-                'data' => Task::getList(),
+            <?= $form->field($model, 'event_ids')->widget(Select2::className(), [
+                'data' => Event::getList(),
                 'showToggleAll' => false,
                 'options' => [
-                    'placeholder' => 'Выберите задачи ...',
+                    'placeholder' => 'Выберите события ...',
                     'multiple' => true,
                 ],
             ]) ?>

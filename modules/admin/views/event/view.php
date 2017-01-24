@@ -13,8 +13,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="event-view">
 
     <p>
-        <?= Html::a(<i class="fa fa-pencil"></i>, ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(<i class="fa fa-trash"></i>, ['delete', 'id' => $model->id], [
+        <?= Html::a('<i class="fa fa-pencil"></i>', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('<i class="fa fa-trash"></i>', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',

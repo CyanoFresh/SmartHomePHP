@@ -1184,6 +1184,9 @@ class CoreServer implements MessageComponentInterface
             $this->doTask($task);
         }
 
+        $event->last_triggered_at = time();
+        $event->save(false);
+
         $this->log("Tasks for Event [{$event->id}] done");
     }
 
