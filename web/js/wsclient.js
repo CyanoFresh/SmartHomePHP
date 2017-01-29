@@ -90,6 +90,7 @@ function updateItemValue(id, type, value) {
             $('.item-variable[data-item-id="' + id + '"]').find('.item-value').html(value + '°C');
             break;
         case 22:    // Variable Humidity
+        case 40:    // Variable Light Level
             $('.item-variable[data-item-id="' + id + '"]').find('.item-value').html(value + "%");
             break;
         case 25:    // Variable boolean

@@ -40,6 +40,7 @@ class Item extends ActiveRecord
     const TYPE_VARIABLE_TEMPERATURE = 21;
     const TYPE_VARIABLE_HUMIDITY = 22;
     const TYPE_RGB = 30;
+    const TYPE_LIGHT_LEVEL = 40;
 
     const VALUE_ON = 1;
     const VALUE_OFF = 0;
@@ -165,6 +166,7 @@ class Item extends ActiveRecord
             self::TYPE_VARIABLE_TEMPERATURE => 'Переменная температура',
             self::TYPE_VARIABLE_HUMIDITY => 'Переменная влажность',
             self::TYPE_RGB => 'RGB LED',
+            self::TYPE_LIGHT_LEVEL => 'Уровень освещенности',
         ];
     }
 
@@ -239,6 +241,7 @@ class Item extends ActiveRecord
 
             case Item::TYPE_VARIABLE_TEMPERATURE:
             case Item::TYPE_VARIABLE_HUMIDITY:
+            case Item::TYPE_LIGHT_LEVEL:
                 return 0;
 
             case Item::TYPE_RGB:

@@ -56,4 +56,5 @@ WSClientAsset::register($this);
             <!-- /.box-body -->
         </div>
     <?php endforeach; ?>
+
 </div>

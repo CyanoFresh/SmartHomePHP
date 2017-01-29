@@ -107,8 +107,6 @@ class CoreServer implements MessageComponentInterface
 
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->log('Managing new connection...');
-
         $query = $conn->WebSocket->request->getQuery();
 
         $type = $query->get('type');

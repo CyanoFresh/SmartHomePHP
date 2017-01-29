@@ -29,6 +29,7 @@ class ItemQuery extends \yii\db\ActiveQuery
                 Item::TYPE_VARIABLE_BOOLEAN_DOOR,
                 Item::TYPE_VARIABLE_TEMPERATURE,
                 Item::TYPE_VARIABLE_HUMIDITY,
+                Item::TYPE_LIGHT_LEVEL,
             ],
         ]);
     }
