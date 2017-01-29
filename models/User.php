@@ -260,12 +260,13 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @param int $size
      * @return string
      */
-    public function getAvatar()
+    public function getAvatar($size = 45)
     {
         $hash = md5($this->email);
-        return 'https://www.gravatar.com/avatar/' . $hash . '?s=45';
+        return 'https://www.gravatar.com/avatar/' . $hash . '?s=' . $size;
     }
 
     /**

@@ -46,7 +46,7 @@ use dmstr\widgets\Alert;
 
 <footer class="main-footer">
     <span class="product-font">
-        <span>Smart</span> Home by <a href="https://solomaha.com" target="_blank">Alex Solomaha</a>
+        <span>Solomaha</span> Home by <a href="https://solomaha.com" target="_blank">Alex Solomaha</a>
     </span>
 </footer>
 
