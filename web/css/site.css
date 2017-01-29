@@ -193,3 +193,12 @@
 .select2-container--krajee .select2-selection--single {
     line-height: 2;
 }
+
+/* material design */
+.navbar-title {
+    display: inline-block;
+    line-height: 64px;
+    margin-left: 30px;
+    color: #fff;
+    font-size: 24px;
+}

@@ -40,7 +40,6 @@ return [
             'showScriptName' => false,
             'rules' => [
                 '' => 'panel/index',
-                'login' => 'auth/login',
                 '<controller>' => '<controller>/index',
                 'admin/<controller>/<id:\d+>/<action:(create|update|delete)>' => 'admin/<controller>/<action>',
                 'admin/<controller>/<id:\d+>' => 'admin/<controller>/view',
@@ -62,7 +61,7 @@ return [
         'assetManager' => [
             'bundles' => [
                 'dmstr\web\AdminLteAsset' => [
-                    'skin' => 'skin-purple',
+//                    'skin' => 'skin-purple',
                 ],
 //                'yii\bootstrap\BootstrapAsset' => [
 //                    'css' => [],
