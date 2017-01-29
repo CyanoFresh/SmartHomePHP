@@ -14,10 +14,13 @@ use app\models\Item;
 
         <div class="info-box-content">
             <span class="info-box-text"><?= $item->name ?></span>
-            <span
-                class="info-box-number item-value <?= ($item->type === Item::TYPE_VARIABLE_TEMPERATURE or $item->type === Item::TYPE_VARIABLE_HUMIDITY) ? 'temperature' : '' ?>">
-                                        НЕИЗВЕСТНО
-                                    </span>
+            <span class="info-box-number item-value <?= (in_array($item->type, [
+                Item::TYPE_VARIABLE_TEMPERATURE,
+                Item::TYPE_VARIABLE_HUMIDITY,
+                Item::TYPE_LIGHT_LEVEL
+            ])) ? 'temperature' : '' ?>">
+                НЕИЗВЕСТНО
+            </span>
         </div>
         <!-- /.info-box-content -->
     </div>
