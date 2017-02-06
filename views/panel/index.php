@@ -1,16 +1,13 @@
 <?php
 
 /* @var $this yii\web\View */
+/* @var $roomModels \app\models\Room[] */
 
-use app\assets\WSClientAsset;
-use app\models\Item;
-use app\models\Room;
-use yii\web\View;
+use app\assets\PanelAsset;
+
+PanelAsset::register($this);
 
 $this->title = 'Панель Управления';
-$this->params['not-boxed'] = true;
-
-WSClientAsset::register($this);
 ?>
 
 <div class="loader" id="loader">
@@ -24,28 +21,28 @@ WSClientAsset::register($this);
 
 <div class="control-panel">
 
-    <?php foreach (Room::find()->all() as $room): ?>
-        <div class="box control-panel-room box-<?= $room->bg ?>" data-room-id="<?= $room->id ?>">
-            <div class="box-header with-border">
-                <h3 class="box-title"><?= $room->name ?></h3>
+    <?php foreach ($roomModels as $room): ?>
+        <div class="card panel-room" data-room-id="<?= $room->id ?>">
+            <div class="card-header">
+                <h3 class="card-header-title"><?= $room->name ?></h3>
             </div>
 
-            <div class="box-body control-panel-items">
-                <div class="row items-variable">
-                    <?php foreach ($room->getItems()->variables()->active()->all() as $item): ?>
-                        <?= $this->render('_variable', [
-                            'item' => $item,
-                        ]) ?>
-                    <?php endforeach; ?>
-                </div>
-                <div class="row items-switch">
+            <div class="card-body">
+                <div class="row panel-items-switch">
                     <?php foreach ($room->getItems()->switches()->active()->all() as $item): ?>
                         <?= $this->render('_switch', [
                             'item' => $item,
                         ]) ?>
                     <?php endforeach; ?>
                 </div>
-                <div class="row items-rgb">
+                <div class="row panel-items-variable">
+                    <?php foreach ($room->getItems()->variables()->active()->all() as $item): ?>
+                        <?= $this->render('_variable', [
+                            'item' => $item,
+                        ]) ?>
+                    <?php endforeach; ?>
+                </div>
+                <div class="row panel-items-rgb">
                     <?php foreach ($room->getItems()->rgb()->all() as $item): ?>
                         <?= $this->render('_rgb', [
                             'item' => $item,
@@ -56,4 +53,5 @@ WSClientAsset::register($this);
             <!-- /.box-body -->
         </div>
     <?php endforeach; ?>
+
 </div>

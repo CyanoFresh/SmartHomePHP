@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Room;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -36,7 +37,11 @@ class PanelController extends Controller
             . '";
         ', View::POS_HEAD);
 
-        return $this->render('index');
+        $roomModels = Room::find()->all();
+
+        return $this->render('index', [
+            'roomModels' => $roomModels,
+        ]);
     }
 
 }

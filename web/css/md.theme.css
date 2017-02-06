@@ -1,0 +1,106 @@
+/* Fixes to Admin */
+.navbar-title {
+    display: inline-block;
+    line-height: 64px;
+    margin-left: 30px;
+    color: #fff;
+    font-size: 24px;
+}
+
+.main-header .navbar {
+    margin-left: 0;
+}
+
+a.product-font {
+    color: #fff;
+}
+
+a.product-font:hover {
+    text-decoration: none;
+}
+
+.navbar-nav > .user-menu > .dropdown-menu > li.user-header > p {
+    color: #000;
+}
+
+.navbar-nav > .user-menu > .dropdown-menu {
+    width: 400px;
+}
+
+.navbar-nav > .user-menu > .dropdown-menu > li.user-header {
+    height: auto;
+}
+
+/* General Syles */
+body {
+    background: #e8e8e8;
+}
+
+.card {
+    background: #fff;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+    overflow: hidden;
+    margin-bottom: 20px;
+    border-radius: 2px;
+    padding: 24px;
+}
+
+.card-header .card-header-title {
+    font-size: 24px;
+    margin: 0 0 8px 0;
+}
+
+/* Panel Items */
+.panel-item.panel-item-switch {
+    background: #009688;
+    border-radius: 30px;
+    color: #fff;
+    margin: 10px 0;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    min-height: 50px;
+    box-shadow: 0 1px 1.5px 0 rgba(0, 0, 0, .12), 0 1px 1px 0 rgba(0, 0, 0, .24);
+    transition: 0.5s;
+    user-select: none;
+}
+
+.panel-item.panel-item-switch.off {
+    background: #909090;
+}
+
+.panel-item-switch-icon {
+    position: absolute;
+    padding: 0 15px 0 20px;
+    font-size: 20px;
+    line-height: 50px;
+    border-right: 1px solid rgba(95, 95, 95, 0.3);
+    background: rgba(0, 0, 0, 0.1);
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+}
+
+.panel-item-switch-name {
+    text-align: center;
+    width: 100%;
+    padding-left: 35px;
+}
+
+/* Migration styles !!! */
+.box {
+    position: relative;
+    border-radius: 0;
+    border: none;
+    background: #ffffff;
+    margin-bottom: 20px;
+    width: 100%;
+    box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.12), 0 1px 6px 0 rgba(0, 0, 0, 0.12);
+}
+
+.box.box-success {
+    border: none;
+}
+
+.content-wrapper {
+    background: #e8e8e8;
+}

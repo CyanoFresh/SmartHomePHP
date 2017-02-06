@@ -3,19 +3,15 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use dmstr\helpers\AdminLteHelper;
+use app\assets\MDThemeAsset;
 use dmstr\web\AdminLteAsset;
 use yii\helpers\Html;
 use app\assets\AppAsset;
 
 AppAsset::register($this);
 AdminLteAsset::register($this);
+MDThemeAsset::register($this);
 
-if (isset($this->params['body-class'])) {
-    $bodyClass = $this->params['body-class'];
-} else {
-    $bodyClass = null;
-}
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -30,7 +26,7 @@ if (isset($this->params['body-class'])) {
     <title><?= $this->title ?> - <?= Yii::$app->name ?></title>
 
     <meta name="application-name" content="<?= Yii::$app->name ?>">
-    <meta name="theme-color" content="#605CA8">
+    <meta name="theme-color" content="#009688">
 
     <link rel="publisher" href="https://plus.google.com/+AlexSolomaha21">
     <link rel="me" href="https://plus.google.com/+AlexSolomaha21" type="text/html">
@@ -40,7 +36,7 @@ if (isset($this->params['body-class'])) {
     <?php $this->head() ?>
 </head>
 
-<body class="hold-transition <?= AdminLteHelper::skinClass() ?> <?= $bodyClass ?> sidebar-mini">
+<body class="hold-transition">
 <?php $this->beginBody() ?>
 
 <?= $content ?>

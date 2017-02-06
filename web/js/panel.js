@@ -207,5 +207,13 @@ $(document).ready(function () {
         $('.fade-checkbox').change(function (e) {
             window.localStorage.setItem('fade-checkbox-' + $(this).data('item-id'), this.checked);
         });
+
+        $('.panel-item-switch').click(function (e) {
+            e.preventDefault();
+
+            $(this).toggleClass('off');
+
+            return false;
+        })
     });
 });

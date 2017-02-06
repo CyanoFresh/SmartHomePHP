@@ -3,8 +3,6 @@
 /* @var $this yii\web\View */
 /* @var $item \app\models\Item */
 
-use app\models\Item;
-
 ?>
 
 <div class="col-md-3 col-sm-4 control-panel-item item-variable"
@@ -14,10 +12,7 @@ use app\models\Item;
 
         <div class="info-box-content">
             <span class="info-box-text"><?= $item->name ?></span>
-            <span
-                class="info-box-number item-value <?= ($item->type === Item::TYPE_VARIABLE_TEMPERATURE or $item->type === Item::TYPE_VARIABLE_HUMIDITY) ? 'temperature' : '' ?>">
-                                        НЕИЗВЕСТНО
-                                    </span>
+            <span class="info-box-number item-value">NaN</span>
         </div>
         <!-- /.info-box-content -->
     </div>

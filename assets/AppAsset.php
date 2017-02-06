@@ -10,7 +10,6 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'https://fonts.googleapis.com/css?family=Product+Sans',
-        'css/theme.css',
         'css/site.css',
     ];
     public $js = [

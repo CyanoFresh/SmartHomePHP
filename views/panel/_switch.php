@@ -3,12 +3,14 @@
 /* @var $this yii\web\View */
 /* @var $item \app\models\Item */
 
+use rmrevin\yii\fontawesome\FA;
+
 ?>
 
-<div class="col-md-2 col-sm-3">
+<div class="col-lg-3 col-sm-4">
     <div class="panel-item panel-item-switch <?= $item->class ?>" data-item-id="<?= $item->id ?>">
         <div class="panel-item-switch-icon">
-            <i class="fa fa-lightbulb-o"></i>
+            <?= FA::i($item->icon) ?>
         </div>
         <div class="panel-item-switch-name">
             <?= $item->name ?>

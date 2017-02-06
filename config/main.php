@@ -63,10 +63,10 @@ return [
                 'dmstr\web\AdminLteAsset' => [
 //                    'skin' => 'skin-purple',
                 ],
-//                'yii\bootstrap\BootstrapAsset' => [
-//                    'css' => [],
+                'yii\bootstrap\BootstrapAsset' => [
+                    'css' => [],
 //                    'js' => [],
-//                ],
+                ],
             ],
         ],
     ],
