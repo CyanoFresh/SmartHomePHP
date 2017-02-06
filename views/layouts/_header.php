@@ -9,80 +9,53 @@ use yii\helpers\Url;
 ?>
 
 <header class="main-header">
-
-    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
-
-        <div class="navbar-title">
-            <a href="<?= Url::home() ?>" class="product-font"><span>Solomaha</span> Home</a>
-        </div>
-
-        <div class="navbar-custom-menu">
-
-            <ul class="nav navbar-nav">
-
-                <li class="dropdown notifications-menu">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-bell-o"></i>
-                        <!--                        <span class="label label-warning">10</span>-->
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li class="header">You have 10 notifications</li>
-                        <li>
-                            <!-- inner menu: contains the actual data -->
-                            <ul class="menu">
-                                <li>
-                                    <a href="#">
-                                        <i class="fa fa-users text-aqua"></i> 5 new members joined today
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="footer"><a href="#">View all</a></li>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand product-font" href="<?= Url::home() ?>"><span>Solomaha</span> Home</a>
+                <?php if (!empty($this->params['breadcrumbs'])): ?>
+                    <ul class="navbar-breadcrumbs hidden-xs">
+                        <?php foreach ($this->params['breadcrumbs'] as $breadcrumb): ?>
+                            <li><?= $breadcrumb ?></li>
+                        <?php endforeach; ?>
                     </ul>
-                </li>
+                <?php endif; ?>
+            </div>
 
-                <li class="dropdown user user-menu">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="<?= Yii::$app->user->identity->getAvatar() ?>" class="user-image" alt="User Image">
-                        <span class="hidden-xs"><?= Yii::$app->user->identity->username ?></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <!-- User image -->
-                        <li class="user-header">
-                            <div class="row">
-                                <div class="col-xs-4">
-                                    <img src="<?= Yii::$app->user->identity->getAvatar(200) ?>" class="img-circle img-responsive"
-                                         alt="User Image">
-                                </div>
-                                <div class="col-xs-8">
-                                    <h4><?= Yii::$app->user->identity->username ?></h4>
-
-                                    <small>
-                                        Зарегистрирован <?= Yii::$app->formatter->asDate(Yii::$app->user->identity->created_at) ?>
-                                    </small>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- Menu Footer-->
-                        <li class="user-footer">
-                            <div class="pull-left">
-                                <a href="<?= Url::to(['/user/view', 'id' => Yii::$app->user->id]) ?>"
-                                   class="btn btn-default">
-                                    Профиль
-                                </a>
-                            </div>
-                            <div class="pull-right">
-                                <?= Html::a(
-                                    'Выйти',
-                                    ['/auth/logout'],
-                                    ['data-method' => 'post', 'class' => 'btn btn-primary']
-                                ) ?>
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-
-            </ul>
-        </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown notifications-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false"><i class="fa fa-bell-o"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown user-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            <img src="<?= Yii::$app->user->identity->getAvatar() ?>" class="user-image">
+                            <span class="hidden-xs"><?= Yii::$app->user->identity->username ?></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <?= Html::a('Выйти', ['/auth/logout'], ['data-method' => 'post']) ?>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
     </nav>
 </header>

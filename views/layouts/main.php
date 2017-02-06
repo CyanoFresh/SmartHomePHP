@@ -7,7 +7,7 @@
 
     <?= $this->render('_header.php') ?>
 
-    <?= $this->render('_left.php') ?>
+<!--    --><?//= $this->render('_left.php') ?>
 
     <?= $this->render('_content.php', ['content' => $content]) ?>
 

@@ -9,7 +9,7 @@ use yii\helpers\Html;
 use app\assets\AppAsset;
 
 AppAsset::register($this);
-AdminLteAsset::register($this);
+//AdminLteAsset::register($this);
 MDThemeAsset::register($this);
 
 ?>
@@ -36,7 +36,7 @@ MDThemeAsset::register($this);
     <?php $this->head() ?>
 </head>
 
-<body class="hold-transition">
+<body>
 <?php $this->beginBody() ?>
 
 <?= $content ?>

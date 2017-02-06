@@ -3,10 +3,6 @@ var wsURL;
 var WS;
 var WSConnectionOpened;
 
-function log(msg) {
-    console.log(msg);
-}
-
 function initWebSocket(callback) {
     WS = new WebSocket(wsURL);
 
@@ -30,7 +26,7 @@ function onMessage(e) {
     try {
         var data = JSON.parse(e.data);
 
-        log(data);
+        console.log(data);
 
         switch (data.type) {
             case 'init':
@@ -67,8 +63,6 @@ function send(msg) {
         msg = JSON.stringify(msg);
     }
 
-    log(msg);
-
     if (WS && WS.readyState == 1) {
         WS.send(msg);
     }
@@ -78,38 +72,59 @@ function updateValue(data) {
     updateItemValue(data.item_id, data.item_type, data.value);
 }
 
+function itemSwitchOn(itemId) {
+    var $item = $('.panel-item-switch[data-item-id="' + itemId + '"]');
+    $item.removeClass('off');
+}
+
+function itemSwitchOff(itemId) {
+    var $item = $('.panel-item-switch[data-item-id="' + itemId + '"]');
+    $item.addClass('off');
+}
+
+function itemSetValue(itemId, value) {
+    console.log(itemId, value);
+    $('.panel-item-variable[data-item-id="' + itemId + '"] > .item-variable-value').html(value);
+}
+
 function updateItemValue(id, type, value) {
     type = parseInt(type);
 
     switch (type) {
         case 10:    // Switch
-            $('.item-switch-checkbox[data-item-id="' + id + '"]').prop('checked', value);
+            if (value == true) {
+                itemSwitchOn(id);
+            } else {
+                itemSwitchOff(id);
+            }
             break;
         case 20:    // Variable
+            itemSetValue(id, value);
+            break;
         case 21:    // Variable Temperature
-            $('.item-variable[data-item-id="' + id + '"]').find('.item-value').html(value + '°C');
+            itemSetValue(id, value + ' °C');
             break;
         case 22:    // Variable Humidity
-            $('.item-variable[data-item-id="' + id + '"]').find('.item-value').html(value + "%");
+            itemSetValue(id, value + '%');
             break;
         case 25:    // Variable boolean
-            var $item_value = $('.item-variable[data-item-id="' + id + '"]').find('.item-value');
-
             if (value) {
-                $item_value.html('ДА');
+                value = 'да';
             } else {
-                $item_value.html('НЕТ');
+                value = 'нет';
             }
+
+            itemSetValue(id, value);
 
             break;
         case 26:    // Variable boolean door
-            var $item_value = $('.item-variable[data-item-id="' + id + '"]').find('.item-value');
-
             if (value) {
-                $item_value.html('ОТКРЫТО');
+                value = 'открыто';
             } else {
-                $item_value.html('ЗАКРЫТО');
+                value = 'закрыто';
             }
+
+            itemSetValue(id, value);
 
             break;
         case 30:    // RGB
@@ -153,37 +168,37 @@ $(document).ready(function () {
         }
     });
 
-    $('.fade-checkbox').each(function () {
-        var localStorageValue = window.localStorage.getItem('fade-checkbox-' + $(this).data('item-id'));
-
-        console.log(localStorageValue);
-
-        this.checked = localStorageValue != null && localStorageValue != 'false';
-    });
+    // $('.fade-checkbox').each(function () {
+    //     var localStorageValue = window.localStorage.getItem('fade-checkbox-' + $(this).data('item-id'));
+    //
+    //     console.log(localStorageValue);
+    //
+    //     this.checked = localStorageValue != null && localStorageValue != 'false';
+    // });
 
     initWebSocket(function () {
-        $('input[type="checkbox"].item-switch-checkbox').click(function (e) {
-            e.preventDefault();
-
-            var item_id = $(this).data('item-id');
-            var action = $(this).prop('checked') ? 'turnON' : 'turnOFF';
-
-            send({
-                "type": action,
-                "item_id": item_id
-            });
-        });
+        // $('input[type="checkbox"].item-switch-checkbox').click(function (e) {
+        //     e.preventDefault();
+        //
+        //     var item_id = $(this).data('item-id');
+        //     var action = $(this).prop('checked') ? 'turnON' : 'turnOFF';
+        //
+        //     send({
+        //         "type": action,
+        //         "item_id": item_id
+        //     });
+        // });
 
         // Delegate click on block to checkbox
-        $('.item-switch .info-box').click(function (e) {
-            e.preventDefault();
-
-            if ($(e.target).is('.item-switch-checkbox')) {
-                return false;
-            }
-
-            $(this).find('.item-switch-checkbox').click();
-        });
+        // $('.item-switch .info-box').click(function (e) {
+        //     e.preventDefault();
+        //
+        //     if ($(e.target).is('.item-switch-checkbox')) {
+        //         return false;
+        //     }
+        //
+        //     $(this).find('.item-switch-checkbox').click();
+        // });
 
         $('.rgb-mode').click(function (e) {
             e.preventDefault();
@@ -204,14 +219,20 @@ $(document).ready(function () {
             });
         });
 
-        $('.fade-checkbox').change(function (e) {
-            window.localStorage.setItem('fade-checkbox-' + $(this).data('item-id'), this.checked);
-        });
+        // $('.fade-checkbox').change(function (e) {
+        //     window.localStorage.setItem('fade-checkbox-' + $(this).data('item-id'), this.checked);
+        // });
 
         $('.panel-item-switch').click(function (e) {
             e.preventDefault();
 
-            $(this).toggleClass('off');
+            var item_id = $(this).data('item-id');
+            var action = $(this).hasClass('off') ? 'turnON' : 'turnOFF';
+
+            send({
+                "type": action,
+                "item_id": item_id
+            });
 
             return false;
         })

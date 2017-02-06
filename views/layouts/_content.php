@@ -3,26 +3,25 @@
 /* @var $this \yii\web\View */
 
 use yii\helpers\Html;
-use yii\helpers\Inflector;
 use yii\widgets\Breadcrumbs;
-use dmstr\widgets\Alert;
 
 ?>
-<div class="container">
-    <section class="content-header">
-        <h1><?= Html::encode($this->title) ?></h1>
 
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-    </section>
+<main>
+    <div class="container">
+        <section class="content-header">
+            <h1><?= Html::encode($this->title) ?></h1>
 
-    <section class="content">
-        <?= Alert::widget() ?>
+            <?= Breadcrumbs::widget([
+                'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+            ]) ?>
+        </section>
 
-        <?= $content ?>
-    </section>
-</div>
+        <section class="content">
+            <?= $content ?>
+        </section>
+    </div>
+</main>
 
 <footer class="main-footer">
     <span class="product-font">
