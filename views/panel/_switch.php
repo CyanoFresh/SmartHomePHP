@@ -8,7 +8,7 @@ use rmrevin\yii\fontawesome\FA;
 ?>
 
 <div class="col-lg-3 col-sm-4">
-    <div class="panel-item panel-item-switch <?= $item->class ?>" data-item-id="<?= $item->id ?>">
+    <div class="panel-item panel-item-switch withripple <?= $item->class ?>" data-item-id="<?= $item->id ?>">
         <div class="panel-item-switch-icon">
             <?= FA::i($item->icon) ?>
         </div>

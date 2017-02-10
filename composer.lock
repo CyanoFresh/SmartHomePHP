@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "92864bfe10c2801fc39e079651eaf8ad",
-    "content-hash": "5c9a74d5c23bfcff41b8812cf37ddf42",
+    "hash": "36277b6bc1344ef7568626d02d35eec2",
+    "content-hash": "30799817bc717ac25ecda917be4bbef5",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -210,6 +210,36 @@
                     "package.json"
                 ]
             }
+        },
+        {
+            "name": "bower-asset/snackbarjs",
+            "version": "dev-fixes",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CyanoFresh/snackbarjs.git",
+                "reference": "18df00bca47dea8421922b37db2ebd798cadd0fa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CyanoFresh/snackbarjs/zipball/18df00bca47dea8421922b37db2ebd798cadd0fa",
+                "reference": "18df00bca47dea8421922b37db2ebd798cadd0fa",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=2.0.0,<3.0.0"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "dist/snackbar.min.js",
+                    "dist/snackbar.min.css"
+                ],
+                "bower-asset-ignore": [
+                    ".jshintrc",
+                    "**/*.txt"
+                ]
+            },
+            "time": "2017-02-08 21:57:42"
         },
         {
             "name": "bower-asset/spectrum",
@@ -3654,7 +3684,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "bower-asset/snackbarjs": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

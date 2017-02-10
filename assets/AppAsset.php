@@ -21,5 +21,6 @@ class AppAsset extends AssetBundle
         'rmrevin\yii\fontawesome\AssetBundle',
 //        'dmstr\web\AdminLteAsset',
         'shifrin\noty\NotyAsset',
+        'app\assets\MDThemeAsset',
     ];
 }

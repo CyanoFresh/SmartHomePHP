@@ -30,6 +30,8 @@ class PanelController extends Controller
 
     public function actionIndex()
     {
+        $this->layout = 'main-no-content';
+
         $this->view->registerJs('
             var wsURL = "' . Yii::$app->params['wsURL']
             . '/?type=user&id=' . Yii::$app->user->identity->id

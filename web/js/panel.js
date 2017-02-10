@@ -3,24 +3,32 @@ var wsURL;
 var WS;
 var WSConnectionOpened;
 
-function initWebSocket(callback) {
+function initWebSocket(onOpenCallback, onMessageCallback, onCloseCallback) {
     WS = new WebSocket(wsURL);
 
-    WS.onmessage = onMessage;
-    WS.onopen = callback;
-    WS.onclose = function () {
-        if (WSConnectionOpened) {
-            $('.loader-text').html('Отключен от сервера').fadeIn();
-
-            $('.control-panel').fadeOut(function () {
-                $('#loader').addClass('error').fadeIn();
-            });
-        } else {
-            $('#loader').addClass('error');
-            $('.loader-text').html('Не удалось подключиться к серверу').fadeIn();
-        }
-    };
+    WS.onmessage = onMessageCallback;
+    WS.onopen = onOpenCallback;
+    WS.onclose = onCloseCallback;
 }
+
+initWebSocket(function () {
+    WSConnectionOpened = true;
+
+    $('#loader, .linear-loader').fadeOut(function () {
+        $('main').fadeIn();
+    });
+}, onMessage, function () {
+    if (WSConnectionOpened) {
+        $('main').fadeOut(function () {
+            $('#loader').fadeIn().addClass('error');
+        });
+    } else {
+        $('#loader').addClass('error');
+        $('.linear-loader').fadeOut();
+    }
+
+    WSConnectionOpened = false;
+});
 
 function onMessage(e) {
     try {
@@ -92,11 +100,12 @@ function updateItemValue(id, type, value) {
 
     switch (type) {
         case 10:    // Switch
-            if (value == true) {
+            if (Boolean(value)) {
                 itemSwitchOn(id);
             } else {
                 itemSwitchOff(id);
             }
+
             break;
         case 20:    // Variable
             itemSetValue(id, value);
@@ -108,11 +117,7 @@ function updateItemValue(id, type, value) {
             itemSetValue(id, value + '%');
             break;
         case 25:    // Variable boolean
-            if (value) {
-                value = 'да';
-            } else {
-                value = 'нет';
-            }
+            value = Boolean(value) ? 'да' : 'нет';
 
             itemSetValue(id, value);
 
@@ -128,6 +133,7 @@ function updateItemValue(id, type, value) {
 
             break;
         case 30:    // RGB
+            // TODO
             if (typeof value === 'string') {
                 $('.item-rgb[data-item-id="' + id + '"]')
                     .find('.rgb-mode[data-mode="' + value + '"]')
@@ -145,28 +151,47 @@ function updateItemValue(id, type, value) {
 }
 
 $(document).ready(function () {
-    $('.rgb-colorpicker').spectrum({
-        showInput: true,
-        showButtons: false,
-        preferredFormat: 'rgb',
-        change: function (color) {
-            var item_id = $(this).data('item-id');
-            var red = Math.round(color._r);
-            var green = Math.round(color._g);
-            var blue = Math.round(color._b);
 
-            var fade = ($('.fade-checkbox[data-item-id="' + item_id + '"]:checked').length > 0);
+    $('body').addClass('loaded');
 
-            send({
-                'type': 'rgb',
-                'item_id': item_id,
-                'fade': fade,
-                'red': red,
-                'green': green,
-                'blue': blue
-            });
-        }
+    // Event listeners
+    $('.panel-item-switch').click(function (e) {
+        e.preventDefault();
+
+        var item_id = $(this).data('item-id');
+        var action = $(this).hasClass('off') ? 'turnON' : 'turnOFF';
+
+        send({
+            "type": action,
+            "item_id": item_id
+        });
+
+        return false;
     });
+
+    // TODO:
+    // $('.rgb-colorpicker').spectrum({
+    //     showInput: true,
+    //     showButtons: false,
+    //     preferredFormat: 'rgb',
+    //     change: function (color) {
+    //         var item_id = $(this).data('item-id');
+    //         var red = Math.round(color._r);
+    //         var green = Math.round(color._g);
+    //         var blue = Math.round(color._b);
+    //
+    //         var fade = ($('.fade-checkbox[data-item-id="' + item_id + '"]:checked').length > 0);
+    //
+    //         send({
+    //             'type': 'rgb',
+    //             'item_id': item_id,
+    //             'fade': fade,
+    //             'red': red,
+    //             'green': green,
+    //             'blue': blue
+    //         });
+    //     }
+    // });
 
     // $('.fade-checkbox').each(function () {
     //     var localStorageValue = window.localStorage.getItem('fade-checkbox-' + $(this).data('item-id'));
@@ -176,65 +201,51 @@ $(document).ready(function () {
     //     this.checked = localStorageValue != null && localStorageValue != 'false';
     // });
 
-    initWebSocket(function () {
-        // $('input[type="checkbox"].item-switch-checkbox').click(function (e) {
-        //     e.preventDefault();
-        //
-        //     var item_id = $(this).data('item-id');
-        //     var action = $(this).prop('checked') ? 'turnON' : 'turnOFF';
-        //
-        //     send({
-        //         "type": action,
-        //         "item_id": item_id
-        //     });
-        // });
+    // initWebSocket(function () {
+    // $('input[type="checkbox"].item-switch-checkbox').click(function (e) {
+    //     e.preventDefault();
+    //
+    //     var item_id = $(this).data('item-id');
+    //     var action = $(this).prop('checked') ? 'turnON' : 'turnOFF';
+    //
+    //     send({
+    //         "type": action,
+    //         "item_id": item_id
+    //     });
+    // });
 
-        // Delegate click on block to checkbox
-        // $('.item-switch .info-box').click(function (e) {
-        //     e.preventDefault();
-        //
-        //     if ($(e.target).is('.item-switch-checkbox')) {
-        //         return false;
-        //     }
-        //
-        //     $(this).find('.item-switch-checkbox').click();
-        // });
+    // Delegate click on block to checkbox
+    // $('.item-switch .info-box').click(function (e) {
+    //     e.preventDefault();
+    //
+    //     if ($(e.target).is('.item-switch-checkbox')) {
+    //         return false;
+    //     }
+    //
+    //     $(this).find('.item-switch-checkbox').click();
+    // });
 
-        $('.rgb-mode').click(function (e) {
-            e.preventDefault();
+    // $('.rgb-mode').click(function (e) {
+    //     e.preventDefault();
+    //
+    //     var mode = $(this).data('mode');
+    //     var start = true;
+    //     var item_id = $(this).parents('.item-rgb').data('item-id');
+    //
+    //     if ($(this).hasClass('active')) {
+    //         start = false
+    //     }
+    //
+    //     send({
+    //         "type": "rgbMode",
+    //         "item_id": item_id,
+    //         "mode": mode,
+    //         "start": start
+    //     });
+    // });
 
-            var mode = $(this).data('mode');
-            var start = true;
-            var item_id = $(this).parents('.item-rgb').data('item-id');
-
-            if ($(this).hasClass('active')) {
-                start = false
-            }
-
-            send({
-                "type": "rgbMode",
-                "item_id": item_id,
-                "mode": mode,
-                "start": start
-            });
-        });
-
-        // $('.fade-checkbox').change(function (e) {
-        //     window.localStorage.setItem('fade-checkbox-' + $(this).data('item-id'), this.checked);
-        // });
-
-        $('.panel-item-switch').click(function (e) {
-            e.preventDefault();
-
-            var item_id = $(this).data('item-id');
-            var action = $(this).hasClass('off') ? 'turnON' : 'turnOFF';
-
-            send({
-                "type": action,
-                "item_id": item_id
-            });
-
-            return false;
-        })
-    });
+    // $('.fade-checkbox').change(function (e) {
+    //     window.localStorage.setItem('fade-checkbox-' + $(this).data('item-id'), this.checked);
+    // });
+    // });
 });

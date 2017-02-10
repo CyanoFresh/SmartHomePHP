@@ -20,5 +20,6 @@ class MDThemeAsset extends AssetBundle
     public $depends = [
         'yii\web\JqueryAsset',
         'yii\bootstrap\BootstrapPluginAsset',
+        'app\assets\SnackbarjsAsset',
     ];
 }

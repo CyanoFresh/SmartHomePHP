@@ -11,6 +11,7 @@
     "cboden/ratchet": "^0.3.4",
     "bower-asset/handlebars": "^4.0",
     "bower-asset/spectrum": "^1.8",
+    "bower-asset/snackbarjs": "dev-fixes",
     "rmrevin/yii2-fontawesome": "~2.12",
     "linslin/yii2-curl": "1.0.8",
     "shifrin/yii2-noty": "^1.0",
@@ -31,6 +32,13 @@
     "asset-installer-paths": {
       "npm-asset-library": "vendor/npm",
       "bower-asset-library": "vendor/bower"
-    }
+    },
+    "asset-repositories": [
+      {
+        "type": "bower-github",
+        "url": "https://github.com/CyanoFresh/snackbarjs",
+        "name": "bower-asset/snackbarjs"
+      }
+    ]
   }
 }

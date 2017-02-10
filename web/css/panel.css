@@ -1,107 +1,112 @@
-.temperature {
-    font-size: 40px;
+body {
+    opacity: 0;
+    transition: 0.3s;
 }
 
-.item-rgb .sp-replacer {
-    margin: 4px 0;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    color: inherit;
-    background: #efefef;
-    display: inline-block;
+body.loaded {
+    opacity: 1;
+}
+
+/* Linear loader */
+.linear-loader {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 4px;
+    background-color: #B3E5FC;
+    z-index: 500;
+}
+
+.indeterminate {
     position: relative;
-    height: 30px;
     width: 100%;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    height: 100%;
 }
 
-.item-rgb .sp-preview {
-    border: none;
-    margin-right: 0;
-    height: 30px;
-    width: 100%;
+.indeterminate:before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    background-color: #03A9F4;
+    animation: indeterminate_first 3s infinite ease-out;
 }
 
-.item-rgb .sp-dd {
-    display: none;
+.indeterminate:after {
+    content: '';
+    position: absolute;
+    height: 100%;
+    background-color: #4FC3F7;
+    animation: indeterminate_second 3s infinite ease-in;
 }
 
-.item-rgb label {
-    margin: 0;
-}
-
-.item-rgb .col-xs-4 {
-    margin: 0;
-    padding: 0;
-    padding-right: 10px;
-}
-
-.item-rgb .col-xs-8 {
-    margin: 0;
-    padding: 0;
-    padding-left: 10px;
-}
-
-.item-rgb .border-right {
-    border-right: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.item-rgb .rgb-mode {
-    display: inline-block;
-    width: 60px;
-    height: 50px;
-    cursor: pointer;
-    margin: 5px 5px 0 0;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    transition: 0.5s;
-}
-
-@media (min-width: 768px) {
-    .item-rgb .rgb-mode {
-        width: 50px;
-        margin: 5px 10px 0 0;
+@keyframes indeterminate_first {
+    0% {
+        left: -100%;
+        width: 100%;
+    }
+    100% {
+        left: 100%;
+        width: 10%;
     }
 }
 
-.item-rgb .rgb-mode.active {
-    /*border: 1px solid #fff;*/
+@keyframes indeterminate_second {
+    0% {
+        left: -150%;
+        width: 100%;
+    }
+    100% {
+        left: 100%;
+        width: 10%;
+    }
 }
 
-.item-rgb .rgb-mode.active .rgb-mode-image {
-    box-shadow: inset 0 0 0 2px #fff;
+/* Content loader */
+#loader {
+    position: relative;
 }
 
-.item-rgb .rgb-mode-image {
-    height: 100%;
-    width: 100%;
-    transition: 0.5s;
+.loader-icon {
+    background: #2f2f2f;
+    border-radius: 100%;
+    height: 150px;
+    width: 150px;
+    margin: 100px auto 30px;
+    color: #fff;
+    text-align: center;
+    line-height: 150px;
+    font-size: 100px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-.item-rgb .rgb-mode-rainbow {
-    background: red; /* not working, let's see some red */
-    background: -moz-linear-gradient(left,
-    rgba(255, 0, 0, 1) 0%,
-    rgba(255, 255, 0, 1) 15%,
-    rgba(0, 255, 0, 1) 30%,
-    rgba(0, 255, 255, 1) 50%,
-    rgba(0, 0, 255, 1) 65%,
-    rgba(255, 0, 255, 1) 80%,
-    rgba(255, 0, 0, 1) 100%);
-    background: -webkit-gradient(linear, left top, right top,
-    color-stop(0%, rgba(255, 0, 0, 1)),
-    color-stop(15%, rgba(255, 255, 0, 1)),
-    color-stop(30%, rgba(0, 255, 0, 1)),
-    color-stop(50%, rgba(0, 255, 255, 1)),
-    color-stop(65%, rgba(0, 0, 255, 1)),
-    color-stop(80%, rgba(255, 0, 255, 1)),
-    color-stop(100%, rgba(255, 0, 0, 1)));
+.loader-brand {
+    text-align: center;
+    font-size: 40px;
 }
 
-.item-rgb .rgb-mode-breath {
-    background: #000000; /* Old browsers */
-    background: -moz-linear-gradient(left, #000000 0%, #30ff60 51%, #000000 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(left, #000000 0%, #30ff60 51%, #000000 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to right, #000000 0%, #30ff60 51%, #000000 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#000000', endColorstr='#000000', GradientType=1);
+.loader-message {
+    opacity: 0;
+    text-align: center;
+    font-size: 18px;
+    position: absolute;
+    left: calc(50% - 15px);
+    top: 125px;
+    background: #F44336;
+    border-radius: 50px;
+    padding: 0 10px;
+    color: #fff;
+    box-shadow: 0 0 10px #f44336;
+    width: 100px;
+    transition: 0.8s;
+}
+
+#loader.error .loader-message {
+    opacity: 1;
+}
+
+.control-panel {
+    display: none;
 }
