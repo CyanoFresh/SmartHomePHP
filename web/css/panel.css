@@ -1,12 +1,3 @@
-body {
-    opacity: 0;
-    transition: 0.3s;
-}
-
-body.loaded {
-    opacity: 1;
-}
-
 /* Linear loader */
 .linear-loader {
     position: absolute;

@@ -1,3 +1,3 @@
 $(document).ready(function () {
-    $('.withripple, .btn').ripples();
+    $('.withripple, .btn, .navbar a').ripples();
 });

@@ -59,6 +59,7 @@ return [
             'timeZone' => 'Europe/Kiev',
         ],
         'assetManager' => [
+            'appendTimestamp' => true,
             'bundles' => [
                 'dmstr\web\AdminLteAsset' => [
 //                    'skin' => 'skin-purple',

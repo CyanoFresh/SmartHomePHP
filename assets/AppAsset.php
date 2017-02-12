@@ -22,5 +22,6 @@ class AppAsset extends AssetBundle
 //        'dmstr\web\AdminLteAsset',
         'shifrin\noty\NotyAsset',
         'app\assets\MDThemeAsset',
+        'app\assets\JSCookieAsset',
     ];
 }

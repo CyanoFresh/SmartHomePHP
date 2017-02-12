@@ -19,7 +19,8 @@
     "voskobovich/yii2-many-many-behavior": "^3.2",
     "kartik-v/yii2-widgets": "^3.4",
     "kartik-v/yii2-datecontrol": "^1.9",
-    "voskobovich/yii2-linker-behavior": "4.0.1-rc"
+    "voskobovich/yii2-linker-behavior": "4.0.1-rc",
+    "bower-asset/js-cookie": "^2.1"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "*",

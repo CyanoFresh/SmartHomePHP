@@ -20,14 +20,16 @@ use yii\helpers\Url;
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
+
+                <a href="#" class="navbar-toggle-drawer">
+                    <div class="navbar-toggle-drawer-icon">
+                        <span class="toggle-bar"></span>
+                        <span class="toggle-bar"></span>
+                        <span class="toggle-bar"></span>
+                    </div>
+                </a>
+
                 <a class="navbar-brand product-font" href="<?= Url::home() ?>"><span>Solomaha</span> Home</a>
-                <?php if (!empty($this->params['breadcrumbs'])): ?>
-                    <ul class="navbar-breadcrumbs hidden-xs">
-                        <?php foreach ($this->params['breadcrumbs'] as $breadcrumb): ?>
-                            <li><?= $breadcrumb ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php endif; ?>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -35,7 +37,7 @@ use yii\helpers\Url;
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown notifications-menu">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false"><i class="fa fa-bell-o"></i></a>
+                           aria-expanded="false"><i class="fa fa-bell"></i></a>
                         <ul class="dropdown-menu">
                             <li><a href="#">Action</a></li>
                             <li><a href="#">Another action</a></li>

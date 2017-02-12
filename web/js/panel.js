@@ -91,7 +91,6 @@ function itemSwitchOff(itemId) {
 }
 
 function itemSetValue(itemId, value) {
-    console.log(itemId, value);
     $('.panel-item-variable[data-item-id="' + itemId + '"] > .item-variable-value').html(value);
 }
 
@@ -151,9 +150,6 @@ function updateItemValue(id, type, value) {
 }
 
 $(document).ready(function () {
-
-    $('body').addClass('loaded');
-
     // Event listeners
     $('.panel-item-switch').click(function (e) {
         e.preventDefault();
