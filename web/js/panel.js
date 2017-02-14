@@ -15,11 +15,11 @@ initWebSocket(function () {
     WSConnectionOpened = true;
 
     $('#loader, .linear-loader').fadeOut(function () {
-        $('main').fadeIn();
+        $('.control-panel').fadeIn();
     });
 }, onMessage, function () {
     if (WSConnectionOpened) {
-        $('main').fadeOut(function () {
+        $('.control-panel').fadeOut(function () {
             $('#loader').fadeIn().addClass('error');
         });
     } else {

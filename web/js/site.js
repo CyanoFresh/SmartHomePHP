@@ -15,7 +15,7 @@ function showSuccessMessage(message) {
 $('.navbar-toggle-drawer').click(function (e) {
     e.preventDefault();
 
-    $('.drawer').toggleClass('visible');
+    $('body').toggleClass('drawer-open');
 
     return false;
 });

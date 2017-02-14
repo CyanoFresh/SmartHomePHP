@@ -7,7 +7,7 @@ use rmrevin\yii\fontawesome\FA;
 
 ?>
 
-<div class="col-lg-2 col-sm-4">
+<div class="col-lg-2 col-md-4 col-sm-6">
     <div class="panel-item panel-item-rgb withripple <?= $item->class ?>" data-item-id="<?= $item->id ?>">
         <div class="panel-item-rgb-icon">
             <?= FA::i($item->icon) ?>
@@ -15,5 +15,8 @@ use rmrevin\yii\fontawesome\FA;
         <div class="panel-item-rgb-name">
             <?= $item->name ?>
         </div>
+    </div>
+    <div class="hidden rgb-widget-popover">
+        Text here
     </div>
 </div>

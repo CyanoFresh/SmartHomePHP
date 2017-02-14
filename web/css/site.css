@@ -11,12 +11,6 @@
     font-style: italic;
 }
 
-@media (max-width: 767px) {
-    .content-header h1 {
-        font-size: 35px;
-    }
-}
-
 .select2-container--krajee .select2-selection--single {
     line-height: 2;
 }

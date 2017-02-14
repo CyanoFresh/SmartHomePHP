@@ -7,7 +7,7 @@ use rmrevin\yii\fontawesome\FA;
 
 ?>
 
-<div class="col-md-2 col-sm-3 col-xs-6">
+<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
     <div class="panel-item panel-item-variable bg-<?= $item->bg ?> withripple" data-item-id="<?= $item->id ?>">
         <div class="item-variable-icon">
             <?= FA::i($item->icon) ?>

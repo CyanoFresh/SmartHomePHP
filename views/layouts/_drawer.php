@@ -5,13 +5,20 @@
 use rmrevin\yii\fontawesome\FA;
 use yii\bootstrap\Nav;
 
-$drawerOpen = true;
-
-Yii::$app->request->cookies->has('drawer-hidden')
-
 ?>
 
 <aside id="drawer" class="drawer">
+    <div class="user-block">
+        <div class="user-avatar">
+            <img src="<?= Yii::$app->user->identity->getAvatar(40) ?>">
+        </div>
+        <div class="user-info">
+            <div class="user-info-name">
+                <?= Yii::$app->user->identity->username ?>
+            </div>
+        </div>
+        <div class="user-caret"><?= FA::i('chevron-down') ?></div>
+    </div>
     <?= Nav::widget([
         'items' => [
             [
