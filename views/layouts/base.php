@@ -4,9 +4,9 @@
 /* @var $content string */
 
 use app\assets\MDThemeAsset;
-use dmstr\web\AdminLteAsset;
 use yii\helpers\Html;
 use app\assets\AppAsset;
+use yii\helpers\Url;
 
 AppAsset::register($this);
 //AdminLteAsset::register($this);
@@ -27,6 +27,9 @@ MDThemeAsset::register($this);
 
     <meta name="application-name" content="<?= Yii::$app->name ?>">
     <meta name="theme-color" content="#009688">
+
+    <link rel="icon" type="image/png" href="<?= Url::home(true) ?>favicon.png">
+    <link rel="icon" type="image/x-icon" href="<?= Url::home(true) ?>favicon.ico">
 
     <link rel="publisher" href="https://plus.google.com/+AlexSolomaha21">
     <link rel="me" href="https://plus.google.com/+AlexSolomaha21" type="text/html">

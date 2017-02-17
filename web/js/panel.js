@@ -3,6 +3,8 @@ var wsURL;
 var WS;
 var WSConnectionOpened;
 
+var itemValues = {};
+
 function initWebSocket(onOpenCallback, onMessageCallback, onCloseCallback) {
     WS = new WebSocket(wsURL);
 
@@ -132,18 +134,19 @@ function updateItemValue(id, type, value) {
 
             break;
         case 30:    // RGB
+            itemValues[id] = value;
             // TODO
-            if (typeof value === 'string') {
-                $('.item-rgb[data-item-id="' + id + '"]')
-                    .find('.rgb-mode[data-mode="' + value + '"]')
-                    .addClass('active');
-            } else {
-                var $colorPicker = $('#colorpicker-' + id);
-
-                $colorPicker.spectrum('set', 'rgb(' + value[0] + ', ' + value[1] + ', ' + value[2] + ')');
-
-                $('.item-rgb .rgb-mode').removeClass('active');
-            }
+            // if (typeof value === 'string') {
+            //     $('.item-rgb[data-item-id="' + id + '"]')
+            //         .find('.rgb-mode[data-mode="' + value + '"]')
+            //         .addClass('active');
+            // } else {
+            //     var $colorPicker = $('#colorpicker-' + id);
+            //
+            //     $colorPicker.spectrum('set', 'rgb(' + value[0] + ', ' + value[1] + ', ' + value[2] + ')');
+            //
+            //     $('.item-rgb .rgb-mode').removeClass('active');
+            // }
 
             break;
     }
@@ -163,6 +166,62 @@ $(document).ready(function () {
         });
 
         return false;
+    });
+
+    $('.panel-item-variable').tooltip();
+
+    $('.panel-item-rgb').popover({
+        html: true,
+        placement: 'bottom',
+        trigger: 'click',
+        content: function () {
+            var source = $("#rgb-item-widget-popover-content").html();
+            var template = Handlebars.compile(source);
+
+            return template({
+                item_id: $(this).data('item-id')
+            });
+        }
+    }).on('inserted.bs.popover', function (e) {
+        var $colorPicker = $(this).parent().find('input').spectrum({
+            flat: true,
+            showInput: true,
+            showButtons: false,
+            preferredFormat: 'rgb',
+            dragstop: function (color) {
+                console.log($(this));
+                var item_id = $(this).data('item-id');
+                var red = Math.round(color._r);
+                var green = Math.round(color._g);
+                var blue = Math.round(color._b);
+                //
+                // var fade = ($('.fade-checkbox[data-item-id="' + item_id + '"]:checked').length > 0);
+                //
+                // send({
+                //     'type': 'rgb',
+                //     'item_id': item_id,
+                //     'fade': fade,
+                //     'red': red,
+                //     'green': green,
+                //     'blue': blue
+                // });
+                $('.panel-item-rgb[data-item-id="' + item_id + '"]').attr('style', 'background: rgb(' + red + ',' + green + ',' + blue + ')');
+            }
+        });
+
+        var item_id = $colorPicker.data('item-id');
+
+        if (Boolean(itemValues[item_id]) != false) {
+            $colorPicker.spectrum('set', itemValues[item_id]);
+        }
+
+        $colorPicker.on("dragstop.spectrum", function (e, color) {
+            var red = Math.round(color._r);
+            var green = Math.round(color._g);
+            var blue = Math.round(color._b);
+
+            $('.panel-item-rgb[data-item-id="' + $(this).data('item-id') + '"]').attr('style', 'background-color: rgb(' + red + ',' + green + ',' + blue + ')')
+        });
     });
 
     // TODO:

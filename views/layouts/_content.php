@@ -7,8 +7,8 @@ use yii\widgets\Breadcrumbs;
 
 ?>
 
-<main>
-    <div class="container">
+<main class="content">
+    <div class="container-fluid">
         <section class="content-header">
             <h1><?= Html::encode($this->title) ?></h1>
 
@@ -17,15 +17,15 @@ use yii\widgets\Breadcrumbs;
             ]) ?>
         </section>
 
-        <section class="content">
+        <section>
             <?= $content ?>
         </section>
+
+        <footer class="main-footer">
+            <span class="product-font">
+                <span>Solomaha</span> Home by <a href="https://solomaha.com" target="_blank">Alex Solomaha</a>
+            </span>
+        </footer>
+
     </div>
 </main>
-
-<footer class="main-footer">
-    <span class="product-font">
-        <span>Solomaha</span> Home by <a href="https://solomaha.com" target="_blank">Alex Solomaha</a>
-    </span>
-</footer>
-

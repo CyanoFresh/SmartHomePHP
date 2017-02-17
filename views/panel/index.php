@@ -70,3 +70,29 @@ $this->title = 'Панель Управления';
         </div>
     </div>
 </main>
+
+<script id="rgb-item-widget-popover-content" type="text/x-handlebars-template">
+    <ul class="nav nav-tabs nav-justified">
+        <li class="active">
+            <a href="#rgb-color" data-toggle="tab" aria-expanded="true">
+                Цвет
+            </a>
+        </li>
+        <li>
+            <a href="#rgb-mode" data-toggle="tab" aria-expanded="false">
+                Режим
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade in active" id="rgb-color">
+            <input type="text"
+                   id="colorpicker-{{item_id}}"
+                   class="rgb-colorpicker"
+                   data-item-id="{{item_id}}">
+        </div>
+        <div class="tab-pane fade" id="rgb-mode">
+            <p>Выберите режим</p>
+        </div>
+    </div>
+</script>

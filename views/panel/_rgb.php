@@ -16,7 +16,4 @@ use rmrevin\yii\fontawesome\FA;
             <?= $item->name ?>
         </div>
     </div>
-    <div class="hidden rgb-widget-popover">
-        Text here
-    </div>
 </div>

@@ -17,11 +17,12 @@ class AppAsset extends AssetBundle
     ];
     public $depends = [
         'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset',
+        'yii\bootstrap\BootstrapPluginAsset',
         'rmrevin\yii\fontawesome\AssetBundle',
 //        'dmstr\web\AdminLteAsset',
-        'shifrin\noty\NotyAsset',
+//        'shifrin\noty\NotyAsset',
         'app\assets\MDThemeAsset',
-        'app\assets\JSCookieAsset',
+//        'app\assets\JSCookieAsset',
+//        'app\assets\ChartjsAsset',
     ];
 }

@@ -20,7 +20,8 @@
     "kartik-v/yii2-widgets": "^3.4",
     "kartik-v/yii2-datecontrol": "^1.9",
     "voskobovich/yii2-linker-behavior": "4.0.1-rc",
-    "bower-asset/js-cookie": "^2.1"
+    "bower-asset/js-cookie": "^2.1",
+    "bower-asset/chart.js": ">=2.5"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "*",

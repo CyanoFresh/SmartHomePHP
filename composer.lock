@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1627a6b0056d96c8d2ba8573dd280894",
-    "content-hash": "9a05371bbaeb69fb2a58db60a6d72bb5",
+    "hash": "47716d6fa73b8f351afd27ba07ca61ea",
+    "content-hash": "510df4f657a11c48c1c48bbc30239f09",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -55,6 +55,37 @@
                 "responsive",
                 "web"
             ]
+        },
+        {
+            "name": "bower-asset/chart.js",
+            "version": "v2.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chartjs/Chart.js.git",
+                "reference": "c867d3f728d595eafc017f4d4136128824d1db25"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chartjs/Chart.js/zipball/c867d3f728d595eafc017f4d4136128824d1db25",
+                "reference": "c867d3f728d595eafc017f4d4136128824d1db25",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "./dist/Chart.js",
+                "bower-asset-ignore": [
+                    ".github",
+                    ".codeclimate.yml",
+                    ".gitignore",
+                    ".npmignore",
+                    ".travis.yml",
+                    "scripts"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Simple HTML5 charts using the canvas element."
         },
         {
             "name": "bower-asset/handlebars",

@@ -22,48 +22,56 @@ use yii\bootstrap\Nav;
     <?= Nav::widget([
         'items' => [
             [
-                'label' => FA::i('sliders') . 'Панель Управления',
+                'label' => FA::i('sliders fa-fw') . 'Панель Управления',
                 'url' => ['/panel/index'],
             ],
             [
-                'label' => FA::i('history') . 'История',
+                'label' => FA::i('history fa-fw') . 'История',
                 'url' => ['/history/index'],
             ],
             [
-                'label' => FA::i('user') . 'Профиль',
+                'label' => FA::i('user fa-fw') . 'Профиль',
                 'url' => ['/profile/index'],
             ],
             [
-                'label' => FA::i('cog') . 'Настройки',
+                'label' => FA::i('cog fa-fw') . 'Настройки',
                 'url' => ['/admin/setting/index'],
             ],
             [
-                'label' => FA::i('toggle-on') . 'Элементы',
-                'url' => ['/admin/setting/index'],
+                'label' => FA::i('toggle-on fa-fw') . 'Элементы',
+                'url' => ['/admin/item/index'],
             ],
             [
-                'label' => FA::i('hdd-o') . 'Устройства',
-                'url' => ['/admin/setting/index'],
+                'label' => FA::i('hdd-o fa-fw') . 'Устройства',
+                'url' => ['/admin/board/index'],
             ],
             [
-                'label' => FA::i('code-fork') . 'События',
-                'url' => ['/admin/setting/index'],
+                'label' => FA::i('code-fork fa-fw') . 'События',
+                'url' => ['/admin/event/index'],
             ],
             [
-                'label' => FA::i('feed') . 'Триггеры',
-                'url' => ['/admin/setting/index'],
+                'label' => FA::i('feed fa-fw') . 'Триггеры',
+                'url' => ['/admin/trigger/index'],
             ],
             [
-                'label' => FA::i('check') . 'Задачи',
-                'url' => ['/admin/setting/index'],
+                'label' => FA::i('check fa-fw') . 'Задачи',
+                'url' => ['/admin/task/index'],
             ],
             [
-                'label' => FA::i('folder-open') . 'Комнаты',
-                'url' => ['/admin/setting/index'],
+                'label' => FA::i('folder-open fa-fw') . 'Комнаты',
+                'url' => ['/admin/room/index'],
             ],
             [
-                'label' => FA::i('users') . 'Пользователи',
-                'url' => ['/admin/setting/index'],
+                'label' => FA::i('users fa-fw') . 'Пользователи',
+                'url' => ['/admin/user/index'],
+            ],
+            '<li class="divider"></li>',
+            [
+                'label' => FA::i('sign-out fa-fw') . 'Выйти',
+                'url' => ['/auth/logout'],
+                'linkOptions' => [
+                    'data-method' => 'post',
+                ],
             ],
         ],
         'encodeLabels' => false,
