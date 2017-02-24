@@ -10,8 +10,6 @@ use app\models\LoginForm;
 
 class AuthController extends Controller
 {
-    public $layout = 'base';
-
     public function behaviors()
     {
         return [
@@ -41,13 +39,13 @@ class AuthController extends Controller
             return $this->goHome();
         }
 
-        $this->layout = 'base';
-
         $model = new LoginForm();
 
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         }
+
+        $this->layout = 'base';
 
         return $this->render('login', [
             'model' => $model,

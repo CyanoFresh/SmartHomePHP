@@ -11,10 +11,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="setting-index">
 
-    <h1 class="page-header">
-        <?= $this->title ?>
-    </h1>
-
     <form action="<?= Url::to(['save']) ?>" method="post">
         <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>">
 

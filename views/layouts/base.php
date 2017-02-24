@@ -9,9 +9,9 @@ use app\assets\AppAsset;
 use yii\helpers\Url;
 
 AppAsset::register($this);
-//AdminLteAsset::register($this);
 MDThemeAsset::register($this);
 
+$bodyClass = isset($this->params['bodyClass']) ? $this->params['bodyClass'] : '';
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -39,7 +39,7 @@ MDThemeAsset::register($this);
     <?php $this->head() ?>
 </head>
 
-<body>
+<body class="<?= $bodyClass ?>">
 <?php $this->beginBody() ?>
 
 <?= $content ?>

@@ -8,7 +8,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
 $this->title = 'Авторизация';
-$this->params['body-class'] = 'login-page';
+$this->params['bodyClass'] = 'login-body';
 
 $fieldOptions1 = [
     'options' => ['class' => 'form-group has-feedback'],
@@ -21,37 +21,37 @@ $fieldOptions2 = [
 ];
 ?>
 
-<div class="login-box">
-    <div class="login-box-body">
+<div class="container login-container">
+    <div class="row">
+        <div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
+            <div class="card">
+                <div class="login-logo product-font">
+                    <span>Solomaha</span> Home
+                </div>
 
-        <div class="login-logo product-font">
-            <span>Solomaha</span> Home
-        </div>
+                <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientValidation' => false]); ?>
 
-<!--        <hr>-->
+                <?= $form
+                    ->field($model, 'username', $fieldOptions1)
+                    ->label(false)
+                    ->textInput(['placeholder' => $model->getAttributeLabel('username')]) ?>
 
-        <?php $form = ActiveForm::begin(['id' => 'login-form', 'enableClientValidation' => false]); ?>
+                <?= $form
+                    ->field($model, 'password', $fieldOptions2)
+                    ->label(false)
+                    ->passwordInput(['placeholder' => $model->getAttributeLabel('password')]) ?>
 
-        <?= $form
-            ->field($model, 'username', $fieldOptions1)
-            ->label(false)
-            ->textInput(['placeholder' => $model->getAttributeLabel('username')]) ?>
+                <div class="row">
+                    <div class="col-xs-8">
+                        <?= $form->field($model, 'rememberMe')->checkbox() ?>
+                    </div>
+                    <div class="col-xs-4">
+                        <?= Html::submitButton('Войти', ['class' => 'btn btn-primary btn-block btn-flat', 'name' => 'login-button']) ?>
+                    </div>
+                </div>
 
-        <?= $form
-            ->field($model, 'password', $fieldOptions2)
-            ->label(false)
-            ->passwordInput(['placeholder' => $model->getAttributeLabel('password')]) ?>
-
-        <div class="row">
-            <div class="col-xs-8">
-                <?= $form->field($model, 'rememberMe')->checkbox() ?>
+                <?php ActiveForm::end(); ?>
             </div>
-            <div class="col-xs-4">
-                <?= Html::submitButton('Войти', ['class' => 'btn btn-primary btn-block btn-flat', 'name' => 'login-button']) ?>
-            </div>
         </div>
-
-        <?php ActiveForm::end(); ?>
-
     </div>
 </div>

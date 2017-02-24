@@ -388,3 +388,65 @@ body {
         width: 10%;
     }
 }
+
+/* Login page */
+.login-logo {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.login-container .card {
+    margin-top: calc(50vh - 140px);
+}
+
+body.login-body {
+    background: url("../img/login-bg.jpg");
+    background-size: cover;
+    /*background-position: center center;*/
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+@media only screen and (max-width: 767px) {
+    body.login-body {
+        background-image: url("../img/login-bg-small.jpg");
+    }
+}
+
+/* Error page */
+.error-page-logo {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.error-page-logo a {
+    color: #666666;
+    font-size: 40px;
+    transition: 0.5s;
+}
+
+.error-page-logo a:hover,
+.error-page-logo a:active,
+.error-page-logo a:focus {
+    color: #444444;
+    text-decoration: none;
+}
+
+/* Data Table */
+.material-table > thead > tr > th {
+    padding: 16px;
+}
+
+.material-table thead a {
+    color: #666;
+}
+
+.material-table thead a:hover,.material-table thead a:active {
+    color: #373737;
+    text-decoration: none;
+}
+
+.material-table > tbody > tr > td {
+    padding: 12px;
+}

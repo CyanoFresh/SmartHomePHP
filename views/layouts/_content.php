@@ -17,15 +17,8 @@ use yii\widgets\Breadcrumbs;
             ]) ?>
         </section>
 
-        <section>
+        <section class="card">
             <?= $content ?>
         </section>
-
-        <footer class="main-footer">
-            <span class="product-font">
-                <span>Solomaha</span> Home by <a href="https://solomaha.com" target="_blank">Alex Solomaha</a>
-            </span>
-        </footer>
-
     </div>
 </main>
