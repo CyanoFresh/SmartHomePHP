@@ -44,8 +44,18 @@ class Item extends ActiveRecord
     const VALUE_ON = 1;
     const VALUE_OFF = 0;
 
+    /**
+     * @deprecated
+     */
     const MODE_RAINBOW = 'rainbow';
+    /**
+     * @deprecated
+     */
     const MODE_BREATH = 'breath';
+
+    const RGB_MODE_STATIC = 'static';
+    const RGB_MODE_WAVE = 'wave';
+    const RGB_MODE_FADE = 'fade';
 
     /**
      * Used for WS handler
@@ -213,42 +223,28 @@ class Item extends ActiveRecord
     /**
      * @return array
      */
-    public static function getModesArray()
+    public static function getRGBModesArray()
     {
         return [
-            self::MODE_RAINBOW,
-            self::MODE_BREATH,
+            self::RGB_MODE_STATIC,
+            self::RGB_MODE_WAVE,
+            self::RGB_MODE_FADE,
         ];
     }
 
-    /**
-     * Returns normalized default value
-     * @return mixed
-     */
-    public function getDefaultValue()
+    public function getDefaultNAValue()
     {
-        if (!is_null($this->default_value)) {
-            return $this->default_value;
-        }
-
         switch ($this->type) {
-            case Item::TYPE_SWITCH:
-            case Item::TYPE_VARIABLE_BOOLEAN:
-            case Item::TYPE_VARIABLE_BOOLEAN_DOOR:
-                return false;
-
-            case Item::TYPE_VARIABLE_TEMPERATURE:
-            case Item::TYPE_VARIABLE_HUMIDITY:
-                return 0;
-
-            case Item::TYPE_RGB:
+            case self::TYPE_RGB:
                 return [
-                    0,
-                    0,
-                    0,
+                    'mode' => 'static',
+                    'red' => 0,
+                    'green' => 0,
+                    'blue' => 0,
+                    'fade_time' => Yii::$app->params['items']['rgb']['fade-time'],
                 ];
+            default:
+                return 'N/A';
         }
-
-        return false;
     }
 }

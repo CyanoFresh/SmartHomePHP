@@ -14,6 +14,6 @@ use rmrevin\yii\fontawesome\FA;
         <div class="item-variable-icon">
             <?= FA::i($item->icon) ?>
         </div>
-        <div class="item-variable-value item-value"><?= $item->getDefaultValue() ?></div>
+        <div class="item-variable-value item-value"><?= $item->getDefaultNAValue() ?></div>
     </div>
 </div>

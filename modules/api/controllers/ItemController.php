@@ -189,7 +189,7 @@ class ItemController extends Controller
             throw new BadRequestHttpException('This item is not the RGB one');
         }
 
-        if (!in_array($mode, Item::getModesArray())) {
+        if (!in_array($mode, Item::getRGBModesArray())) {
             throw new InvalidParamException('Unknown mode');
         }
 

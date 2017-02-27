@@ -21,5 +21,6 @@ class MDThemeAsset extends AssetBundle
         'yii\web\JqueryAsset',
         'yii\bootstrap\BootstrapPluginAsset',
         'app\assets\SnackbarjsAsset',
+        'app\assets\SpectrumAsset',
     ];
 }

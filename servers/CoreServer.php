@@ -3,6 +3,7 @@
 namespace app\servers;
 
 use app\helpers\IPHelper;
+use app\helpers\RGBHelper;
 use app\models\Board;
 use app\models\Event;
 use app\models\Setting;
@@ -11,15 +12,18 @@ use app\models\Trigger;
 use app\models\History;
 use app\models\Item;
 use app\models\User;
-use MongoDB\Driver\Exception\AuthenticationException;
+use Guzzle\Http\QueryString;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
+use Ratchet\WebSocket\Version\RFC6455\Connection;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
@@ -40,13 +44,13 @@ class CoreServer implements MessageComponentInterface
      * All connected users
      * @var ConnectionInterface[]
      */
-    protected $user_clients;
+    protected $userConnections;
 
     /**
      * All connected boards
      * @var ConnectionInterface[]
      */
-    protected $board_clients;
+    protected $boardConnections;
 
     /**
      * Format like this:
@@ -55,19 +59,19 @@ class CoreServer implements MessageComponentInterface
      *
      * @var array
      */
-    protected $item_values;
+    protected $itemValues;
 
     /**
      * `item_id` => TimerInterface
      * @var TimerInterface[]
      */
-    protected $connectionCheckTimers;
+    protected $pingTimers;
 
     /**
      * `item_id` => iteration count
      * @var array
      */
-    protected $connectionCheckIteration;
+    protected $pingCount;
 
     /**
      * @var TimerInterface[]
@@ -85,11 +89,11 @@ class CoreServer implements MessageComponentInterface
     {
         // Init variables
         $this->loop = $loop;
-        $this->user_clients = [];
-        $this->board_clients = [];
-        $this->item_values = [];
-        $this->connectionCheckTimers = [];
-        $this->connectionCheckIteration = [];
+        $this->userConnections = [];
+        $this->boardConnections = [];
+        $this->itemValues = [];
+        $this->pingTimers = [];
+        $this->pingCount = [];
         $this->triggerTimers = [];
 
         // Database driver hack: Prevent MySQL for disconnecting by timeout
@@ -98,168 +102,40 @@ class CoreServer implements MessageComponentInterface
             Yii::$app->db->createCommand('SHOW TABLES;')->execute();
         });
 
-        $this->updateItems();
-
+        // Do the startup tasks
+//        $this->updateItems();
         $this->scheduleTriggers();
 
         $this->log('Server started');
     }
 
+    /**
+     * @inheritdoc
+     */
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->log('Managing new connection...');
+        /** @var Connection $conn */
 
+        /** @var QueryString $query */
         $query = $conn->WebSocket->request->getQuery();
 
         $type = $query->get('type');
 
         switch ($type) {
             case 'user':
-                $this->log('Connection type is User. Authenticating...');
-
-                $userID = $query->get('id');
-                $userAuthToken = $query->get('auth_token');
-
-                if (!$userID or !$userAuthToken) {
-                    $this->log("Invalid credentials: '$userID', '$userAuthToken'");
-
-                    throw new InvalidParamException("Required fields does not exist");
-                }
-
-                $user = User::findOne([
-                    'id' => $userID,
-                ]);
-
-                if (!$user) {
-                    $this->log("User was not found with id '$userID'");
-
-                    throw new NotFoundHttpException("User was not found with id '$userID'");
-                }
-
-                if ($user->getAuthToken() != $userAuthToken) {
-                    $this->log("User [$user->id] wrong auth token ($userAuthToken and {$user->getAuthToken()})");
-
-                    throw new AuthenticationException("Wrong credentials");
-                }
-
-                // API request
-                $api = false;
-
-                if ($conn->remoteAddress == '127.0.0.1' and $conn->WebSocket->request->getHeader('Origin') == 'origin') {
-                    $api = true;
-                }
-
-                // Close previous connection if it is not an API connection
-                if (isset($this->user_clients[$user->id]) and !$api) {
-                    $this->user_clients[$user->id]->close();
-                }
-
-                // Regenerate auth key
-                $user->reGenerateAuthToken();
-
-                // Attach to users
-                $conn->User = $user;
-                $conn->api = $api;
-                $this->user_clients[$user->id] = $conn;
-
-                // Prepare Items for User
-                $items = Item::find()
-                    ->active()
-                    ->select(['id', 'type', 'room_id', 'board_id', 'default_value'])
-                    ->asArray()
-                    ->all();
-
-                for ($i = 0; $i < count($items); $i++) {
-                    $items[$i]['value'] = $this->getItemSavedValue($items[$i]['id'], $items[$i]['default_value']);
-                }
-
-                $conn->send(Json::encode([
-                    'type' => 'init',
-                    'items' => $items,
-                ]));
-
-                $this->logUserConnection($user, true);
-
-                return $this->log("Connected user [{$user->id}] {$user->username}");
+                $this->handleUserConnection($conn, $query);
+                break;
             case 'board':
-                $this->log('Connection type is Board. Authenticating...');
-
-                $boardID = $query->get('id');
-                $boardSecret = $query->get('secret');
-
-                if (!$boardID or !$boardSecret) {
-                    $this->log("Wrong login data: '$boardID' and '$boardSecret'");
-
-                    throw new UnauthorizedHttpException('Wrong credentials');
-                }
-
-                $board = Board::findOne([
-                    'id' => $boardID,
-                    'type' => Board::TYPE_WEBSOCKET,
-                    'secret' => $boardSecret,
-                ]);
-
-                if (!$board) {
-                    $this->log("Board [$boardID] not found!");
-
-                    throw new NotFoundHttpException("Board with given ID does not exists");
-                }
-
-                if (!$board->remote_connection and !IPHelper::isLocal($conn->remoteAddress)) {
-                    $this->log("Remote connection blocked for board [$boardID]; IP: {$conn->remoteAddress}");
-
-                    throw new ForbiddenHttpException("Remote connection is not allowed for this Board");
-                }
-
-                // Attach to boards
-                $conn->Board = $board;
-                $this->board_clients[$board->id] = $conn;
-
-                // Reset previous timer and start a new one
-                $this->startConnectionCheckTimer($boardID, true);
-
-                // Set default values to board's items
-                foreach ($board->items as $item) {
-                    if ($item->default_value and !is_null($item->default_value)) {
-                        switch ($item->type) {
-                            case Item::TYPE_SWITCH:
-                                $this->sendToBoard($board->id, [
-                                    'type' => $item->default_value == 1 ? 'turnON' : 'turnOFF',
-                                    'pin' => $item->pin,
-                                ]);
-
-                                break;
-                            case Item::TYPE_RGB:
-                                $rgbData = $this->valueToRgbData($item->default_value);
-
-                                $red = $rgbData[0];
-                                $green = $rgbData[1];
-                                $blue = $rgbData[2];
-                                $fade = (bool)$rgbData[3];
-
-                                $this->sendToBoard($board->id, [
-                                    'type' => 'rgb',
-                                    'red' => $red * 4,
-                                    'green' => $green * 4,
-                                    'blue' => $blue * 4,
-                                    'fade' => $fade,
-                                ]);
-
-                                break;
-                        }
-                    }
-                }
-
-                $this->triggerBoardConnection($board, true);
-
-                $this->logBoardConnection($board->id, true);
-
-                return $this->log("Connected board [{$board->id}]");
+                $this->handleBoardConnection($conn, $query);
+                break;
+            default:
+                throw new BadRequestHttpException('Unknown device type');
         }
-
-        return $this->log('Connection has unknown type. Disconnect');
     }
 
+    /**
+     * @inheritdoc
+     */
     public function onMessage(ConnectionInterface $from, $msg)
     {
         if (isset($from->User)) {
@@ -275,6 +151,9 @@ class CoreServer implements MessageComponentInterface
         return $this->log("Message: '$msg' from unknown client");
     }
 
+    /**
+     * @inheritdoc
+     */
     public function onClose(ConnectionInterface $conn)
     {
         if (isset($conn->User)) {
@@ -284,12 +163,10 @@ class CoreServer implements MessageComponentInterface
         } elseif (isset($conn->Board)) {
             $boardId = $conn->Board->id;
 
-            $this->log("Disconnecting Board [{$boardId}]...");
-
             // Cancel connection check timer
-            $this->stopConnectionCheckTimer($boardId);
+            $this->stopPingTimer($boardId);
 
-            unset($this->board_clients[$boardId]);
+            unset($this->boardConnections[$boardId]);
 
             $this->triggerBoardConnection($conn->Board, false);
 
@@ -299,12 +176,169 @@ class CoreServer implements MessageComponentInterface
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
         $this->log("Error: {$e->getMessage()} in file {$e->getFile()} at line {$e->getLine()}");
 
         // Close connection
         $conn->close();
+    }
+
+    /**
+     * @param Connection $conn
+     * @param QueryString $query
+     * @throws UnauthorizedHttpException
+     */
+    protected function handleUserConnection($conn, $query)
+    {
+        $userID = $query->get('id');
+        $userAuthToken = $query->get('auth_token');
+
+        $user = User::findOne([
+            'id' => $userID,
+            'auth_token' => $userAuthToken,
+        ]);
+
+        if (!$user) {
+            $this->log("Wrong credentials: '$userID', '$userAuthToken''");
+
+            throw new UnauthorizedHttpException("Wrong credentials");
+        }
+
+        // Check if it is an API request
+        $api = $conn->remoteAddress == '127.0.0.1' and $conn->WebSocket->request->getHeader('Origin') == 'origin';
+
+        // Close previous connection if it is not an API connection
+        if (isset($this->userConnections[$user->id]) and !$api) {
+            $this->userConnections[$user->id]->close();
+        }
+
+        // Regenerate auth token
+        $user->reGenerateAuthToken();
+
+        // Attach to users
+        $conn->User = $user;
+        $conn->api = $api;
+
+        $this->userConnections[$user->id] = $conn;
+
+        // Prepare Items for User
+        $itemModels = Item::find()
+            ->active()
+            ->all();
+
+        $items = [];
+
+        foreach ($itemModels as $itemModel) {
+            $itemData = [];
+            $itemData['id'] = $itemModel->id;
+            $itemData['type'] = $itemModel->type;
+            $itemData['room_id'] = $itemModel->room_id;
+            $itemData['board_id'] = $itemModel->board_id;
+            $itemData['pin'] = $itemModel->pin;
+            $itemData['name'] = $itemModel->name;
+            $itemData['icon'] = $itemModel->icon;
+            $itemData['bg'] = $itemModel->bg;
+            $itemData['class'] = $itemModel->class;
+            $itemData['sort_order'] = $itemModel->sort_order;
+
+            $itemData['value'] = $this->getItemSavedValue($itemModel->id, $itemModel->getDefaultNAValue());
+
+            $items[$itemModel->id] = $itemData;
+        }
+
+        $conn->send(Json::encode([
+            'type' => 'init',
+            'items' => $items,
+        ]));
+
+        $this->logUserConnection($user, true);
+
+        $this->log("Connected user [{$user->id}] {$user->username}");
+    }
+
+    /**
+     * @param ConnectionInterface $conn
+     * @param QueryString $query
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     * @throws UnauthorizedHttpException
+     */
+    protected function handleBoardConnection(ConnectionInterface $conn, $query)
+    {
+        $boardID = $query->get('id');
+        $boardSecret = $query->get('secret');
+
+        if (!$boardID or !$boardSecret) {
+            $this->log("Wrong board login data: '$boardID' and '$boardSecret'");
+
+            throw new UnauthorizedHttpException('Wrong credentials');
+        }
+
+        $board = Board::findOne([
+            'id' => $boardID,
+            'type' => Board::TYPE_WEBSOCKET,
+            'secret' => $boardSecret,
+        ]);
+
+        if (!$board) {
+            $this->log("Board [$boardID] not found!");
+
+            throw new NotFoundHttpException("Board with given ID does not exists");
+        }
+
+        if (!$board->remote_connection and !IPHelper::isLocal($conn->remoteAddress)) {
+            $this->log("Remote connection blocked for board [$boardID]; IP: {$conn->remoteAddress}");
+
+            throw new ForbiddenHttpException("Remote connection is not allowed for this Board");
+        }
+
+        // Attach to boards
+        $conn->Board = $board;
+        $this->boardConnections[$board->id] = $conn;
+
+        // Reset previous timer and start a new one
+        $this->startPingTimer($boardID, true);
+
+        // Set default values to board's items
+//        foreach ($board->items as $item) {
+//            if ($item->default_value and !is_null($item->default_value)) {
+//                switch ($item->type) {
+//                    case Item::TYPE_SWITCH:
+//                        $this->sendToBoard($board->id, [
+//                            'type' => $item->default_value == 1 ? 'turnON' : 'turnOFF',
+//                            'pin' => $item->pin,
+//                        ]);
+//
+//                        break;
+//                    case Item::TYPE_RGB:
+//                        $rgbData = $this->valueToRgbData($item->default_value);
+//
+//                        $red = $rgbData[0];
+//                        $green = $rgbData[1];
+//                        $blue = $rgbData[2];
+//                        $fade = (bool)$rgbData[3];
+//
+//                        $this->sendToBoard($board->id, [
+//                            'type' => 'rgb',
+//                            'red' => $red * 4,
+//                            'green' => $green * 4,
+//                            'blue' => $blue * 4,
+//                            'fade' => $fade,
+//                        ]);
+//
+//                        break;
+//                }
+//            }
+//        }
+
+        $this->triggerBoardConnection($board, true);
+        $this->logBoardConnection($board->id, true);
+
+        $this->log("Connected board [{$board->id}]");
     }
 
     /**
@@ -328,8 +362,6 @@ class CoreServer implements MessageComponentInterface
                 return $this->handleTurnOff($from, $user, $data);
             case 'rgb':
                 return $this->handleRgb($from, $user, $data);
-            case 'rgbMode':
-                return $this->handleRgbMode($from, $user, $data);
             case 'schedule-triggers':
                 return $this->scheduleTriggers();
             case 'update-items':
@@ -345,6 +377,7 @@ class CoreServer implements MessageComponentInterface
      * @param $from
      * @param $msg
      * @return bool
+     * @throws NotFoundHttpException
      */
     public function handleBoardMessage($from, $msg)
     {
@@ -352,8 +385,8 @@ class CoreServer implements MessageComponentInterface
         $board = $from->Board;
         $data = Json::decode($msg);
 
-        // Board responds: restart connection check timer
-        $this->startConnectionCheckTimer($board->id);
+        // Restart ping timer
+        $this->startPingTimer($board->id);
 
         switch ($data['type']) {
             case 'value':
@@ -385,42 +418,67 @@ class CoreServer implements MessageComponentInterface
                 $this->logItemValue($item, $value);
 
                 break;
-            case 'rgbMode':
-                /**
-                 * Message structure:
-                 * {"start":true,"type":"rgbMode","mode":"rainbow","pin":1}
-                 */
-                $value = $data['mode'];
-                $pin = (integer)$data['pin'];
-                $start = (bool)$data['start'];
+            case 'rgb':
+                $itemId = (integer)$data['item_id'];
+                $mode = $data['mode'];
+                $fadeTime = (int)$data['fade_time'];
 
                 $item = Item::findOne([
+                    'id' => $itemId,
                     'board_id' => $board->id,
-                    'pin' => $pin,
                 ]);
 
                 if (!$item) {
-                    return $this->log('Trying to use unknown item');
+                    $this->log("Board [{$board->id}] tried to use unknown item");
+                    throw new NotFoundHttpException('Item does not exist');
                 }
 
-                if ($start) {
-                    $value = $this->saveItemValue($item->id, $value, $item->type, false);
-                } else {
-                    $value = $this->saveItemValue($item->id, $item->getDefaultValue(), $item->type);
+                if (!in_array($mode, Item::getRGBModesArray())) {
+                    $this->log("Board [{$board->id}] tried to use unknown RGB mode");
+                    throw new InvalidParamException('Unknown RGB mode');
                 }
 
-                // TODO: trigger
+                if ($fadeTime < 0) {
+                    $fadeTime = 0;
+                }
 
-                $this->sendUsers([
-                    'type' => 'value',
+                $commonParameters = [
+                    'type' => 'rgb',
                     'item_id' => $item->id,
-                    'item_type' => $item->type,
-                    'value' => $value,
-                    'start' => $start,
-                ]);
+                    'mode' => $mode,
+                    'fade_time' => $fadeTime,
+                ];
 
-                // Save to history
-                $this->logItemValue($item, $start ? 'start:' : '' . $value);
+                $modeParameters = [];
+
+                if ($mode === Item::RGB_MODE_STATIC or $mode === Item::RGB_MODE_FADE) {
+                    // Fill saved values if not provided
+                    $red = isset($data['red']) ? $data['red'] : Yii::$app->params['items']['rgb']['red'];
+                    $green = isset($data['green']) ? $data['green'] : Yii::$app->params['items']['rgb']['green'];
+                    $blue = isset($data['blue']) ? $data['blue'] : Yii::$app->params['items']['rgb']['blue'];
+
+                    // Convert color from 1023 to 255
+                    $red = RGBHelper::from10to8($red);
+                    $green = RGBHelper::from10to8($green);
+                    $blue = RGBHelper::from10to8($blue);
+
+                    $modeParameters['red'] = $red;
+                    $modeParameters['green'] = $green;
+                    $modeParameters['blue'] = $blue;
+                }
+
+                if ($mode === Item::RGB_MODE_WAVE or $mode === Item::RGB_MODE_FADE) {
+                    $colorTime = isset($data['color_time']) ? $data['color_time'] : Yii::$app->params['items']['rgb']['color-time'];
+
+                    $modeParameters['color_time'] = $colorTime;
+                }
+
+                $parameters = ArrayHelper::merge($commonParameters, $modeParameters);
+
+                $this->sendUsers($parameters);
+
+                $this->logItemValue($item, serialize($parameters));
+                $this->saveItemValue($item->id, $parameters, $item->type);
 
                 break;
             case 'values':
@@ -600,107 +658,65 @@ class CoreServer implements MessageComponentInterface
             ]);
         }
 
-        $red = $data['red'];
-        $green = $data['green'];
-        $blue = $data['blue'];
-
-        if ($red > 255) {
-            $red = 255;
-        }
-
-        if ($green > 255) {
-            $green = 255;
-        }
-
-        if ($blue > 255) {
-            $blue = 255;
-        }
-
-        $board = $item->board;
-
-        switch ($board->type) {
-            case Board::TYPE_AREST:
-                throw new NotSupportedException();
-
-            case Board::TYPE_WEBSOCKET:
-                if (!$this->isBoardConnected($board->id)) {
-                    return $from->send(Json::encode([
-                        'type' => 'error',
-                        'message' => 'Устройство не подключено',
-                    ]));
-                }
-
-                $fade = isset($data['fade']) ? (bool)$data['fade'] : false;
-
-                $this->sendToBoard($board->id, [
-                    'type' => 'rgb',
-                    'red' => $red * 4,
-                    'green' => $green * 4,
-                    'blue' => $blue * 4,
-                    'fade' => $fade,
-                ]);
-
-                break;
-        }
-
-//        $rgbArray = [
-//            $red,
-//            $green,
-//            $blue
-//        ];
-
-//        $this->item_values[$item->id]['value'] = $rgbArray;
-
-        $history = new History();
-        $history->type = History::TYPE_USER_ACTION;
-        $history->user_id = $user->id;
-        $history->item_id = $item->id;
-        $history->commited_at = time();
-        $history->value = $red . ',' . $green . ',' . $blue;
-
-        if (!$history->save()) {
-            $this->log("Cannot log: ");
-            var_dump($history->errors);
-        }
-
-        return true;
-    }
-
-    /**
-     * @param ConnectionInterface $from
-     * @param User $user
-     * @param array $data
-     * @return bool|mixed
-     * @throws NotSupportedException
-     */
-    protected function handleRgbMode($from, $user, $data)
-    {
-        $item_id = (int)$data['item_id'];
-        $item = Item::findOne($item_id);
-
-        if (!$item) {
-            return $from->send(Json::encode([
-                'type' => 'error',
-                'message' => 'Такое устройство не существует',
-            ]));
-        }
-
-        if ($item->type !== Item::TYPE_RGB) {
-            return $from->send(Json::encode([
-                'type' => 'error',
-                'message' => 'Данный тип устройства не является RGB',
-            ]));
-        }
-
         $mode = $data['mode'];
-        $start = (bool)$data['start'];
+        $fadeTime = isset($data['fade_time']) ? $data['fade_time'] : Yii::$app->params['items']['rgb']['fade-time'];
 
-        if (!in_array($mode, Item::getModesArray())) {
-            return $from->send(Json::encode([
-                'type' => 'error',
-                'message' => 'Неизвестный режим',
-            ]));
+        if (!in_array($mode, Item::getRGBModesArray())) {
+            throw new InvalidParamException('Unknown RGB mode');
         }
+
+        if ($fadeTime < 0) {
+            $fadeTime = 0;
+        }
+
+        $commonParameters = [
+            'type' => 'rgb',
+            'item_id' => $item->id,
+            'mode' => $mode,
+            'fade_time' => $fadeTime,
+        ];
+
+        $modeParameters = [];
+
+        if ($mode === Item::RGB_MODE_STATIC or $mode === Item::RGB_MODE_FADE) {
+            // Fill saved values if not provided
+            $red = isset($data['red']) ? $data['red'] : Yii::$app->params['items']['rgb']['red'];
+            $green = isset($data['green']) ? $data['green'] : Yii::$app->params['items']['rgb']['green'];
+            $blue = isset($data['blue']) ? $data['blue'] : Yii::$app->params['items']['rgb']['blue'];
+
+            // Convert color from 255 to 1023
+            if ($red > 255) {
+                $red = 255;
+            }
+
+            if ($green > 255) {
+                $green = 255;
+            }
+
+            if ($blue > 255) {
+                $blue = 255;
+            }
+
+            $red = RGBHelper::from8to10($red);
+            $green = RGBHelper::from8to10($green);
+            $blue = RGBHelper::from8to10($blue);
+
+            $modeParameters['red'] = $red;
+            $modeParameters['green'] = $green;
+            $modeParameters['blue'] = $blue;
+        }
+
+        if ($mode === Item::RGB_MODE_WAVE or $mode === Item::RGB_MODE_FADE) {
+            $colorTime = isset($data['color_time']) ? $data['color_time'] : Yii::$app->params['items']['rgb']['color-time'];
+
+            if ($colorTime < 0) {
+                $colorTime = 0;
+            }
+
+            $modeParameters['color_time'] = $colorTime;
+        }
+
+        $parameters = ArrayHelper::merge($commonParameters, $modeParameters);
 
         $board = $item->board;
 
@@ -716,11 +732,7 @@ class CoreServer implements MessageComponentInterface
                     ]));
                 }
 
-                $this->sendToBoard($board->id, [
-                    'type' => 'rgbMode',
-                    'mode' => $mode,
-                    'action' => $start ? 'start' : 'stop',
-                ]);
+                $this->sendToBoard($board->id, $parameters);
 
                 break;
         }
@@ -730,10 +742,10 @@ class CoreServer implements MessageComponentInterface
         $history->user_id = $user->id;
         $history->item_id = $item->id;
         $history->commited_at = time();
-        $history->value = $mode . ', ' . $start ? 'start' : 'stop';
+        $history->value = serialize($parameters);
 
         if (!$history->save()) {
-            $this->log("Cannot log: ");
+            $this->log("Cannot log:");
             var_dump($history->errors);
         }
 
@@ -792,7 +804,7 @@ class CoreServer implements MessageComponentInterface
     {
         $msg = Json::encode($data);
 
-        foreach ($this->user_clients as $client) {
+        foreach ($this->userConnections as $client) {
             $client->send($msg);
         }
     }
@@ -802,24 +814,21 @@ class CoreServer implements MessageComponentInterface
      *
      * @param integer $board_id
      * @param array $data
-     * @return bool|ConnectionInterface
      */
     protected function sendToBoard($board_id, $data)
     {
-        if (isset($this->board_clients[$board_id])) {
+        if (isset($this->boardConnections[$board_id])) {
             /** @var ConnectionInterface $client */
-            $client = $this->board_clients[$board_id];
+            $client = $this->boardConnections[$board_id];
 
             $msg = Json::encode($data);
 
             $this->log("Sending to board [$board_id]: $msg");
 
-            return $client->send($msg);
+            $client->send($msg);
+        } else {
+            $this->log("Cannot send to board [$board_id]: not connected");
         }
-
-        $this->log("Cannot send to board [$board_id]: not connected");
-
-        return false;
     }
 
     /**
@@ -852,7 +861,7 @@ class CoreServer implements MessageComponentInterface
      */
     protected function isBoardConnected($boardID)
     {
-        return isset($this->board_clients[$boardID]);
+        return isset($this->boardConnections[$boardID]);
     }
 
     /**
@@ -973,7 +982,7 @@ class CoreServer implements MessageComponentInterface
         $this->log("Connection check for Board [$boardID]...");
 
         // Check if it is already disconnected
-        if (!isset($this->board_clients[$boardID])) {
+        if (!isset($this->boardConnections[$boardID])) {
             $this->logBoardConnection($boardID, false);
 
             $this->log("Board [$boardID] has already been disconnected");
@@ -981,18 +990,18 @@ class CoreServer implements MessageComponentInterface
             return;
         }
 
-        if (isset($this->connectionCheckIteration[$boardID])) {
-            if ($this->connectionCheckIteration[$boardID] >= Yii::$app->params['server']['connectionCheckMaxIteration']) {
+        if (isset($this->pingCount[$boardID])) {
+            if ($this->pingCount[$boardID] >= Yii::$app->params['server']['connectionCheckMaxIteration']) {
                 $this->log("Maximum ignored ping commands reached. Disconnecting...");
 
-                $this->board_clients[$boardID]->close();
+                $this->boardConnections[$boardID]->close();
 
                 return;
             }
 
-            $this->connectionCheckIteration[$boardID]++;
+            $this->pingCount[$boardID]++;
         } else {
-            $this->connectionCheckIteration[$boardID] = 1;
+            $this->pingCount[$boardID] = 1;
         }
 
         $this->sendToBoard($boardID, [
@@ -1356,30 +1365,35 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
+     * Checks if item value is stored and if so returns it.
+     * If value is missing - returns default from parameter
+     *
      * @param int $item_id
      * @param mixed $defaultValue
      * @return mixed
      */
-    protected function getItemSavedValue($item_id, $defaultValue = false)
+    protected function getItemSavedValue($item_id, $defaultValue = null)
     {
         if ($this->hasItemSavedValue($item_id)) {
-            return $this->item_values[$item_id];
+            return $this->itemValues[$item_id];
         }
 
         return $defaultValue;
     }
 
     /**
+     * Checks if item value is stored.
+     *
      * @param int $item_id
      * @return bool
      */
     protected function hasItemSavedValue($item_id)
     {
-        return isset($this->item_values[$item_id]);
+        return isset($this->itemValues[$item_id]) and $this->itemValues[$item_id] !== null;
     }
 
     /**
-     * Saves to value array and returns it. Normalization is on by default
+     * Saves to value array and returns it. Normalization is enabled by default
      *
      * @param int $item_id
      * @param mixed $value
@@ -1393,7 +1407,7 @@ class CoreServer implements MessageComponentInterface
             $value = $this->normalizeItemValue($value, $item_type);
         }
 
-        $this->item_values[$item_id] = $value;
+        $this->itemValues[$item_id] = $value;
 
         return $value;
     }
@@ -1414,9 +1428,6 @@ class CoreServer implements MessageComponentInterface
             case Item::TYPE_VARIABLE_TEMPERATURE:
             case Item::TYPE_VARIABLE_HUMIDITY:
                 return (int)$value;
-
-            case Item::TYPE_RGB:
-                return $this->valueToRgb($value);
         }
 
         return $value;
@@ -1430,14 +1441,14 @@ class CoreServer implements MessageComponentInterface
      * @param int $boardID
      * @param bool $stopPrevious
      */
-    protected function startConnectionCheckTimer($boardID, $stopPrevious = true)
+    protected function startPingTimer($boardID, $stopPrevious = true)
     {
         if ($stopPrevious) {
-            $this->stopConnectionCheckTimer($boardID);
+            $this->stopPingTimer($boardID);
         }
 
         // Start connection checks
-        $this->connectionCheckTimers[$boardID] = $this->loop->addPeriodicTimer(
+        $this->pingTimers[$boardID] = $this->loop->addPeriodicTimer(
             Yii::$app->params['server']['connectionCheckTimeout'],
             function () use ($boardID) {
                 $this->doConnectionCheckTimer($boardID);
@@ -1451,18 +1462,18 @@ class CoreServer implements MessageComponentInterface
      * @param int $boardID
      * @param bool $resetCount
      */
-    protected function stopConnectionCheckTimer($boardID, $resetCount = true)
+    protected function stopPingTimer($boardID, $resetCount = true)
     {
-        if (isset($this->connectionCheckTimers[$boardID])) {
-            if ($this->connectionCheckTimers[$boardID] instanceof TimerInterface) {
-                $this->connectionCheckTimers[$boardID]->cancel();
+        if (isset($this->pingTimers[$boardID])) {
+            if ($this->pingTimers[$boardID] instanceof TimerInterface) {
+                $this->pingTimers[$boardID]->cancel();
             }
 
-            unset($this->connectionCheckTimers[$boardID]);
+            unset($this->pingTimers[$boardID]);
         }
 
-        if ($resetCount and isset($this->connectionCheckIteration[$boardID])) {
-            unset($this->connectionCheckIteration[$boardID]);
+        if ($resetCount and isset($this->pingCount[$boardID])) {
+            unset($this->pingCount[$boardID]);
         }
     }
 }

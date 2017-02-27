@@ -5966,28 +5966,6 @@ button.close {
   -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
-.btn-default:after {
-  content: "";
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-image: -webkit-radial-gradient(circle, #444444 10%, transparent 10.01%);
-  background-image: radial-gradient(circle, #444444 10%, transparent 10.01%);
-  background-repeat: no-repeat;
-  background-size: 1000% 1000%;
-  background-position: 50%;
-  opacity: 0;
-  pointer-events: none;
-  transition: background .5s, opacity 1s;
-}
-.btn-default:active:after {
-  background-size: 0% 0%;
-  opacity: .2;
-  transition: 0s;
-}
 .btn-primary {
   position: relative;
 }
@@ -6001,28 +5979,6 @@ button.close {
 .btn-primary:active {
   -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-}
-.btn-primary:after {
-  content: "";
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-image: -webkit-radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-image: radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-repeat: no-repeat;
-  background-size: 1000% 1000%;
-  background-position: 50%;
-  opacity: 0;
-  pointer-events: none;
-  transition: background .5s, opacity 1s;
-}
-.btn-primary:active:after {
-  background-size: 0% 0%;
-  opacity: .2;
-  transition: 0s;
 }
 .btn-success {
   position: relative;
@@ -6038,28 +5994,6 @@ button.close {
   -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
-.btn-success:after {
-  content: "";
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-image: -webkit-radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-image: radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-repeat: no-repeat;
-  background-size: 1000% 1000%;
-  background-position: 50%;
-  opacity: 0;
-  pointer-events: none;
-  transition: background .5s, opacity 1s;
-}
-.btn-success:active:after {
-  background-size: 0% 0%;
-  opacity: .2;
-  transition: 0s;
-}
 .btn-info {
   position: relative;
 }
@@ -6073,28 +6007,6 @@ button.close {
 .btn-info:active {
   -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-}
-.btn-info:after {
-  content: "";
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-image: -webkit-radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-image: radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-repeat: no-repeat;
-  background-size: 1000% 1000%;
-  background-position: 50%;
-  opacity: 0;
-  pointer-events: none;
-  transition: background .5s, opacity 1s;
-}
-.btn-info:active:after {
-  background-size: 0% 0%;
-  opacity: .2;
-  transition: 0s;
 }
 .btn-warning {
   position: relative;
@@ -6110,28 +6022,6 @@ button.close {
   -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
-.btn-warning:after {
-  content: "";
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-image: -webkit-radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-image: radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-repeat: no-repeat;
-  background-size: 1000% 1000%;
-  background-position: 50%;
-  opacity: 0;
-  pointer-events: none;
-  transition: background .5s, opacity 1s;
-}
-.btn-warning:active:after {
-  background-size: 0% 0%;
-  opacity: .2;
-  transition: 0s;
-}
 .btn-danger {
   position: relative;
 }
@@ -6145,28 +6035,6 @@ button.close {
 .btn-danger:active {
   -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-}
-.btn-danger:after {
-  content: "";
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background-image: -webkit-radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-image: radial-gradient(circle, #ffffff 10%, transparent 10.01%);
-  background-repeat: no-repeat;
-  background-size: 1000% 1000%;
-  background-position: 50%;
-  opacity: 0;
-  pointer-events: none;
-  transition: background .5s, opacity 1s;
-}
-.btn-danger:active:after {
-  background-size: 0% 0%;
-  opacity: .2;
-  transition: 0s;
 }
 .btn-link {
   position: relative;

@@ -41,7 +41,15 @@ function onMessage(e) {
         switch (data.type) {
             case 'init':
                 $.each(data.items, function (key, value) {
-                    updateItemValue(value.id, value.type, value.value)
+                    if (value.type == 30) {
+                        updateRGB(value.id, value.value);
+                    } else {
+                        if (value.value != 'N/A') {
+                            saveItemValue(id, value.value);
+                        }
+
+                        updateItemValue(value.id, value.type, value.value);
+                    }
                 });
 
                 afterConnected();
@@ -68,18 +76,34 @@ function afterConnected() {
     });
 }
 
-function send(msg) {
-    if (typeof msg != "string") {
-        msg = JSON.stringify(msg);
+function send(data) {
+    console.log(data);
+
+    if (typeof data != "string") {
+        data = JSON.stringify(data);
     }
 
     if (WS && WS.readyState == 1) {
-        WS.send(msg);
+        WS.send(data);
     }
 }
 
 function updateValue(data) {
     updateItemValue(data.item_id, data.item_type, data.value);
+}
+
+function updateRGB(itemId, data) {
+    itemValues[itemId] = data;
+
+    if (data.mode == 'static' || data.mode == 'fade') {
+        $('.panel-item-rgb[data-item-id="' + itemId + '"]').attr('style', 'background: rgb(' + data.red + ',' + data.green + ',' + data.blue + ')');
+    }
+
+    $('#rgb-widget-wave-fade-time').val(data.fade_time);
+
+    if (data.mode == 'fade' || data.mode == 'wave') {
+        $('#rgb-widget-wave-color-time').val(data.color_time);
+    }
 }
 
 function itemSwitchOn(itemId) {
@@ -96,12 +120,22 @@ function itemSetValue(itemId, value) {
     $('.panel-item-variable[data-item-id="' + itemId + '"] > .item-variable-value').html(value);
 }
 
+function saveItemValue(itemId, value) {
+    itemValues[itemId] = value;
+}
+
+function getSavedItemValue(itemId) {
+    return itemValues[itemId];
+}
+
 function updateItemValue(id, type, value) {
     type = parseInt(type);
 
     switch (type) {
         case 10:    // Switch
-            if (Boolean(value)) {
+            value = Boolean(value);
+
+            if (value) {
                 itemSwitchOn(id);
             } else {
                 itemSwitchOff(id);
@@ -118,14 +152,22 @@ function updateItemValue(id, type, value) {
             itemSetValue(id, value + '%');
             break;
         case 25:    // Variable boolean
-            value = Boolean(value) ? 'да' : 'нет';
+            if (Boolean(value)) {
+                if (value != 'N/A') {
+                    value = 'да';
+                }
+            } else {
+                value = 'нет';
+            }
 
             itemSetValue(id, value);
 
             break;
         case 26:    // Variable boolean door
             if (value) {
-                value = 'открыто';
+                if (value != 'N/A') {
+                    value = 'открыто';
+                }
             } else {
                 value = 'закрыто';
             }
@@ -133,174 +175,203 @@ function updateItemValue(id, type, value) {
             itemSetValue(id, value);
 
             break;
-        case 30:    // RGB
-            itemValues[id] = value;
-            // TODO
-            // if (typeof value === 'string') {
-            //     $('.item-rgb[data-item-id="' + id + '"]')
-            //         .find('.rgb-mode[data-mode="' + value + '"]')
-            //         .addClass('active');
-            // } else {
-            //     var $colorPicker = $('#colorpicker-' + id);
-            //
-            //     $colorPicker.spectrum('set', 'rgb(' + value[0] + ', ' + value[1] + ', ' + value[2] + ')');
-            //
-            //     $('.item-rgb .rgb-mode').removeClass('active');
-            // }
-
-            break;
     }
 }
 
 $(document).ready(function () {
-    // Event listeners
     $('.panel-item-switch').click(function (e) {
         e.preventDefault();
 
-        var item_id = $(this).data('item-id');
-        var action = $(this).hasClass('off') ? 'turnON' : 'turnOFF';
+        var $this = $(this);
+
+        var item_id = $this.data('item-id');
 
         send({
-            "type": action,
+            "type": $this.hasClass('off') ? 'turnON' : 'turnOFF',
             "item_id": item_id
         });
-
-        return false;
     });
 
     $('.panel-item-variable').tooltip();
 
-    $('.panel-item-rgb').popover({
-        html: true,
-        placement: 'bottom',
-        trigger: 'click',
-        content: function () {
-            var source = $("#rgb-item-widget-popover-content").html();
-            var template = Handlebars.compile(source);
+    // RGB Widget
+    $('.panel-item-rgb')
+        .popover({
+            html: true,
+            placement: 'bottom',
+            trigger: 'click',
+            container: 'body',
+            content: function () {
+                var source = $("#rgb-item-widget-popover-content").html();
+                var template = Handlebars.compile(source);
 
-            return template({
-                item_id: $(this).data('item-id')
+                return template({
+                    item_id: $(this).data('item-id')
+                });
+            }
+        })
+        // On popover init
+        .on('inserted.bs.popover', function () {
+            var item_id = $(this).data('item-id');
+
+            // Init colorpicker
+            var $colorPicker = $('body').find('.rgb-widget-colorpicker[data-item-id="' + item_id + '"]').spectrum({
+                flat: true,
+                showInput: false,
+                showButtons: false,
+                preferredFormat: 'rgb'
             });
-        }
-    }).on('inserted.bs.popover', function (e) {
-        var $colorPicker = $(this).parent().find('input').spectrum({
-            flat: true,
-            showInput: true,
-            showButtons: false,
-            preferredFormat: 'rgb',
-            dragstop: function (color) {
-                console.log($(this));
-                var item_id = $(this).data('item-id');
+
+            var savedItemValue = getSavedItemValue(item_id);
+
+            // Set colorpicker value
+            if (savedItemValue != null) {
+                $colorPicker.spectrum('set', 'rgb(' + savedItemValue['red'] + ',' + savedItemValue['green'] + ',' + savedItemValue['blue'] + ')');
+            }
+
+            // Set mode and variables
+            if (savedItemValue.mode == 'static') {
+                $('.rgb-widget-mode-static').tab('show');
+            } else if (savedItemValue.mode == 'wave') {
+                $('#rgb-widget-wave-color-time').val(savedItemValue.color_time);
+                $('#rgb-widget-fade-color-time').val(savedItemValue.color_time);
+
+                $('.rgb-widget-mode-wave').tab('show');
+            } else if (savedItemValue.mode == 'fade') {
+                $('#rgb-widget-wave-color-time').val(savedItemValue.color_time);
+                $('#rgb-widget-fade-color-time').val(savedItemValue.color_time);
+
+                $('.rgb-widget-mode-fade').tab('show');
+            }
+
+            $('#rgb-widget-static-fade-time').val(savedItemValue.fade_time);
+            $('#rgb-widget-wave-fade-time').val(savedItemValue.fade_time);
+            $('#rgb-widget-fade-fade-time').val(savedItemValue.fade_time);
+
+            // On color select
+            $colorPicker.on("dragstop.spectrum", function (e, color) {
                 var red = Math.round(color._r);
                 var green = Math.round(color._g);
                 var blue = Math.round(color._b);
-                //
-                // var fade = ($('.fade-checkbox[data-item-id="' + item_id + '"]:checked').length > 0);
-                //
-                // send({
-                //     'type': 'rgb',
-                //     'item_id': item_id,
-                //     'fade': fade,
-                //     'red': red,
-                //     'green': green,
-                //     'blue': blue
-                // });
-                $('.panel-item-rgb[data-item-id="' + item_id + '"]').attr('style', 'background: rgb(' + red + ',' + green + ',' + blue + ')');
-            }
+
+                var $this = $(this);
+                var itemId = $this.data('item-id');
+
+                $('.panel-item-rgb[data-item-id="' + itemId + '"]')
+                    .attr('style', 'background-color: rgb(' + red + ',' + green + ',' + blue + ')');
+
+                var modeId = $this.parents('.tab-pane').attr('id');
+
+                if (modeId == 'rgb-widget-static') {
+                    send({
+                        "type": "rgb",
+                        "item_id": item_id,
+                        "fade_time": parseInt($('#rgb-widget-static-fade-time').val()),
+                        "mode": "static",
+                        "red": red,
+                        "green": green,
+                        "blue": blue
+                    });
+                } else if (modeId == 'rgb-widget-fade') {
+                    send({
+                        "type": "rgb",
+                        "item_id": item_id,
+                        "fade_time": parseInt($('#rgb-widget-fade-fade-time').val()),
+                        "color_time": parseInt($('#rgb-widget-fade-color-time').val()),
+                        "mode": "fade",
+                        "red": red,
+                        "green": green,
+                        "blue": blue
+                    });
+                }
+            });
+
+            $('.btn-save-times').click(function (e) {
+                e.preventDefault();
+
+                var mode = $(this).data('mode');
+
+                if (mode == 'wave') {
+                    send({
+                        "type": "rgb",
+                        "item_id": item_id,
+                        "mode": "wave",
+                        "fade_time": parseInt($('#rgb-widget-wave-fade-time').val()),
+                        "color_time": parseInt($('#rgb-widget-wave-color-time').val())
+                    });
+                } else if (mode == 'fade') {
+                    var color = $('.rgb-widget-colorpicker-fade').spectrum('get');
+                    var red = Math.round(color._r);
+                    var green = Math.round(color._g);
+                    var blue = Math.round(color._b);
+
+                    if (savedItemValue != null) {
+                        send({
+                            "type": "rgb",
+                            "item_id": item_id,
+                            "mode": "fade",
+                            "fade_time": parseInt($('#rgb-widget-fade-fade-time').val()),
+                            "color_time": parseInt($('#rgb-widget-fade-color-time').val()),
+                            "red": red,
+                            "green": green,
+                            "blue": blue
+                        });
+                    } else {
+                        send({
+                            "type": "rgb",
+                            "item_id": item_id,
+                            "mode": "fade",
+                            "fade_time": parseInt($('#rgb-widget-fade-fade-time').val()),
+                            "color_time": parseInt($('#rgb-widget-fade-color-time').val())
+                        });
+                    }
+                }
+            });
+
+            $('.rgb-widget-popover-content[data-item-id="' + item_id + '"]').on('click', '.rgb-widget-mode', function (e) {
+                var $this = $(this);
+
+                if ($this.attr('aria-expanded') == 'true') {
+                    return;
+                }
+
+                if ($this.hasClass('rgb-widget-mode-static')) {
+                    var color = $('.rgb-widget-colorpicker-static').spectrum('get');
+                    var red = Math.round(color._r);
+                    var green = Math.round(color._g);
+                    var blue = Math.round(color._b);
+
+                    send({
+                        "type": "rgb",
+                        "item_id": item_id,
+                        "fade_time": parseInt($('#rgb-widget-static-fade-time').val()),
+                        "mode": "static",
+                        "red": red,
+                        "green": green,
+                        "blue": blue
+                    });
+                } else if ($this.hasClass('rgb-widget-mode-wave')) {
+                    send({
+                        "type": "rgb",
+                        "item_id": item_id,
+                        "mode": "wave",
+                        "fade_time": parseInt($('#rgb-widget-wave-fade-time').val()),
+                        "color_time": parseInt($('#rgb-widget-wave-color-time').val())
+                    });
+                } else if ($this.hasClass('rgb-widget-mode-fade')) {
+                    var color = $('.rgb-widget-colorpicker-fade').spectrum('get');
+                    var red = Math.round(color._r);
+                    var green = Math.round(color._g);
+                    var blue = Math.round(color._b);
+
+                    send({
+                        "type": "rgb",
+                        "item_id": item_id,
+                        "mode": "fade",
+                        "fade_time": parseInt($('#rgb-widget-fade-fade-time').val()),
+                        "color_time": parseInt($('#rgb-widget-fade-color-time').val())
+                    });
+                }
+            });
         });
-
-        var item_id = $colorPicker.data('item-id');
-
-        if (Boolean(itemValues[item_id]) != false) {
-            $colorPicker.spectrum('set', itemValues[item_id]);
-        }
-
-        $colorPicker.on("dragstop.spectrum", function (e, color) {
-            var red = Math.round(color._r);
-            var green = Math.round(color._g);
-            var blue = Math.round(color._b);
-
-            $('.panel-item-rgb[data-item-id="' + $(this).data('item-id') + '"]').attr('style', 'background-color: rgb(' + red + ',' + green + ',' + blue + ')')
-        });
-    });
-
-    // TODO:
-    // $('.rgb-colorpicker').spectrum({
-    //     showInput: true,
-    //     showButtons: false,
-    //     preferredFormat: 'rgb',
-    //     change: function (color) {
-    //         var item_id = $(this).data('item-id');
-    //         var red = Math.round(color._r);
-    //         var green = Math.round(color._g);
-    //         var blue = Math.round(color._b);
-    //
-    //         var fade = ($('.fade-checkbox[data-item-id="' + item_id + '"]:checked').length > 0);
-    //
-    //         send({
-    //             'type': 'rgb',
-    //             'item_id': item_id,
-    //             'fade': fade,
-    //             'red': red,
-    //             'green': green,
-    //             'blue': blue
-    //         });
-    //     }
-    // });
-
-    // $('.fade-checkbox').each(function () {
-    //     var localStorageValue = window.localStorage.getItem('fade-checkbox-' + $(this).data('item-id'));
-    //
-    //     console.log(localStorageValue);
-    //
-    //     this.checked = localStorageValue != null && localStorageValue != 'false';
-    // });
-
-    // initWebSocket(function () {
-    // $('input[type="checkbox"].item-switch-checkbox').click(function (e) {
-    //     e.preventDefault();
-    //
-    //     var item_id = $(this).data('item-id');
-    //     var action = $(this).prop('checked') ? 'turnON' : 'turnOFF';
-    //
-    //     send({
-    //         "type": action,
-    //         "item_id": item_id
-    //     });
-    // });
-
-    // Delegate click on block to checkbox
-    // $('.item-switch .info-box').click(function (e) {
-    //     e.preventDefault();
-    //
-    //     if ($(e.target).is('.item-switch-checkbox')) {
-    //         return false;
-    //     }
-    //
-    //     $(this).find('.item-switch-checkbox').click();
-    // });
-
-    // $('.rgb-mode').click(function (e) {
-    //     e.preventDefault();
-    //
-    //     var mode = $(this).data('mode');
-    //     var start = true;
-    //     var item_id = $(this).parents('.item-rgb').data('item-id');
-    //
-    //     if ($(this).hasClass('active')) {
-    //         start = false
-    //     }
-    //
-    //     send({
-    //         "type": "rgbMode",
-    //         "item_id": item_id,
-    //         "mode": mode,
-    //         "start": start
-    //     });
-    // });
-
-    // $('.fade-checkbox').change(function (e) {
-    //     window.localStorage.setItem('fade-checkbox-' + $(this).data('item-id'), this.checked);
-    // });
-    // });
 });

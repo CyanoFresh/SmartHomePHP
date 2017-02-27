@@ -183,7 +183,7 @@ body {
     display: block;
     position: relative;
     height: 1px;
-    width:100%;
+    width: 100%;
     background: #efefef;
     margin: 10px 0;
 }
@@ -290,7 +290,7 @@ body {
 }
 
 .panel-item.panel-item-rgb {
-    background: #909090;
+    background: #009688;
     border-radius: 30px;
     color: #fff;
     margin: 10px 0;
@@ -300,15 +300,12 @@ body {
     height: 50px;
     width: 100%;
     box-shadow: 0 1px 1.5px 0 rgba(0, 0, 0, .12), 0 1px 1px 0 rgba(0, 0, 0, .24);
-    transition: 0.5s;
+    transition: 1s;
     user-select: none;
 }
 
 .popover {
-    position: fixed;
-    z-index: 1000;
     width: 300px;
-    /*height: 200px;*/
     box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
     max-width: none;
     border-radius: 0;
@@ -321,6 +318,35 @@ body {
 
 .popover-content {
     padding: 0;
+}
+
+.rgb-widget-form {
+    padding: 10px;
+}
+
+.sp-container {
+    display: block;
+    border-radius: 0;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
+.sp-picker-container {
+    width: 100%;
+    border: none;
+}
+
+.sp-picker-container, .sp-palette-container {
+    float: none;
+    padding: 2px 0 0 0;
+    margin: 0;
+}
+
+@media (min-width: 767px) {
+    .popover {
+        width: 500px;
+    }
 }
 
 /* Snackbar fixes */
@@ -442,7 +468,7 @@ body.login-body {
     color: #666;
 }
 
-.material-table thead a:hover,.material-table thead a:active {
+.material-table thead a:hover, .material-table thead a:active {
     color: #373737;
     text-decoration: none;
 }
