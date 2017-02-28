@@ -37,7 +37,7 @@ class ActionButtonColumn extends ActionColumn
             $this->buttons['view'] = function ($url, $model, $key) {
                 return Html::a(FA::i('eye'), $url, array_merge([
                     'title' => Yii::t('yii', 'View'),
-                    'class' => 'btn btn-ar btn-default btn-xs',
+                    'class' => 'btn btn-flat btn-xs btn-default',
                 ], $this->buttonOptions));
             };
         }
@@ -45,7 +45,7 @@ class ActionButtonColumn extends ActionColumn
             $this->buttons['update'] = function ($url, $model, $key) {
                 return Html::a(FA::i('pencil'), $url, array_merge([
                     'title' => Yii::t('yii', 'Update'),
-                    'class' => 'btn btn-ar btn-primary btn-xs',
+                    'class' => 'btn btn-flat btn-xs btn-default',
                 ], $this->buttonOptions));
             };
         }
@@ -53,7 +53,7 @@ class ActionButtonColumn extends ActionColumn
             $this->buttons['delete'] = function ($url, $model, $key) {
                 return Html::a(FA::i('trash'), $url, array_merge([
                     'title' => Yii::t('yii', 'Delete'),
-                    'class' => 'btn btn-ar btn-danger btn-xs',
+                    'class' => 'btn btn-flat btn-xs btn-default',
                     'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
                     'data-method' => 'post',
                 ], $this->buttonOptions));

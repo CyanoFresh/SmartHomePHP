@@ -8,6 +8,7 @@
 use yii\helpers\Html;
 
 $this->title = $name;
+$this->params['in-card'] = false;
 ?>
 
 <div class="alert alert-danger">

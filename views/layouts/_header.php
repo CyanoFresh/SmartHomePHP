@@ -5,6 +5,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\widgets\Breadcrumbs;
 
 ?>
 
@@ -23,6 +24,14 @@ use yii\helpers\Url;
             <a class="navbar-brand product-font" href="<?= Url::home() ?>"><span>Solomaha</span> Home</a>
         </div>
 
+        <div class="navbar-breadcrumbs hidden-xs">
+
+            <?= Breadcrumbs::widget([
+                'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+                'homeLink' => false,
+            ]) ?>
+        </div>
+
         <ul class="nav navbar-nav navbar-right hidden-xs">
             <li class="dropdown notifications-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -33,18 +42,18 @@ use yii\helpers\Url;
                     <li><a href="#">Something else here</a></li>
                 </ul>
             </li>
-            <li class="dropdown user-menu">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                   aria-expanded="false">
-                    <img src="<?= Yii::$app->user->identity->getAvatar() ?>" class="user-image">
-                    <span class="hidden-xs"><?= Yii::$app->user->identity->username ?></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <?= Html::a('Выйти', ['/auth/logout'], ['data-method' => 'post']) ?>
-                    </li>
-                </ul>
-            </li>
+<!--            <li class="dropdown user-menu">-->
+<!--                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"-->
+<!--                   aria-expanded="false">-->
+<!--                    <img src="--><?//= Yii::$app->user->identity->getAvatar() ?><!--" class="user-image">-->
+<!--                    <span class="hidden-xs">--><?//= Yii::$app->user->identity->username ?><!--</span>-->
+<!--                </a>-->
+<!--                <ul class="dropdown-menu">-->
+<!--                    <li>-->
+<!--                        --><?//= Html::a('Выйти', ['/auth/logout'], ['data-method' => 'post']) ?>
+<!--                    </li>-->
+<!--                </ul>-->
+<!--            </li>-->
         </ul>
     </div><!-- /.container-fluid -->
 </nav>

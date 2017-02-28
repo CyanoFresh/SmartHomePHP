@@ -72,6 +72,49 @@ body {
     margin-top: -1px;
 }
 
+.navbar-breadcrumbs {
+    display: inline-block;
+}
+
+.navbar-breadcrumbs .breadcrumb {
+    background: transparent;
+    margin: 0;
+    padding: 18px 0 15px;
+}
+
+.navbar-breadcrumbs .breadcrumb li {
+    font-weight: 500;
+    font-size: 16px;
+    position: relative;
+}
+
+.navbar-breadcrumbs .breadcrumb li a {
+    color: #fff;
+}
+
+.navbar-breadcrumbs .breadcrumb li a:hover,
+.navbar-breadcrumbs .breadcrumb li a:active {
+    text-decoration: none;
+}
+
+.navbar-breadcrumbs .breadcrumb li:before {
+    content: '\f054';
+    font-family: FontAwesome;
+    color: #fff;
+    padding: 0 10px 0 0;
+}
+
+
+.navbar-breadcrumbs .breadcrumb li + li:before {
+    padding: 0 10px;
+}
+
+.navbar-breadcrumbs .breadcrumb .active {
+    color: #fff;
+    font-weight: 500;
+    font-size: 16px;
+}
+
 /* Drawer */
 .drawer {
     position: fixed;
@@ -265,7 +308,7 @@ body {
 .panel-item-rgb-name {
     text-align: center;
     width: 100%;
-    padding-left: 35px;
+    padding-left: 25px;
 }
 
 .panel-item.panel-item-variable {
@@ -475,4 +518,78 @@ body.login-body {
 
 .material-table > tbody > tr > td {
     padding: 12px;
+}
+
+.material-table > tbody > tr:hover {
+    background-color: #EEEEEE;
+}
+
+.material-table a.asc:before, .material-table a.desc:before {
+    position: absolute;
+    font-family: FontAwesome, sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    top: 0;
+    left: -15px;
+}
+
+.material-table thead a {
+    position: relative;
+}
+
+.material-table a.asc:before {
+    content: "\f062";
+}
+
+.material-table a.desc:before {
+    content: "\f063";
+}
+
+.material-table a.btn-flat {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: #717171;
+    font-size: 15px;
+}
+
+.material-table a.btn-flat:hover {
+    color: #000;
+}
+
+.material-table thead tr th:first-child {
+    padding-left: 24px;
+}
+
+.material-table tbody tr td:first-child {
+    padding-left: 24px;
+    width: 60px;
+}
+
+.table-card {
+    padding: 0;
+}
+
+.table-card-actions {
+    padding: 10px;
+    border-bottom: 1px solid #dddddd;
+}
+
+.table-card-actions .btn-flat {
+    color: #009688;
+    font-weight: 500;
+}
+
+.btn-flat {
+    background: transparent;
+    box-shadow: none;
+}
+
+.btn-flat,
+.btn-flat:active,
+.btn-flat:hover,
+.btn-flat:focus {
+    box-shadow: none;
 }

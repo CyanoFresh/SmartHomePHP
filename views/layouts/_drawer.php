@@ -29,14 +29,7 @@ use yii\bootstrap\Nav;
                 'label' => FA::i('history fa-fw') . 'История',
                 'url' => ['/history/index'],
             ],
-            [
-                'label' => FA::i('user fa-fw') . 'Профиль',
-                'url' => ['/profile/index'],
-            ],
-            [
-                'label' => FA::i('cog fa-fw') . 'Настройки',
-                'url' => ['/admin/setting/index'],
-            ],
+            '<li class="divider"></li>',
             [
                 'label' => FA::i('toggle-on fa-fw') . 'Элементы',
                 'url' => ['/admin/item/index'],
@@ -62,10 +55,18 @@ use yii\bootstrap\Nav;
                 'url' => ['/admin/room/index'],
             ],
             [
+                'label' => FA::i('cog fa-fw') . 'Настройки',
+                'url' => ['/admin/setting/index'],
+            ],
+            [
                 'label' => FA::i('users fa-fw') . 'Пользователи',
                 'url' => ['/admin/user/index'],
             ],
             '<li class="divider"></li>',
+            [
+                'label' => FA::i('user fa-fw') . 'Профиль',
+                'url' => ['/profile/index'],
+            ],
             [
                 'label' => FA::i('sign-out fa-fw') . 'Выйти',
                 'url' => ['/auth/logout'],
