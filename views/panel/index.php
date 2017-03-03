@@ -43,23 +43,23 @@ $this->title = 'Панель Управления';
 
                     <div class="card-body">
                         <div class="row panel-items-variable">
-                            <?php foreach ($room->getItems()->variables()->active()->all() as $item): ?>
+                            <?php foreach ($room->getItemWidgets()->variables()->active()->all() as $widget): ?>
                                 <?= $this->render('_variable', [
-                                    'item' => $item,
+                                    'widget' => $widget,
                                 ]) ?>
                             <?php endforeach; ?>
                         </div>
                         <div class="row panel-items-switch">
-                            <?php foreach ($room->getItems()->switches()->active()->all() as $item): ?>
+                            <?php foreach ($room->getItemWidgets()->switches()->active()->all() as $widget): ?>
                                 <?= $this->render('_switch', [
-                                    'item' => $item,
+                                    'widget' => $widget,
                                 ]) ?>
                             <?php endforeach; ?>
                         </div>
                         <div class="row panel-items-rgb">
-                            <?php foreach ($room->getItems()->rgb()->all() as $item): ?>
+                            <?php foreach ($room->getItemWidgets()->rgb()->all() as $widget): ?>
                                 <?= $this->render('_rgb', [
-                                    'item' => $item,
+                                    'widget' => $widget,
                                 ]) ?>
                             <?php endforeach; ?>
                         </div>

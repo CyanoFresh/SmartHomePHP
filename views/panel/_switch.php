@@ -1,19 +1,17 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $item \app\models\Item */
-
-use rmrevin\yii\fontawesome\FA;
+/* @var $widget \app\models\ItemWidget */
 
 ?>
 
 <div class="col-lg-3 col-md-4 col-sm-6">
-    <div class="panel-item panel-item-switch withripple <?= $item->class ?>" data-item-id="<?= $item->id ?>">
+    <div class="panel-item panel-item-switch withripple <?= $widget->html_class ?>" data-item-id="<?= $widget->item_id ?>">
         <div class="panel-item-switch-icon">
-            <?= FA::i($item->icon) ?>
+            <i class="fa <?= $widget->icon ?>"></i>
         </div>
         <div class="panel-item-switch-name">
-            <?= $item->name ?>
+            <?= $widget->getName() ?>
         </div>
     </div>
 </div>

@@ -56,6 +56,14 @@ class Room extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return \yii\db\ActiveQuery|ItemWidgetQuery
+     */
+    public function getItemWidgets()
+    {
+        return $this->hasMany(ItemWidget::className(), ['room_id' => 'id'])->inverseOf('room');
+    }
+
+    /**
      * @inheritdoc
      * @return RoomQuery the active query used by this AR class.
      */

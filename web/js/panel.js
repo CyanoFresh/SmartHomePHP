@@ -48,7 +48,7 @@ function onMessage(e) {
                             saveItemValue(id, value.value);
                         }
 
-                        updateItemValue(value.id, value.type, value.value);
+                        updateItemValue(value.id, value.type, value.value, value.value_type);
                     }
                 });
 
@@ -128,7 +128,7 @@ function getSavedItemValue(itemId) {
     return itemValues[itemId];
 }
 
-function updateItemValue(id, type, value) {
+function updateItemValue(id, type, value, value_type) {
     type = parseInt(type);
 
     switch (type) {
@@ -143,33 +143,37 @@ function updateItemValue(id, type, value) {
 
             break;
         case 20:    // Variable
-            itemSetValue(id, value);
-            break;
-        case 21:    // Variable Temperature
-            itemSetValue(id, value + ' °C');
-            break;
-        case 22:    // Variable Humidity
-            itemSetValue(id, value + '%');
-            break;
-        case 25:    // Variable boolean
-            if (Boolean(value)) {
-                if (value != 'N/A') {
-                    value = 'да';
-                }
-            } else {
-                value = 'нет';
+            if (!value_type || value_type == null) {
+                return itemSetValue(id, value);
             }
 
-            itemSetValue(id, value);
+            switch (value_type) {
+                case 10:    // Boolean
+                    if (Boolean(value)) {
+                        if (value != 'N/A') {
+                            value = 'да';
+                        }
+                    } else {
+                        value = 'нет';
+                    }
 
-            break;
-        case 26:    // Variable boolean door
-            if (value) {
-                if (value != 'N/A') {
-                    value = 'открыто';
-                }
-            } else {
-                value = 'закрыто';
+                    break;
+                case 20:    // Variable boolean door
+                    if (value) {
+                        if (value != 'N/A') {
+                            value = 'открыто';
+                        }
+                    } else {
+                        value = 'закрыто';
+                    }
+
+                    break;
+                case 30:    // Celsius
+                    value += ' °C';
+                    break;
+                case 40:    // Percent
+                    value += '%';
+                    break;
             }
 
             itemSetValue(id, value);
@@ -187,7 +191,7 @@ $(document).ready(function () {
         var item_id = $this.data('item-id');
 
         send({
-            "type": $this.hasClass('off') ? 'turnON' : 'turnOFF',
+            "type": $this.hasClass('off') ? 'turn_on' : 'turn_off',
             "item_id": item_id
         });
     });

@@ -18,7 +18,7 @@ class ItemSearch extends Item
     public function rules()
     {
         return [
-            [['id', 'type', 'room_id', 'board_id', 'sort_order', 'pin'], 'integer'],
+            [['id', 'type', 'board_id', 'pin'], 'integer'],
             [['url', 'name'], 'safe'],
         ];
     }
@@ -61,9 +61,7 @@ class ItemSearch extends Item
         $query->andFilterWhere([
             'id' => $this->id,
             'type' => $this->type,
-            'room_id' => $this->room_id,
             'board_id' => $this->board_id,
-            'sort_order' => $this->sort_order,
             'pin' => $this->pin,
         ]);
 

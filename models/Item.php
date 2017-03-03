@@ -11,25 +11,20 @@ use yii\helpers\ArrayHelper;
  * This is the model class for table "item".
  *
  * @property integer $id
- * @property boolean $active
  * @property integer $type
  * @property integer $update_interval
  * @property boolean $enable_log
  * @property integer $save_history_interval
- * @property integer $room_id
  * @property integer $board_id
  * @property integer $pin
  * @property string $url
  * @property string $name
- * @property string $icon
- * @property string $bg
- * @property string $class
- * @property integer $sort_order
  * @property string $default_value
  *
  * @property History[] $histories
  * @property Room $room
  * @property Board $board
+ * @property ItemWidget $widget
  */
 class Item extends ActiveRecord
 {
@@ -77,19 +72,12 @@ class Item extends ActiveRecord
     public function rules()
     {
         return [
-            [['active', 'type', 'room_id', 'name', 'icon', 'bg', 'board_id'], 'required'],
+            [['type', 'name', 'board_id'], 'required'],
             [
-                ['type', 'update_interval', 'save_history_interval', 'room_id', 'sort_order', 'board_id', 'pin'],
+                ['type', 'update_interval', 'save_history_interval', 'board_id', 'pin'],
                 'integer'
             ],
-            [['url', 'name', 'icon', 'bg', 'class', 'default_value'], 'string', 'max' => 255],
-            [
-                ['room_id'],
-                'exist',
-                'skipOnError' => true,
-                'targetClass' => Room::className(),
-                'targetAttribute' => ['room_id' => 'id']
-            ],
+            [['url', 'name', 'default_value'], 'string', 'max' => 255],
             [
                 ['board_id'],
                 'exist',
@@ -97,9 +85,7 @@ class Item extends ActiveRecord
                 'targetClass' => Board::className(),
                 'targetAttribute' => ['board_id' => 'id']
             ],
-            [['sort_order', 'update_interval', 'save_history_interval'], 'default', 'value' => 0],
-            [['active', 'enable_log'], 'default', 'value' => true],
-            [['active', 'enable_log'], 'boolean'],
+            [['update_interval', 'save_history_interval'], 'default', 'value' => 0],
             [['default_value'], 'default', 'value' => null],
         ];
     }
@@ -111,20 +97,14 @@ class Item extends ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'active' => Yii::t('app', 'Активно'),
             'enable_log' => Yii::t('app', 'Логирование'),
             'type' => Yii::t('app', 'Тип'),
             'update_interval' => Yii::t('app', 'Интервал обновления'),
             'save_history_interval' => Yii::t('app', 'Интервал сохранения в историю'),
-            'room_id' => Yii::t('app', 'Комната'),
             'board_id' => Yii::t('app', 'Плата'),
             'url' => Yii::t('app', 'Url'),
             'pin' => Yii::t('app', 'Pin'),
             'name' => Yii::t('app', 'Название'),
-            'icon' => Yii::t('app', 'Иконка'),
-            'bg' => Yii::t('app', 'CSS Background'),
-            'class' => Yii::t('app', 'CSS Класс'),
-            'sort_order' => Yii::t('app', 'Порядок сортировки'),
             'default_value' => Yii::t('app', 'Значение по умолчанию'),
         ];
     }
@@ -140,17 +120,17 @@ class Item extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRoom()
+    public function getBoard()
     {
-        return $this->hasOne(Room::className(), ['id' => 'room_id'])->inverseOf('items');
+        return $this->hasOne(Board::className(), ['id' => 'board_id'])->inverseOf('items');
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getBoard()
+    public function getWidget()
     {
-        return $this->hasOne(Board::className(), ['id' => 'board_id'])->inverseOf('items');
+        return $this->hasOne(ItemWidget::className(), ['item_id' => 'id'])->inverseOf('item');
     }
 
     /**
@@ -174,7 +154,7 @@ class Item extends ActiveRecord
             self::TYPE_VARIABLE_BOOLEAN_DOOR => 'Переменная boolean дверь',
             self::TYPE_VARIABLE_TEMPERATURE => 'Переменная температура',
             self::TYPE_VARIABLE_HUMIDITY => 'Переменная влажность',
-            self::TYPE_RGB => 'RGB LED',
+            self::TYPE_RGB => 'RGB',
         ];
     }
 
@@ -188,16 +168,15 @@ class Item extends ActiveRecord
 
     /**
      * @param bool $prependId
-     * @param bool $appendRoomName
      * @return array
      */
-    public static function getList($prependId = false, $appendRoomName = false)
+    public static function getList($prependId = false)
     {
         /** @var self[] $models */
         $models = self::find()->all();
         $result = [];
 
-        if (!$appendRoomName and !$prependId) {
+        if (!$prependId) {
             return ArrayHelper::map($models, 'id', 'name');
         }
 
@@ -209,10 +188,6 @@ class Item extends ActiveRecord
             }
 
             $title .= $model->name;
-
-            if ($appendRoomName) {
-                $title .= ' - ' . $model->room->name;
-            }
 
             $result[$model->id] = $title;
         }

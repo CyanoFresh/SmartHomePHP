@@ -31,11 +31,15 @@ use yii\bootstrap\Nav;
             ],
             '<li class="divider"></li>',
             [
-                'label' => FA::i('toggle-on fa-fw') . 'Элементы',
+                'label' => FA::i('microchip fa-fw') . 'Элементы',
                 'url' => ['/admin/item/index'],
             ],
             [
-                'label' => FA::i('hdd-o fa-fw') . 'Устройства',
+                'label' => FA::i('toggle-on fa-fw') . 'Виджеты',
+                'url' => ['/admin/item-widget/index'],
+            ],
+            [
+                'label' => FA::i('wifi fa-fw') . 'Устройства',
                 'url' => ['/admin/board/index'],
             ],
             [

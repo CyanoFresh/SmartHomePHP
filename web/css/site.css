@@ -11,6 +11,6 @@
     font-style: italic;
 }
 
-.select2-container--krajee .select2-selection--single {
-    line-height: 2;
+.fontawesome-iconpicker-input {
+    display: block;
 }

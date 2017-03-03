@@ -1,17 +1,16 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\ItemSearch */
+/* @var $searchModel app\modules\admin\models\ItemWidgetSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-use app\models\Board;
 use app\models\Item;
+use app\models\ItemWidget;
 use app\models\Room;
 use yii\helpers\Html;
-use yii\grid\GridView;
 use yii\widgets\Pjax;
 
-$this->title = 'Элементы';
+$this->title = 'Виджеты';
 $this->params['breadcrumbs'][] = $this->title;
 $this->params['in-card'] = false;
 ?>
@@ -19,43 +18,36 @@ $this->params['in-card'] = false;
 <div class="card table-card">
     <div class="table-card-actions">
         <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-default btn-flat']) ?>
-        <?= Html::a('Обновить на сервере', [
-            '/api/panel/update-items',
-            'access-token' => Yii::$app->user->identity->api_key,
-        ], [
-            'class' => 'btn btn-default btn-flat ajax-call',
-        ]) ?>
     </div>
 
     <?php Pjax::begin(); ?>
-
     <?= \app\widgets\DataTable::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
             'id',
             'name',
+            'icon',
             [
-                'attribute' => 'board_id',
-                'filter' => Board::getList(),
+                'attribute' => 'room_id',
+                'filter' => Room::getList(),
                 'value' => function ($model) {
-                    /** @var $model Item */
-                    return $model->board->name;
+                    /** @var $model ItemWidget */
+                    return $model->room->name;
                 },
             ],
             [
-                'filter' => Item::getTypesArray(),
-                'attribute' => 'type',
+                'attribute' => 'item_id',
+                'filter' => Item::getList(),
                 'value' => function ($model) {
-                    /** @var $model Item */
-                    return $model->getTypeLabel();
+                    /** @var $model ItemWidget */
+                    return $model->item->name;
                 },
             ],
-            'pin',
+            'active:boolean',
 
             ['class' => 'app\components\ActionButtonColumn'],
         ],
     ]); ?>
-
     <?php Pjax::end(); ?>
 </div>

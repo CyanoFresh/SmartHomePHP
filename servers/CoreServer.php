@@ -226,24 +226,21 @@ class CoreServer implements MessageComponentInterface
         $this->userConnections[$user->id] = $conn;
 
         // Prepare Items for User
-        $itemModels = Item::find()
-            ->active()
-            ->all();
+        $itemModels = Item::find()->all();
 
         $items = [];
 
         foreach ($itemModels as $itemModel) {
             $itemData = [];
             $itemData['id'] = $itemModel->id;
-            $itemData['type'] = $itemModel->type;
-            $itemData['room_id'] = $itemModel->room_id;
+            $itemData['type'] = $itemModel->widget->type;
+            $itemData['value_type'] = $itemModel->widget->value_type;
+            $itemData['room_id'] = $itemModel->widget->room_id;
             $itemData['board_id'] = $itemModel->board_id;
-            $itemData['pin'] = $itemModel->pin;
-            $itemData['name'] = $itemModel->name;
-            $itemData['icon'] = $itemModel->icon;
-            $itemData['bg'] = $itemModel->bg;
-            $itemData['class'] = $itemModel->class;
-            $itemData['sort_order'] = $itemModel->sort_order;
+            $itemData['name'] = $itemModel->widget->getName();
+            $itemData['icon'] = $itemModel->widget->icon;
+            $itemData['html_class'] = $itemModel->widget->html_class;
+            $itemData['sort_order'] = $itemModel->widget->sort_order;
 
             $itemData['value'] = $this->getItemSavedValue($itemModel->id, $itemModel->getDefaultNAValue());
 
@@ -356,9 +353,9 @@ class CoreServer implements MessageComponentInterface
         }
 
         switch ($data['type']) {
-            case 'turnON':
+            case 'turn_on':
                 return $this->handleTurnOn($from, $user, $data);
-            case 'turnOFF':
+            case 'turn_off':
                 return $this->handleTurnOff($from, $user, $data);
             case 'rgb':
                 return $this->handleRgb($from, $user, $data);
@@ -410,7 +407,7 @@ class CoreServer implements MessageComponentInterface
                 $this->sendUsers([
                     'type' => 'value',
                     'item_id' => $item->id,
-                    'item_type' => $item->type,
+                    'value_type' => $item->widget->type,
                     'value' => $value,
                 ]);
 
@@ -502,7 +499,7 @@ class CoreServer implements MessageComponentInterface
                     $this->sendUsers([
                         'type' => 'value',
                         'item_id' => $item->id,
-                        'item_type' => $item->type,
+                        'value_type' => $item->widget->type,
                         'value' => $value,
                     ]);
 
@@ -1353,11 +1350,11 @@ class CoreServer implements MessageComponentInterface
         $this->log("Loading items...");
 
         /** @var Item[] $items */
-        $items = Item::find()->active()->all();
+        $items = Item::find()->all();
 
         foreach ($items as $item) {
             if (!$this->hasItemSavedValue($item->id)) {
-                $this->saveItemValue($item->id, $item->getDefaultValue(), $item->type, false);
+                $this->saveItemValue($item->id, $item->getDefaultNAValue(), $item->type, false);
             }
         }
 

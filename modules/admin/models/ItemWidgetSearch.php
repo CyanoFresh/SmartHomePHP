@@ -1,16 +1,16 @@
 <?php
 
-namespace app\models;
+namespace app\modules\admin\models;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Item;
+use app\models\ItemWidget;
 
 /**
- * ItemSearch represents the model behind the search form about `app\models\Item`.
+ * ItemWidgetSearch represents the model behind the search form about `app\models\ItemWidget`.
  */
-class ItemSearch extends Item
+class ItemWidgetSearch extends ItemWidget
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class ItemSearch extends Item
     public function rules()
     {
         return [
-            [['id', 'type', 'update_interval', 'save_history_interval', 'room_id', 'board_id', 'sort_order'], 'integer'],
-            [['url', 'name'], 'safe'],
+            [['id', 'active', 'sort_order', 'item_id', 'room_id'], 'integer'],
+            [['name', 'html_class', 'icon'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class ItemSearch extends Item
      */
     public function search($params)
     {
-        $query = Item::find();
+        $query = ItemWidget::find();
 
         // add conditions that should always apply here
 
@@ -60,13 +60,15 @@ class ItemSearch extends Item
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'type' => $this->type,
-            'update_interval' => $this->update_interval,
-            'save_history_interval' => $this->save_history_interval,
+            'active' => $this->active,
+            'sort_order' => $this->sort_order,
+            'item_id' => $this->item_id,
+            'room_id' => $this->room_id,
         ]);
 
-        $query->andFilterWhere(['like', 'url', $this->url])
-            ->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'html_class', $this->html_class])
+            ->andFilterWhere(['like', 'icon', $this->icon]);
 
         return $dataProvider;
     }

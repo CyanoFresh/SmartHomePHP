@@ -8,13 +8,15 @@ use app\modules\api\components\WebSocketAPIBridge;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
-use yii\rest\Controller;
+use yii\rest\ActiveController;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
-class ItemController extends Controller
+class ItemController extends ActiveController
 {
+    public $modelClass = 'app\models\Item';
+
     /**
      * @inheritdoc
      */
@@ -27,14 +29,6 @@ class ItemController extends Controller
             'rgb-mode' => ['POST'],
             'value' => ['GET'],
         ];
-    }
-
-    /**
-     * @throws NotSupportedException
-     */
-    public function actionIndex()
-    {
-        throw new NotSupportedException();
     }
 
     /**

@@ -6,7 +6,6 @@
 
 use app\models\User;
 use yii\helpers\Html;
-use yii\grid\GridView;
 use yii\widgets\Pjax;
 
 $this->title = 'Пользователи';
@@ -20,11 +19,9 @@ $this->params['in-card'] = false;
     </div>
 
     <?php Pjax::begin(); ?>
-    <?= GridView::widget([
+    <?= \app\widgets\DataTable::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-        'summaryOptions' => ['class' => 'alert alert-info'],
-        'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'columns' => [
             'id',
             'username',

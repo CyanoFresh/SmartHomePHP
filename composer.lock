@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "47716d6fa73b8f351afd27ba07ca61ea",
-    "content-hash": "510df4f657a11c48c1c48bbc30239f09",
+    "hash": "d72e15d1c94855a26467586b784ffcb8",
+    "content-hash": "50f7bcdee8e1349910fd57865528edf4",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -86,6 +86,42 @@
                 "MIT"
             ],
             "description": "Simple HTML5 charts using the canvas element."
+        },
+        {
+            "name": "bower-asset/fontawesome-iconpicker",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/itsjavi/fontawesome-iconpicker.git",
+                "reference": "6087c66a7395738f59cab3887221bb75cd0e08f7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/itsjavi/fontawesome-iconpicker/zipball/6087c66a7395738f59cab3887221bb75cd0e08f7",
+                "reference": "6087c66a7395738f59cab3887221bb75cd0e08f7",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/bootstrap": ">=3.0.0,<4.0.0",
+                "bower-asset/jquery": ">=1.10"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "dist/css/fontawesome-iconpicker.css",
+                    "dist/css/fontawesome-iconpicker.min.css",
+                    "dist/js/fontawesome-iconpicker.js",
+                    "dist/js/fontawesome-iconpicker.min.js"
+                ],
+                "bower-asset-ignore": [
+                    "\\.*",
+                    "/extension",
+                    "/src",
+                    "index.html",
+                    "/package.json",
+                    "/Gruntfile.js"
+                ]
+            }
         },
         {
             "name": "bower-asset/handlebars",
