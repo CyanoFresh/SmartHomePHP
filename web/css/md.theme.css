@@ -234,12 +234,15 @@ body {
     height: 64px;
     padding: 12px;
     border-bottom: 1px solid #efefef;
+    display: flex;
+    align-items: center;
 }
 
 .user-block .user-info {
     display: inline-block;
-    margin-left: 30px;
     font-weight: 500;
+    flex: 1;
+    text-align: center;
 }
 
 .user-block .user-avatar {
@@ -254,7 +257,9 @@ body {
 
 .user-block .user-caret {
     display: inline-block;
-    margin-left: 30px;
+    margin-left: auto;
+    padding: 5px 10px;
+    border-radius: 50%;
 }
 
 /* Cards */
