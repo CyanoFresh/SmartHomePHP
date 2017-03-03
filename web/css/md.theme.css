@@ -104,7 +104,6 @@ body {
     padding: 0 10px 0 0;
 }
 
-
 .navbar-breadcrumbs .breadcrumb li + li:before {
     padding: 0 10px;
 }
@@ -504,7 +503,7 @@ body.login-body {
 
 /* Data Table */
 .material-table > thead > tr > th {
-    padding: 16px;
+    padding: 16px 12px;
 }
 
 .material-table thead a {
@@ -531,7 +530,7 @@ body.login-body {
     font-weight: normal;
     line-height: 1;
     top: 0;
-    left: -15px;
+    left: -18px;
 }
 
 .material-table thead a {
@@ -580,6 +579,56 @@ body.login-body {
 .table-card-actions .btn-flat {
     color: #009688;
     font-weight: 500;
+}
+
+.table-card .material-table {
+    margin-bottom: 0;
+}
+
+.table-card .table-footer {
+    display: flex;
+    height: 56px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap-reverse;
+    box-sizing: border-box;
+    border-top: 1px solid #dddddd;
+    padding-right: 14px;
+}
+
+.table-footer-summary {
+    display: inline-block;
+}
+
+.table-footer .pagination {
+    display: inline-block;
+    margin: 0 0 0 32px;
+}
+
+/*.table-footer .pagination {*/
+    /*margin: 0;*/
+    /*padding: 0;*/
+    /*display: block;*/
+/*}*/
+
+.table-footer .prev,
+.table-footer .next {
+    font-family: FontAwesome;
+}
+
+.table-footer .pagination > li > a,
+.table-footer .pagination > li > span {
+    border: none;
+    color: #717171;
+}
+
+.table-footer .pagination > .disabled > span,
+.table-footer .pagination > .disabled > span:hover,
+.table-footer .pagination > .disabled > span:focus,
+.table-footer .pagination > .disabled > a,
+.table-footer .pagination > .disabled > a:hover,
+.table-footer .pagination > .disabled > a:focus {
+    color: rgba(0, 0, 0, 0.3);
 }
 
 .btn-flat {

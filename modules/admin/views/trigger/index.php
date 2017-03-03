@@ -11,30 +11,26 @@ use yii\widgets\Pjax;
 
 $this->title = 'Триггеры';
 $this->params['breadcrumbs'][] = $this->title;
+$this->params['in-card'] = false;
 ?>
-<div class="trigger-index">
 
-    <p>
-        <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
+<div class="card table-card">
+    <div class="table-card-actions">
+        <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-default btn-flat']) ?>
         <?= Html::a('Обновить на сервере', [
             '/api/panel/schedule-triggers',
             'access-token' => Yii::$app->user->identity->api_key
         ], [
-            'class' => 'btn btn-default ajax-call',
+            'class' => 'btn btn-default btn-flat ajax-call',
         ]) ?>
-    </p>
+    </div>
 
     <?php Pjax::begin(); ?>
-    <?= GridView::widget([
+    <?= \app\widgets\DataTable::widget([
         'dataProvider' => $dataProvider,
-        'summaryOptions' => ['class' => 'alert alert-info'],
-        'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'filterModel' => $searchModel,
         'columns' => [
-            [
-                'attribute' => 'id',
-                'contentOptions' => ['style' => 'width: 5%']
-            ],
+            'id',
             'name',
             [
                 'filter' => Trigger::getTypes(),

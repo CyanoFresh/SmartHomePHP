@@ -15,6 +15,7 @@ $this->title = 'Элементы';
 $this->params['breadcrumbs'][] = $this->title;
 $this->params['in-card'] = false;
 ?>
+
 <div class="card table-card">
     <div class="table-card-actions">
         <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-default btn-flat']) ?>
@@ -28,16 +29,11 @@ $this->params['in-card'] = false;
 
     <?php Pjax::begin(); ?>
 
-    <?= GridView::widget([
+    <?= \app\widgets\DataTable::widget([
         'dataProvider' => $dataProvider,
-        'summary' => false,
-        'tableOptions' => ['class' => 'table table-hover material-table'],
-        'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'filterModel' => $searchModel,
         'columns' => [
-            [
-                'attribute' => 'id',
-            ],
+            'id',
             'name',
             [
                 'attribute' => 'room_id',

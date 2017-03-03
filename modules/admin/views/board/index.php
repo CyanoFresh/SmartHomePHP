@@ -11,24 +11,21 @@ use yii\widgets\Pjax;
 
 $this->title = 'Устройства';
 $this->params['breadcrumbs'][] = $this->title;
+$this->params['in-card'] = false;
 ?>
-<div class="board-index">
 
-    <p>
-        <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+<div class="card table-card">
+    <div class="table-card-actions">
+        <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-default btn-flat']) ?>
+    </div>
 
     <?php Pjax::begin(); ?>
-    <?= GridView::widget([
+
+    <?= \app\widgets\DataTable::widget([
         'dataProvider' => $dataProvider,
-        'summaryOptions' => ['class' => 'alert alert-info'],
-        'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'filterModel' => $searchModel,
         'columns' => [
-            [
-                'attribute' => 'id',
-                'contentOptions' => ['style' => 'width: 5%']
-            ],
+            'id',
             'name',
             [
                 'attribute' => 'type',
@@ -49,5 +46,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'app\components\ActionButtonColumn'],
         ],
     ]); ?>
+
     <?php Pjax::end(); ?>
 </div>
