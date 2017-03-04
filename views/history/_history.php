@@ -6,7 +6,6 @@
 use app\models\History;
 use app\models\Item;
 
-$this->params['not-boxed'] = true;
 ?>
 
 <div class="panel panel-defaul">
