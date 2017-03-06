@@ -1,0 +1,105 @@
+select.md-select {
+    height: 41px;
+    padding: 8px 16px;
+    font-size: 13px;
+    width: 100%;
+}
+
+.mad-select ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+.mad-select ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.mad-select ::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 1px;
+}
+
+.mad-select ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.mad-select {
+    position: relative;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    padding-right: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.mad-select ul {
+    list-style: none;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+.mad-select ul li,
+.md-select-selected-value {
+    vertical-align: middle;
+    white-space: nowrap;
+    height: 24px;
+    line-height: 24px;
+    display: none;
+    padding: 8px 16px;
+    margin: 0;
+    box-sizing: initial;
+}
+
+.mad-select > ul:first-of-type {
+    min-width: 120px;
+}
+
+.md-select-selected-value {
+    flex-grow: 1;
+}
+
+.mad-select ul:first-of-type li.selected,
+.md-select-selected-value {
+    display: inline-block;
+    height: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mad-select ul.mad-select-drop {
+    position: absolute;
+    z-index: 9999;
+    visibility: hidden;
+    opacity: 0;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    top: 0;
+    left: 0;
+    transition: 0.24s;
+    max-height: 0;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.mad-select ul.mad-select-drop.show {
+    visibility: visible;
+    opacity: 1;
+    max-height: 160px; /* COMMENT IF YOU DON?T NEED MAX HEIGHT */
+}
+
+.mad-select ul.mad-select-drop li {
+    display: block;
+    transition: background 0.24s;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.mad-select ul.mad-select-drop li.selected {
+    background: rgba(0, 0, 0, 0.07);
+}
+
+.mad-select ul.mad-select-drop li:hover {
+    background: rgba(0, 0, 0, 0.04);
+}

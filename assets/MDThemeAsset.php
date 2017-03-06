@@ -11,6 +11,7 @@ class MDThemeAsset extends AssetBundle
     public $css = [
         'css/theme.css',
         'css/ripples.css',
+        'css/md.select.css',
         'css/md.theme.css',
     ];
     public $js = [
