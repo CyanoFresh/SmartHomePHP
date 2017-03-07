@@ -50,7 +50,7 @@ $(document).ready(function () {
 
             var $li = $(this);
 
-            $select.val($li.data('value'));
+            $select.val($li.data('value')).change();
             $widget.find('.md-select-selected-value').html($li.text());
 
             $li.addClass('selected')
@@ -67,7 +67,7 @@ $(document).ready(function () {
             $ulDrop.scrollTop(liTop + $ulDrop[0].scrollTop);
         });
 
-        $('body').click(function (e) {
+        $('body').click(function () {
             $ulDrop.removeClass('show');
         });
     });

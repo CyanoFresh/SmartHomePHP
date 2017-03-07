@@ -14,8 +14,8 @@ $params = [
     ],
     'items' => [
         'rgb' => [
-            'fade-time' => 10000,
-            'color-time' => 5000,
+            'fade-time' => 3000,
+            'color-time' => 3000,
             'red' => 0,
             'green' => 150,
             'blue' => 150,

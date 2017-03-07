@@ -23,6 +23,7 @@ use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\helpers\VarDumper;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -415,6 +416,36 @@ class CoreServer implements MessageComponentInterface
                 $this->logItemValue($item, $value);
 
                 break;
+            case 'values':
+                unset($data['type']);
+
+                foreach ($data as $pin => $value) {
+                    $item = Item::findOne([
+                        'board_id' => $board->id,
+                        'pin' => $pin,
+                    ]);
+
+                    if (!$item) {
+                        return $this->log('Trying to use unknown item');
+                    }
+
+                    // Trig event
+                    $this->triggerItemValue($item, $value);
+
+                    $value = $this->saveItemValue($item->id, $value, $item->type);
+
+                    $this->sendUsers([
+                        'type' => 'value',
+                        'item_id' => $item->id,
+                        'value_type' => $item->widget->type,
+                        'value' => $value,
+                    ]);
+
+                    // Save to history
+                    $this->logItemValue($item, $value);
+                }
+
+                break;
             case 'rgb':
                 $itemId = (integer)$data['item_id'];
                 $mode = $data['mode'];
@@ -428,15 +459,6 @@ class CoreServer implements MessageComponentInterface
                 if (!$item) {
                     $this->log("Board [{$board->id}] tried to use unknown item");
                     throw new NotFoundHttpException('Item does not exist');
-                }
-
-                if (!in_array($mode, Item::getRGBModesArray())) {
-                    $this->log("Board [{$board->id}] tried to use unknown RGB mode");
-                    throw new InvalidParamException('Unknown RGB mode');
-                }
-
-                if ($fadeTime < 0) {
-                    $fadeTime = 0;
                 }
 
                 $commonParameters = [
@@ -475,37 +497,8 @@ class CoreServer implements MessageComponentInterface
                 $this->sendUsers($parameters);
 
                 $this->logItemValue($item, serialize($parameters));
+                VarDumper::dump($parameters);
                 $this->saveItemValue($item->id, $parameters, $item->type);
-
-                break;
-            case 'values':
-                unset($data['type']);
-
-                foreach ($data as $pin => $value) {
-                    $item = Item::findOne([
-                        'board_id' => $board->id,
-                        'pin' => $pin,
-                    ]);
-
-                    if (!$item) {
-                        return $this->log('Trying to use unknown item');
-                    }
-
-                    // Trig event
-                    $this->triggerItemValue($item, $value);
-
-                    $value = $this->saveItemValue($item->id, $value, $item->type);
-
-                    $this->sendUsers([
-                        'type' => 'value',
-                        'item_id' => $item->id,
-                        'value_type' => $item->widget->type,
-                        'value' => $value,
-                    ]);
-
-                    // Save to history
-                    $this->logItemValue($item, $value);
-                }
 
                 break;
             case 'pong':
@@ -951,10 +944,6 @@ class CoreServer implements MessageComponentInterface
         if (!$item->enable_log) {
             $this->log("Logging for this item is disabled");
             return;
-        }
-
-        if ($item->type === Item::TYPE_RGB) {
-            $value = implode(',', $value);
         }
 
         $model = new History();

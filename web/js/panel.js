@@ -96,7 +96,10 @@ function updateRGB(itemId, data) {
     itemValues[itemId] = data;
 
     if (data.mode == 'static' || data.mode == 'fade') {
-        $('.panel-item-rgb[data-item-id="' + itemId + '"]').attr('style', 'background: rgb(' + data.red + ',' + data.green + ',' + data.blue + ')');
+        var $panelItem = $('.panel-item-rgb[data-item-id="' + itemId + '"]');
+
+        $panelItem.css('background-color', 'rgb(' + data.red + ',' + data.green + ',' + data.blue + ')');
+        $panelItem.css('color', textColorDepOnBackground(data.red, data.green, data.blue));
     }
 
     $('#rgb-widget-wave-fade-time').val(data.fade_time);
@@ -182,6 +185,19 @@ function updateItemValue(id, type, value, value_type) {
     }
 }
 
+function textColorDepOnBackground(red, green, blue) {
+    var brightness = Math.round((red * 299 + green * 587 + blue * 114) / 1000);
+    var textColor;
+
+    if (brightness > 125) {
+        textColor = 'black';
+    } else {
+        textColor = 'white';
+    }
+
+    return textColor;
+}
+
 $(document).ready(function () {
     $('.panel-item-switch').click(function (e) {
         e.preventDefault();
@@ -233,7 +249,7 @@ $(document).ready(function () {
                 $colorPicker.spectrum('set', 'rgb(' + savedItemValue['red'] + ',' + savedItemValue['green'] + ',' + savedItemValue['blue'] + ')');
             }
 
-            // Set mode and variables
+            // Open mode tabs and set variables
             if (savedItemValue.mode == 'static') {
                 $('.rgb-widget-mode-static').tab('show');
             } else if (savedItemValue.mode == 'wave') {
@@ -261,8 +277,11 @@ $(document).ready(function () {
                 var $this = $(this);
                 var itemId = $this.data('item-id');
 
-                $('.panel-item-rgb[data-item-id="' + itemId + '"]')
-                    .attr('style', 'background-color: rgb(' + red + ',' + green + ',' + blue + ')');
+                var $panelItem = $('.panel-item-rgb[data-item-id="' + itemId + '"]');
+
+                // Update text color
+                $panelItem.css('background-color', 'rgb(' + red + ',' + green + ',' + blue + ')');
+                $panelItem.css('color', textColorDepOnBackground(red, green, blue));
 
                 var modeId = $this.parents('.tab-pane').attr('id');
 
@@ -309,26 +328,16 @@ $(document).ready(function () {
                     var green = Math.round(color._g);
                     var blue = Math.round(color._b);
 
-                    if (savedItemValue != null) {
-                        send({
-                            "type": "rgb",
-                            "item_id": item_id,
-                            "mode": "fade",
-                            "fade_time": parseInt($('#rgb-widget-fade-fade-time').val()),
-                            "color_time": parseInt($('#rgb-widget-fade-color-time').val()),
-                            "red": red,
-                            "green": green,
-                            "blue": blue
-                        });
-                    } else {
-                        send({
-                            "type": "rgb",
-                            "item_id": item_id,
-                            "mode": "fade",
-                            "fade_time": parseInt($('#rgb-widget-fade-fade-time').val()),
-                            "color_time": parseInt($('#rgb-widget-fade-color-time').val())
-                        });
-                    }
+                    send({
+                        "type": "rgb",
+                        "item_id": item_id,
+                        "mode": "fade",
+                        "fade_time": parseInt($('#rgb-widget-fade-fade-time').val()),
+                        "color_time": parseInt($('#rgb-widget-fade-color-time').val()),
+                        "red": red,
+                        "green": green,
+                        "blue": blue
+                    });
                 }
             });
 
@@ -373,7 +382,10 @@ $(document).ready(function () {
                         "item_id": item_id,
                         "mode": "fade",
                         "fade_time": parseInt($('#rgb-widget-fade-fade-time').val()),
-                        "color_time": parseInt($('#rgb-widget-fade-color-time').val())
+                        "color_time": parseInt($('#rgb-widget-fade-color-time').val()),
+                        "red": red,
+                        "green": green,
+                        "blue": blue
                     });
                 }
             });
