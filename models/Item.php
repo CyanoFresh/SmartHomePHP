@@ -34,6 +34,7 @@ class Item extends ActiveRecord
     const TYPE_VARIABLE_BOOLEAN_DOOR = 26;
     const TYPE_VARIABLE_TEMPERATURE = 21;
     const TYPE_VARIABLE_HUMIDITY = 22;
+    const TYPE_VARIABLE_LIGHT = 23;
     const TYPE_RGB = 30;
 
     const VALUE_ON = 1;
@@ -154,6 +155,7 @@ class Item extends ActiveRecord
             self::TYPE_VARIABLE_BOOLEAN_DOOR => 'Переменная boolean дверь',
             self::TYPE_VARIABLE_TEMPERATURE => 'Переменная температура',
             self::TYPE_VARIABLE_HUMIDITY => 'Переменная влажность',
+            self::TYPE_VARIABLE_LIGHT => 'Переменная освещенность',
             self::TYPE_RGB => 'RGB',
         ];
     }
