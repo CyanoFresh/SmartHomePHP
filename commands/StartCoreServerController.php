@@ -10,7 +10,7 @@ use React\EventLoop\Factory;
 use React\Socket\Server;
 use yii\console\Controller;
 
-class MainController extends Controller
+class StartCoreServerController extends Controller
 {
     public function actionIndex($port = 8081)
     {
