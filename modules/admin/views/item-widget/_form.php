@@ -77,6 +77,15 @@ $('.fontawesome-iconpicker-input').iconpicker({container: 'body', inputSearch: t
 
             <?= $form->field($model, 'type')->widget(Select2::className(), [
                 'data' => ItemWidget::getTypes(),
+                'pluginEvents' => [
+                    'change' => "function(e) {
+                        if (parseInt($(this).val()) == 20) {
+                            $('.field-itemwidget-value_type').fadeIn().removeClass('hidden');
+                        } else {
+                            $('.field-itemwidget-value_type').fadeOut().addClass('hidden');
+                        }
+                    }",
+                ],
                 'options' => [
                     'placeholder' => 'Выберите тип ...',
                 ],
