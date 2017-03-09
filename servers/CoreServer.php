@@ -232,6 +232,10 @@ class CoreServer implements MessageComponentInterface
         $items = [];
 
         foreach ($itemModels as $itemModel) {
+            if (!$itemModel->widget) {
+                continue;
+            }
+
             $itemData = [];
             $itemData['id'] = $itemModel->id;
             $itemData['type'] = $itemModel->widget->type;
