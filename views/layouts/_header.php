@@ -42,18 +42,6 @@ use yii\widgets\Breadcrumbs;
                     <li><a href="#">Something else here</a></li>
                 </ul>
             </li>
-<!--            <li class="dropdown user-menu">-->
-<!--                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"-->
-<!--                   aria-expanded="false">-->
-<!--                    <img src="--><?//= Yii::$app->user->identity->getAvatar() ?><!--" class="user-image">-->
-<!--                    <span class="hidden-xs">--><?//= Yii::$app->user->identity->username ?><!--</span>-->
-<!--                </a>-->
-<!--                <ul class="dropdown-menu">-->
-<!--                    <li>-->
-<!--                        --><?//= Html::a('Выйти', ['/auth/logout'], ['data-method' => 'post']) ?>
-<!--                    </li>-->
-<!--                </ul>-->
-<!--            </li>-->
         </ul>
     </div><!-- /.container-fluid -->
 </nav>
