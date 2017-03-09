@@ -45,7 +45,7 @@ function onMessage(e) {
                         updateRGB(value.id, value.value);
                     } else {
                         if (value.value != 'N/A') {
-                            saveItemValue(id, value.value);
+                            saveItemValue(value.id, value.value);
                         }
 
                         updateItemValue(value.id, value.type, value.value, value.value_type);
