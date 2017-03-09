@@ -413,7 +413,7 @@ class CoreServer implements MessageComponentInterface
                     $this->sendUsers([
                         'type' => 'value',
                         'item_id' => $item->id,
-                        'item_type' => $item->type,
+                        'item_type' => $item->widget->type,
                         'value_type' => $item->widget->value_type,
                         'value' => $value,
                     ]);
@@ -445,7 +445,7 @@ class CoreServer implements MessageComponentInterface
                         $this->sendUsers([
                             'type' => 'value',
                             'item_id' => $item->id,
-                            'item_type' => $item->type,
+                            'item_type' => $item->widget->type,
                             'value_type' => $item->widget->value_type,
                             'value' => $value,
                         ]);
