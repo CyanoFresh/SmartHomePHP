@@ -89,7 +89,7 @@ function send(data) {
 }
 
 function updateValue(data) {
-    updateItemValue(data.item_id, data.item_type, data.value);
+    updateItemValue(data.item_id, data.item_type, data.value, data.value_type);
 }
 
 function updateRGB(itemId, data) {
