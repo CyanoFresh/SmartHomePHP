@@ -405,12 +405,14 @@ class CoreServer implements MessageComponentInterface
 
                 $value = $this->saveItemValue($item->id, $value, $item->type);
 
-                $this->sendUsers([
-                    'type' => 'value',
-                    'item_id' => $item->id,
-                    'value_type' => $item->widget->type,
-                    'value' => $value,
-                ]);
+                if ($item->widget) {
+                    $this->sendUsers([
+                        'type' => 'value',
+                        'item_id' => $item->id,
+                        'value_type' => $item->widget->type,
+                        'value' => $value,
+                    ]);
+                }
 
                 // Save to history
                 $this->logItemValue($item, $value);
@@ -434,12 +436,14 @@ class CoreServer implements MessageComponentInterface
 
                     $value = $this->saveItemValue($item->id, $value, $item->type);
 
-                    $this->sendUsers([
-                        'type' => 'value',
-                        'item_id' => $item->id,
-                        'value_type' => $item->widget->type,
-                        'value' => $value,
-                    ]);
+                    if ($item->widget) {
+                        $this->sendUsers([
+                            'type' => 'value',
+                            'item_id' => $item->id,
+                            'value_type' => $item->widget->type,
+                            'value' => $value,
+                        ]);
+                    }
 
                     // Save to history
                     $this->logItemValue($item, $value);
