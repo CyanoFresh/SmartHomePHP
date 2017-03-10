@@ -12,6 +12,7 @@ use yii\rest\ActiveController;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 class ItemController extends ActiveController
 {
@@ -26,7 +27,6 @@ class ItemController extends ActiveController
             'turn-on' => ['POST'],
             'turn-off' => ['POST'],
             'rgb' => ['POST'],
-            'rgb-mode' => ['POST'],
             'value' => ['GET'],
         ];
     }
@@ -132,21 +132,75 @@ class ItemController extends ActiveController
 
     /**
      * @param int $item_id
+     * @param string $mode
+     * @param int $fade_time
      * @param int $red
      * @param int $green
      * @param int $blue
-     * @param bool $fade
+     * @param int $color_time
      * @return array
      * @throws BadRequestHttpException
      * @throws NotSupportedException
      * @throws ServerErrorHttpException
+     * @throws UnprocessableEntityHttpException
+     * @internal param bool $fade
      */
-    public function actionRgb($item_id, $red = 0, $green = 0, $blue = 0, $fade = false)
-    {
+    public function actionRgb(
+        $item_id,
+        $mode,
+        $fade_time = null,
+        $red = null,
+        $green = null,
+        $blue = null,
+        $color_time = null
+    ) {
         $item = $this->findItem($item_id);
 
         if ($item->type !== Item::TYPE_RGB) {
-            throw new BadRequestHttpException();
+            throw new BadRequestHttpException('It is not a RGB Item');
+        }
+
+        if (!in_array($mode, Item::getRGBModesArray())) {
+            throw new BadRequestHttpException('Invalid mode');
+        }
+
+        if (!isset($fade_time) or $fade_time === null) {
+            $fade_time = Yii::$app->params['items']['rgb']['fade-time'];
+        } elseif ($fade_time < 0) {
+            $fade_time = 0;
+        }
+
+        $sendParameters = [
+            'type' => 'rgb',
+            'item_id' => $item_id,
+            'mode' => $mode,
+            'fade_time' => $fade_time,
+        ];
+
+        if ($mode === Item::RGB_MODE_STATIC or $mode === Item::RGB_MODE_FADE) {
+            if (!isset($red) or $red === null) {
+                throw new UnprocessableEntityHttpException('Missing red parameter');
+            }
+
+            if (!isset($green) or $green === null) {
+                throw new UnprocessableEntityHttpException('Missing green parameter');
+            }
+
+            if (!isset($blue) or $blue === null) {
+                throw new UnprocessableEntityHttpException('Missing blue parameter');
+            }
+
+            $sendParameters['red'] = $red;
+            $sendParameters['green'] = $green;
+            $sendParameters['blue'] = $blue;
+        }
+
+        if ($mode === Item::RGB_MODE_WAVE or $mode === Item::RGB_MODE_FADE) {
+            if (!isset($color_time) or $color_time === null) {
+                throw new UnprocessableEntityHttpException('Missing color_time parameter');
+            }
+
+            $sendParameters['color_time'] = $color_time;
         }
 
         $board = $item->board;
@@ -159,7 +213,7 @@ class ItemController extends ActiveController
                 $api = new WebSocketAPIBridge(Yii::$app->user->identity);
 
                 return [
-                    'success' => $api->rgb($item_id, $red, $green, $blue, $fade),
+                    'success' => $api->send($sendParameters),
                 ];
             default:
                 throw new ServerErrorHttpException();

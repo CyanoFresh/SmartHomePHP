@@ -40,15 +40,6 @@ class Item extends ActiveRecord
     const VALUE_ON = 1;
     const VALUE_OFF = 0;
 
-    /**
-     * @deprecated
-     */
-    const MODE_RAINBOW = 'rainbow';
-    /**
-     * @deprecated
-     */
-    const MODE_BREATH = 'breath';
-
     const RGB_MODE_STATIC = 'static';
     const RGB_MODE_WAVE = 'wave';
     const RGB_MODE_FADE = 'fade';

@@ -94,44 +94,6 @@ class WebSocketAPIBridge
     }
 
     /**
-     * @param int $itemID
-     * @param int $red
-     * @param int $green
-     * @param int $blue
-     * @param boolean $fade
-     * @return bool
-     * @internal param array $rgbData
-     */
-    public function rgb($itemID, $red, $green, $blue, $fade)
-    {
-        return $this->send([
-            'type' => 'rgb',
-            'item_id' => $itemID,
-            'red' => $red,
-            'green' => $green,
-            'blue' => $blue,
-            'fade' => $fade,
-        ]);
-    }
-
-    /**
-     * @param int $itemID
-     * @param string $mode
-     * @param bool $start
-     * @return bool
-     * @internal param array $rgbData
-     */
-    public function rgbMode($itemID, $mode, $start)
-    {
-        return $this->send([
-            'type' => 'rgbMode',
-            'item_id' => $itemID,
-            'mode' => $mode,
-            'start' => $start,
-        ]);
-    }
-
-    /**
      * @param int $triggerID
      * @return bool
      */
