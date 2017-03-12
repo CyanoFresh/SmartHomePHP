@@ -58,6 +58,9 @@ function onMessage(e) {
             case 'value':
                 updateValue(data);
                 break;
+            case 'rgb':
+                updateRGB(data.item_id, data);
+                break;
             case 'error':
                 showErrorMessage(data.message);
                 break;
