@@ -2,19 +2,17 @@
 body {
     background: #e8e8e8;
     overflow-x: hidden;
-    height: 100%;
 }
 
 .content {
     padding-top: 64px;
     transition: transform .3s ease-in-out, margin .3s ease-in-out;
     margin-left: 260px;
-    /*overflow-x: hidden;*/
 }
 
 /* Navbar */
 .navbar {
-    box-shadow: 0 0 10px #9e9e9e;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .navbar .container-fluid {
@@ -118,17 +116,22 @@ body {
 /* Drawer */
 .drawer {
     position: fixed;
-    top: 0;
+    display: flex;
+    flex-direction: column;
+    top: 64px;
     left: 0;
-    display: block;
+    bottom: 0;
     width: 260px;
-    height: calc(100vh - 64px);
-    margin-top: 64px;
-    z-index: 810;
+    z-index: 100;
     background: #fff;
     transition: transform .3s ease-in-out, width .3s ease-in-out;
     border-right: 1px solid #d5d5d5;
-    overflow-y: auto;
+    overflow: auto;
+}
+
+.drawer .drawer-content {
+    height: 100%;
+    overflow: auto;
 }
 
 @media (max-width: 767px) {
@@ -589,9 +592,9 @@ body.login-body {
 }
 
 /*.table-footer .pagination {*/
-    /*margin: 0;*/
-    /*padding: 0;*/
-    /*display: block;*/
+/*margin: 0;*/
+/*padding: 0;*/
+/*display: block;*/
 /*}*/
 
 .table-footer .prev,
