@@ -25,7 +25,7 @@ $this->params['in-card'] = false;
         'columns' => [
             'id',
             'name',
-            'bg',
+            'sort_order',
 
             ['class' => 'app\components\ActionButtonColumn'],
         ],

@@ -39,7 +39,7 @@ class PanelController extends Controller
             . '";
         ', View::POS_HEAD);
 
-        $roomModels = Room::find()->all();
+        $roomModels = Room::find()->orderBy('sort_order')->all();
 
         return $this->render('index', [
             'roomModels' => $roomModels,
