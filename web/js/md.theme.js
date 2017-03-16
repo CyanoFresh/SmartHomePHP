@@ -10,7 +10,7 @@ function uid() {
 }
 
 $(document).ready(function () {
-    $('.withripple, .btn, .navbar a').ripples();
+    $('.withripple, .btn, .navbar a, .drawer-menu a').ripples();
 
     $('select.md-select').each(function () {
         var $select = $(this);

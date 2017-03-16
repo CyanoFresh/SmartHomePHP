@@ -10,7 +10,7 @@ $this->title = 'Профиль ' . $user->username;
 
 <div class="row user-profile">
     <div class="col-sm-2">
-        <img src="<?= $user->getAvatar(200) ?>" alt="<?= $user->username ?>" class="img-responsive img-circle">
+        <img src="<?= $user->getAvatar(200) ?>" alt="<?= $user->username ?>" class="img-responsive img-circle center-block">
 
         <div class="user-actions text-center">
             <a href="<?= Url::to(['edit']) ?>" class="btn btn-primary"><i class="fa fa-pencil"></i>
