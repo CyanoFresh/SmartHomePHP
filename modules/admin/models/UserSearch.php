@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\modules\admin\models;
 
 use Yii;
 use yii\base\Model;
@@ -18,8 +18,8 @@ class UserSearch extends User
     public function rules()
     {
         return [
-            [['id', 'status', 'group', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'email'], 'safe'],
+            [['id', 'status', 'group', 'created_at', 'updated_at', 'room_id'], 'integer'],
+            [['username', 'email', 'name'], 'safe'],
         ];
     }
 
@@ -64,9 +64,12 @@ class UserSearch extends User
             'group' => $this->group,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'room_id' => $this->room_id,
         ]);
 
-        $query->andFilterWhere(['like', 'username', $this->username])
+        $query
+            ->andFilterWhere(['like', 'username', $this->username])
+            ->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'email', $this->email]);
 
         return $dataProvider;

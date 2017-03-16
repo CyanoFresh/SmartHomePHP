@@ -1,9 +1,10 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\UserSearch */
+/* @var $searchModel \app\modules\admin\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+use app\models\Room;
 use app\models\User;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
@@ -26,6 +27,15 @@ $this->params['in-card'] = false;
             'id',
             'username',
             'email',
+            'name',
+            [
+                'attribute' => 'room_id',
+                'filter' => Room::getList(),
+                'value' => function ($model) {
+                    /** @var $model User */
+                    return $model->room->name;
+                },
+            ],
             [
                 'filter' => User::getStatuses(),
                 'attribute' => 'status',

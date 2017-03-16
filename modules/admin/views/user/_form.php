@@ -4,7 +4,9 @@
 /* @var $model app\models\User */
 /* @var $form yii\widgets\ActiveForm */
 
+use app\models\Room;
 use app\models\User;
+use kartik\widgets\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -26,9 +28,20 @@ if ($model->isNewRecord) {
 
     <?= $form->field($model, 'email')->input('email') ?>
 
+    <?= $form->field($model, 'name')->textInput() ?>
+
+    <?= $form->field($model, 'avatar')->textInput() ?>
+
     <?= $form->field($model, 'status')->dropDownList(User::getStatuses()) ?>
 
     <?= $form->field($model, 'group')->dropDownList(User::getGroups()) ?>
+
+    <?= $form->field($model, 'room_id')->widget(Select2::className(), [
+        'data' => Room::getList(),
+        'options' => [
+            'placeholder' => 'Выберите комнату ...',
+        ],
+    ]) ?>
 
     <?= $form->field($model, 'api_key')->textInput()->hint($randomApiKey) ?>
 
