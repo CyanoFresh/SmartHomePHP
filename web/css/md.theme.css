@@ -628,3 +628,18 @@ body.login-body {
 .btn-flat:focus {
     box-shadow: none;
 }
+
+/* Profile */
+.user-actions .btn {
+    margin: 20px 0;
+}
+
+.user-profile h4 {
+    margin-bottom: 20px;
+    font-weight: lighter;
+}
+
+.show-on-click:not(.open) {
+    text-decoration: underline;
+    cursor: pointer;
+}

@@ -12,8 +12,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-view">
 
-    <h1 class="page-header">
-        <?= $this->title ?>
+    <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
@@ -22,13 +21,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-    </h1>
+    </p>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
             'id',
             'username',
+            'name',
             'email:email',
             [
                 'attribute' => 'status',
@@ -37,6 +37,10 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'group',
                 'value' => $model->getGroupLabel(),
+            ],
+            [
+                'attribute' => 'room_id',
+                'value' => $model->room->name,
             ],
             'api_key',
             'created_at:datetime',

@@ -33,3 +33,11 @@ $('.ajax-call').click(function (e) {
         showErrorMessage('Не удалось обновить');
     });
 });
+
+$('.show-on-click').click(function (e) {
+    e.preventDefault();
+
+    $(this).text($(this).data('text')).addClass('open');
+
+    return false;
+});

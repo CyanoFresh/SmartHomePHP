@@ -41,6 +41,7 @@ return [
             'rules' => [
                 '' => 'panel/index',
                 '<controller>' => '<controller>/index',
+                'profile/<id:\d+>' => 'profile/index',
                 'admin/<controller>/<id:\d+>/<action:(create|update|delete)>' => 'admin/<controller>/<action>',
                 'admin/<controller>/<id:\d+>' => 'admin/<controller>/view',
                 'admin/<controller>s' => 'admin/<controller>/index',
