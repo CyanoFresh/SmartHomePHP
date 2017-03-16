@@ -44,7 +44,7 @@ $this->title = 'Профиль ' . $user->username;
             </tr>
             <tr>
                 <th scope="row">Комната</th>
-                <td><?= $user->room->name ?></td>
+                <td><?= $user->room ? $user->room->name : null ?></td>
             </tr>
             <?php if (Yii::$app->user->id === $user->id): ?>
             <tr>

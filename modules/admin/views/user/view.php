@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'room_id',
-                'value' => $model->room->name,
+                'value' => $model->room ? $model->room->name : null,
             ],
             'api_key',
             'created_at:datetime',
