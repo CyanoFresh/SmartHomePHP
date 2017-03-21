@@ -33,7 +33,7 @@ $this->params['in-card'] = false;
                 'filter' => Room::getList(),
                 'value' => function ($model) {
                     /** @var $model User */
-                    return $model->room->name;
+                    return $model->room ? $model->room->name : null;
                 },
             ],
             [
