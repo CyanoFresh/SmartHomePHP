@@ -223,7 +223,7 @@ $(document).ready(function () {
             html: true,
             placement: 'bottom',
             trigger: 'click',
-            container: 'body',
+            // container: 'body',
             content: function () {
                 var source = $("#rgb-item-widget-popover-content").html();
                 var template = Handlebars.compile(source);
