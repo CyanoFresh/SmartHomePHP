@@ -379,12 +379,7 @@ html, body {
     margin: 0;
 }
 
-.sp-color, .sp-hue, .sp-clear {
-     border: none;
-}
-
 .sp-dragger {
-    border: 2px solid #fff;
     background: transparent;
 }
 
