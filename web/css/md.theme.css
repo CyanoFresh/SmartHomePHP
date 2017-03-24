@@ -379,14 +379,6 @@ html, body {
     margin: 0;
 }
 
-.sp-dragger {
-    background: transparent;
-}
-
-.sp-slider {
-    opacity: 1;
-}
-
 /* Snackbar fixes */
 #snackbar-container {
     position: fixed;
