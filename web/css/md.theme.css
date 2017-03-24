@@ -379,6 +379,19 @@ html, body {
     margin: 0;
 }
 
+.sp-color, .sp-hue, .sp-clear {
+     border: none;
+}
+
+.sp-dragger {
+    border: 2px solid #fff;
+    background: transparent;
+}
+
+.sp-slider {
+    opacity: 1;
+}
+
 /* Snackbar fixes */
 #snackbar-container {
     position: fixed;
