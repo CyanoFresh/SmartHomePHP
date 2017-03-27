@@ -1,4 +1,5 @@
 var wsURL;
+var itemValueChartUrl;
 
 var WS;
 var WSConnectionOpened;
@@ -216,6 +217,63 @@ $(document).ready(function () {
     });
 
     $('.panel-item-variable').tooltip();
+
+    // Value widget
+    $('body').on('click', '.panel-item-variable', function () {
+        var $modal = $('#item-chart-modal');
+        var $this = $(this);
+
+        var title = $this.data('original-title');
+        var itemId = $this.data('item-id');
+
+        var data;
+
+        $.ajax({
+            url: itemValueChartUrl + '&item_id=' + itemId,
+            dataType: 'json',
+        }).success(function (result) {
+            $modal.find('.item-chart-name').html(title);
+            var $canvas = $modal.find('#item-chart');
+
+            Date.prototype.formatMMDDYYYY = function () {
+                return this.getHours() + ':' + this.getMinutes() + ':' + this.getSeconds();
+            };
+
+            // Split timestamp and data into separate arrays
+            var labels = [],
+                data = [];
+
+            $.each(result.data, function (key, value) {
+                console.log(key);
+                labels.push(new Date(key * 1000).formatMMDDYYYY());
+                data.push(parseInt(value));
+            });
+
+            // Create the chart.js data structure using 'labels' and 'data'
+            var tempData = {
+                labels: labels,
+                datasets: [{
+                    label: title,
+                    data: data,
+                    backgroundColor: 'transparent',
+                    borderColor: '#009688',
+                }],
+            };
+
+            // Get the context of the canvas element we want to select
+            var ctx = $canvas.get(0).getContext("2d");
+
+            // Instantiate a new chart
+            var myLineChart = new Chart(ctx, {
+                type: 'line',
+                data: tempData
+            });
+
+            $modal.modal('show');
+        }).fail(function () {
+            showErrorMessage('Не удалось получить данные');
+        });
+    });
 
     // RGB Widget
     $('.panel-item-rgb')

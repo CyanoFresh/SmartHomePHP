@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Room;
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\View;
 
@@ -37,6 +38,7 @@ class PanelController extends Controller
             . '/?type=user&id=' . Yii::$app->user->identity->id
             . '&auth_token=' . Yii::$app->user->identity->getAuthToken()
             . '";
+            var itemValueChartUrl = "' . Url::to(['/api/item/chart-data', 'access-token' => Yii::$app->user->identity->api_key]) . '"
         ', View::POS_HEAD);
 
         $roomModels = Room::find()->orderBy('sort_order')->all();

@@ -158,3 +158,21 @@ $this->title = 'Панель Управления';
         </div>
     </div>
 </script>
+
+<!-- Modal -->
+<div class="modal fade" id="item-chart-modal" tabindex="-1" role="dialog" aria-labelledby="item-chart-modal-label">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="item-chart-modal-label">График элемента <span class="item-chart-name"></span></h4>
+            </div>
+            <div class="modal-body">
+                <canvas id="item-chart"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>

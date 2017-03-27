@@ -18,7 +18,7 @@ class PanelAsset extends AssetBundle
         'app\assets\AppAsset',
         'app\assets\HandlebarsAsset',
         'app\assets\SpectrumAsset',
-//        'app\assets\ChartjsAsset',
+        'app\assets\ChartjsAsset',
         'yii\web\JqueryAsset',
     ];
 }

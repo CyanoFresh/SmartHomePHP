@@ -3,6 +3,7 @@
 namespace app\modules\api\controllers;
 
 use app\models\Board;
+use app\models\History;
 use app\models\Item;
 use app\modules\api\components\WebSocketAPIBridge;
 use Yii;
@@ -256,6 +257,46 @@ class ItemController extends ActiveController
             default:
                 throw new ServerErrorHttpException();
         }
+    }
+
+    /**
+     * @param int $item_id
+     * @return array
+     * @throws BadRequestHttpException
+     */
+    public function actionChartData($item_id)
+    {
+        $item = $this->findItem($item_id);
+
+        if (!in_array($item->type, [
+            Item::TYPE_VARIABLE,
+            Item::TYPE_VARIABLE_HUMIDITY,
+            Item::TYPE_VARIABLE_LIGHT,
+            Item::TYPE_VARIABLE_TEMPERATURE
+        ])
+        ) {
+            throw new BadRequestHttpException('This item is not the variable one');
+        }
+
+        $historyModels = History::find()
+            ->where([
+                'type' => History::TYPE_ITEM_VALUE,
+                'item_id' => $item->id,
+            ])
+            ->andWhere(['>=', 'commited_at', time() - 21600])
+            ->orderBy('commited_at DESC')
+            ->all();
+
+        $data = [];
+
+        foreach ($historyModels as $historyModel) {
+            $data[$historyModel->commited_at] = $historyModel->value;
+        }
+
+        return [
+            'success' => true,
+            'data' => $data,
+        ];
     }
 
     /**
