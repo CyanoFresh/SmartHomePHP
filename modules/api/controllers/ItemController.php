@@ -296,6 +296,7 @@ class ItemController extends ActiveController
         return [
             'success' => true,
             'data' => $data,
+            'item' => $item,
         ];
     }
 

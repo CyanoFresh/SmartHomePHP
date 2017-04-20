@@ -223,16 +223,22 @@ $(document).ready(function () {
         var $modal = $('#item-chart-modal');
         var $this = $(this);
 
+        var type = parseInt($this.data('item-type'));
         var title = $this.data('original-title');
         var itemId = $this.data('item-id');
 
         var data;
+
+        if (type !== 20 && type !== 21 && type !== 22 && type !== 23) {
+            return;
+        }
 
         $.ajax({
             url: itemValueChartUrl + '&item_id=' + itemId,
             dataType: 'json',
         }).success(function (result) {
             $modal.find('.item-chart-name').html(title);
+
             var $canvas = $modal.find('#item-chart');
 
             Date.prototype.formatMMDDYYYY = function () {
@@ -244,7 +250,6 @@ $(document).ready(function () {
                 data = [];
 
             $.each(result.data, function (key, value) {
-                console.log(key);
                 labels.push(new Date(key * 1000).formatMMDDYYYY());
                 data.push(parseInt(value));
             });
@@ -255,9 +260,10 @@ $(document).ready(function () {
                 datasets: [{
                     label: title,
                     data: data,
+                    lineTension: 0,
                     backgroundColor: 'transparent',
-                    borderColor: '#009688',
-                }],
+                    borderColor: '#009688'
+                }]
             };
 
             // Get the context of the canvas element we want to select

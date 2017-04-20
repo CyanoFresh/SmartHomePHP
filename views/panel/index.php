@@ -57,7 +57,7 @@ $this->title = 'Панель Управления';
                             <?php endforeach; ?>
                         </div>
                         <div class="row panel-items-rgb">
-                            <?php foreach ($room->getItemWidgets()->rgb()->all() as $widget): ?>
+                            <?php foreach ($room->getItemWidgets()->rgb()->active()->all() as $widget): ?>
                                 <?= $this->render('_rgb', [
                                     'widget' => $widget,
                                 ]) ?>
