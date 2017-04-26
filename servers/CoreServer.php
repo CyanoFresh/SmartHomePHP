@@ -160,6 +160,11 @@ class CoreServer implements MessageComponentInterface
         if (isset($conn->User)) {
             $this->logUserConnection($conn->User, false);
 
+            if (isset($this->userConnections[$conn->User->id][$conn->resourceId])
+                and $this->userConnections[$conn->User->id][$conn->resourceId] instanceof ConnectionInterface) {
+                unset($this->userConnections[$conn->User->id][$conn->resourceId]);
+            }
+
             $this->log("User [{$conn->User->id}] disconnected");
         } elseif (isset($conn->Board)) {
             $boardId = $conn->Board->id;
@@ -210,12 +215,12 @@ class CoreServer implements MessageComponentInterface
         }
 
         // Check if it is an API request
-        $api = $conn->remoteAddress == '127.0.0.1' and $conn->WebSocket->request->getHeader('Origin') == 'origin';
+        $api = $conn->remoteAddress === '127.0.0.1' and $conn->WebSocket->request->getHeader('Origin') == 'origin';
 
         // Close previous connection if it is not an API connection
-        if (isset($this->userConnections[$user->id]) and !$api) {
-            $this->userConnections[$user->id]->close();
-        }
+//        if (!$api and isset($this->userConnections[$user->id]) and $this->userConnections[$user->id] instanceof ConnectionInterface) {
+//            $this->userConnections[$user->id]->close();
+//        }
 
         // Regenerate auth token
         $user->reGenerateAuthToken();
@@ -224,7 +229,7 @@ class CoreServer implements MessageComponentInterface
         $conn->User = $user;
         $conn->api = $api;
 
-        $this->userConnections[$user->id] = $conn;
+        $this->userConnections[$user->id][$conn->resourceId] = $conn;
 
         // Prepare Items for User
         $itemModels = Item::find()->all();
@@ -507,7 +512,6 @@ class CoreServer implements MessageComponentInterface
                 $this->sendUsers($parameters);
 
                 $this->logItemValue($item, serialize($parameters));
-                VarDumper::dump($parameters);
                 $this->saveItemValue($item->id, $parameters, $item->type);
 
                 break;
@@ -804,8 +808,15 @@ class CoreServer implements MessageComponentInterface
     {
         $msg = Json::encode($data);
 
-        foreach ($this->userConnections as $client) {
-            $client->send($msg);
+        foreach ($this->userConnections as $userConnections) {
+            if (is_array($userConnections)) {
+                /** @var Connection[] $userConnections */
+                foreach ($userConnections as $connection) {
+                    $connection->send($msg);
+                }
+            } else {
+                $userConnections->send($msg);
+            }
         }
     }
 

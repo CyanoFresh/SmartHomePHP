@@ -54,6 +54,7 @@ class ItemWidget extends ActiveRecord
             [['value_type'], 'in', 'range' => self::getValueTypesArray()],
             [['name', 'item_id', 'icon', 'type'], 'required'],
             [['name', 'html_class', 'icon'], 'string', 'max' => 255],
+            [['sort_order'], 'default', 'value' => 0],
             [['item_id'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_id' => 'id']],
             [['room_id'], 'exist', 'skipOnError' => true, 'targetClass' => Room::className(), 'targetAttribute' => ['room_id' => 'id']],
         ];
