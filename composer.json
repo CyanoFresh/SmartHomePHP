@@ -43,5 +43,8 @@
         "name": "bower-asset/snackbarjs"
       }
     ]
+  },
+  "scripts": {
+    "post-install-cmd": "php init --env=Development --overwrite=n"
   }
 }
