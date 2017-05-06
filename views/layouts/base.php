@@ -3,19 +3,15 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use dmstr\helpers\AdminLteHelper;
-use dmstr\web\AdminLteAsset;
+use app\assets\MDThemeAsset;
 use yii\helpers\Html;
 use app\assets\AppAsset;
+use yii\helpers\Url;
 
 AppAsset::register($this);
-AdminLteAsset::register($this);
+MDThemeAsset::register($this);
 
-if (isset($this->params['body-class'])) {
-    $bodyClass = $this->params['body-class'];
-} else {
-    $bodyClass = null;
-}
+$bodyClass = isset($this->params['bodyClass']) ? $this->params['bodyClass'] : '';
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -29,8 +25,14 @@ if (isset($this->params['body-class'])) {
 
     <title><?= $this->title ?> - <?= Yii::$app->name ?></title>
 
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= Yii::$app->homeUrl ?>img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="<?= Yii::$app->homeUrl ?>img/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="<?= Yii::$app->homeUrl ?>img/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="<?= Yii::$app->homeUrl ?>manifest.json">
+    <link rel="mask-icon" href="<?= Yii::$app->homeUrl ?>img/safari-pinned-tab.svg" color="#5bbad5">
+
     <meta name="application-name" content="<?= Yii::$app->name ?>">
-    <meta name="theme-color" content="#605CA8">
+    <meta name="theme-color" content="#009688">
 
     <link rel="publisher" href="https://plus.google.com/+AlexSolomaha21">
     <link rel="me" href="https://plus.google.com/+AlexSolomaha21" type="text/html">
@@ -40,7 +42,7 @@ if (isset($this->params['body-class'])) {
     <?php $this->head() ?>
 </head>
 
-<body class="hold-transition <?= AdminLteHelper::skinClass() ?> <?= $bodyClass ?> sidebar-mini">
+<body class="<?= $bodyClass ?>">
 <?php $this->beginBody() ?>
 
 <?= $content ?>

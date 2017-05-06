@@ -1,22 +1,24 @@
 function showErrorMessage(message) {
-    return noty({
-        layout: 'bottomRight',
-        text: message,
-        timeout: 5000,
-        type: 'error',
-        theme: 'relax'
+    return $.snackbar({
+        content: message,
+        timeout: 5000
     });
 }
 
 function showSuccessMessage(message) {
-    return noty({
-        layout: 'bottomRight',
-        text: message,
-        timeout: 5000,
-        type: 'success',
-        theme: 'relax'
+    return $.snackbar({
+        content: message,
+        timeout: 5000
     });
 }
+
+$('.navbar-toggle-drawer').click(function (e) {
+    e.preventDefault();
+
+    $('body').toggleClass('drawer-open');
+
+    return false;
+});
 
 $('.ajax-call').click(function (e) {
     e.preventDefault();
@@ -30,4 +32,12 @@ $('.ajax-call').click(function (e) {
     }).fail(function () {
         showErrorMessage('Не удалось обновить');
     });
+});
+
+$('.show-on-click').click(function (e) {
+    e.preventDefault();
+
+    $(this).text($(this).data('text')).addClass('open');
+
+    return false;
 });

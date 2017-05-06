@@ -28,18 +28,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'name',
-            'icon',
-            'bg',
-            'class',
             ['attribute' => 'board_id', 'value' => $model->board->name],
             'pin',
             'type',
             'default_value',
             'update_interval',
             'save_history_interval',
-            ['attribute' => 'room_id', 'value' => $model->room->name],
             'url:url',
-            'sort_order',
         ],
     ]) ?>
 

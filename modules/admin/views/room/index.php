@@ -7,26 +7,25 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+
 $this->title = 'Комнаты';
 $this->params['breadcrumbs'][] = $this->title;
+$this->params['in-card'] = false;
 ?>
-<div class="room-index">
 
-    <p>
-        <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+<div class="card table-card">
+    <div class="table-card-actions">
+        <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-default btn-flat']) ?>
+    </div>
 
     <?php Pjax::begin(); ?>
-    <?= GridView::widget([
+    <?= \app\widgets\DataTable::widget([
         'dataProvider' => $dataProvider,
-        'summaryOptions' => ['class' => 'alert alert-info'],
-        'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'filterModel' => $searchModel,
         'columns' => [
             'id',
             'name',
-            'bg',
+            'sort_order',
 
             ['class' => 'app\components\ActionButtonColumn'],
         ],

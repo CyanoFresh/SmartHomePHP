@@ -3,21 +3,22 @@
 namespace app\assets;
 
 use yii\web\AssetBundle;
-use yii\web\JqueryAsset;
 
-class WSClientAsset extends AssetBundle
+class PanelAsset extends AssetBundle
 {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'css/wsclient.css',
+        'css/panel.css',
     ];
     public $js = [
-        'js/wsclient.js',
+        'js/panel.js',
     ];
     public $depends = [
-        'app\assets\SpectrumAsset',
         'app\assets\AppAsset',
+        'app\assets\HandlebarsAsset',
+        'app\assets\SpectrumAsset',
+        'app\assets\ChartjsAsset',
         'yii\web\JqueryAsset',
     ];
 }

@@ -13,40 +13,28 @@ use yii\widgets\Pjax;
 
 $this->title = 'Элементы';
 $this->params['breadcrumbs'][] = $this->title;
+$this->params['in-card'] = false;
 ?>
-<div class="item-index">
 
-    <p>
-        <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-success']) ?>
+<div class="card table-card">
+    <div class="table-card-actions">
+        <?= Html::a('Добавить', ['create'], ['class' => 'btn btn-default btn-flat']) ?>
         <?= Html::a('Обновить на сервере', [
             '/api/panel/update-items',
             'access-token' => Yii::$app->user->identity->api_key,
         ], [
-            'class' => 'btn btn-default ajax-call',
+            'class' => 'btn btn-default btn-flat ajax-call',
         ]) ?>
-    </p>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    </div>
 
     <?php Pjax::begin(); ?>
-    <?= GridView::widget([
+
+    <?= \app\widgets\DataTable::widget([
         'dataProvider' => $dataProvider,
-        'summaryOptions' => ['class' => 'alert alert-info'],
-        'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         'filterModel' => $searchModel,
         'columns' => [
-            [
-                'attribute' => 'id',
-                'contentOptions' => ['style' => 'width: 5%']
-            ],
+            'id',
             'name',
-            [
-                'attribute' => 'room_id',
-                'filter' => Room::getList(),
-                'value' => function ($model) {
-                    /** @var $model Item */
-                    return $model->room->name;
-                },
-            ],
             [
                 'attribute' => 'board_id',
                 'filter' => Board::getList(),
@@ -68,5 +56,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'app\components\ActionButtonColumn'],
         ],
     ]); ?>
+
     <?php Pjax::end(); ?>
 </div>

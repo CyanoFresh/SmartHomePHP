@@ -12,6 +12,15 @@ $params = [
         'connectionCheckTimeout' => 180,
         'connectionCheckMaxIteration' => 2,
     ],
+    'items' => [
+        'rgb' => [
+            'fade-time' => 3000,
+            'color-time' => 3000,
+            'red' => 0,
+            'green' => 150,
+            'blue' => 150,
+        ],
+    ],
     'telegramBotApiKey' => '',
     'telegramBotChatId' => '',
 ];

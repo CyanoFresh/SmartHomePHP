@@ -18,8 +18,8 @@ class RoomSearch extends Room
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['name', 'bg'], 'safe'],
+            [['id', 'sort_order'], 'integer'],
+            [['name'], 'safe'],
         ];
     }
 
@@ -60,10 +60,10 @@ class RoomSearch extends Room
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'sort_order' => $this->sort_order,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'bg', $this->bg]);
+        $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

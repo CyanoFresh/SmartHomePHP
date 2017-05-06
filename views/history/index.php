@@ -9,6 +9,7 @@ use yii\widgets\Pjax;
 
 $this->title = 'История';
 $this->params['breadcrumbs'][] = $this->title;
+$this->params['in-card'] = false;
 ?>
 <div class="history-index">
 

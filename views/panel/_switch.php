@@ -1,22 +1,17 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $item \app\models\Item */
+/* @var $widget \app\models\ItemWidget */
 
 ?>
 
-<div class="col-md-3 col-sm-4 control-panel-item item-switch"
-     data-item-id="<?= $item->id ?>">
-    <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
-        <div class="info-box-action material-switch">
-            <input id="switch-for-item-<?= $item->id ?>" class="item-switch-checkbox"
-                   type="checkbox" data-item-id="<?= $item->id ?>">
-            <label for="switch-for-item-<?= $item->id ?>" class="label-default"></label>
+<div class="col-lg-3 col-md-4 col-sm-6">
+    <div class="panel-item panel-item-switch withripple <?= $widget->html_class ?>" data-item-id="<?= $widget->item_id ?>">
+        <div class="panel-item-switch-icon">
+            <i class="fa <?= $widget->icon ?>"></i>
         </div>
-
-        <div class="info-box-content">
-            <span class="info-box-text"><?= $item->name ?></span>
+        <div class="panel-item-switch-name">
+            <?= $widget->getName() ?>
         </div>
-        <!-- /.info-box-content -->
     </div>
 </div>

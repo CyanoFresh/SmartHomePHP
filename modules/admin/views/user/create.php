@@ -11,8 +11,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-create">
 
-    <h1 class="page-header"><?= $this->title ?></h1>
-
     <?= $this->render('_form', [
         'model' => $model,
     ]) ?>

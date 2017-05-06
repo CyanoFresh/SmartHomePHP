@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -10,11 +11,11 @@ use yii\helpers\ArrayHelper;
  *
  * @property integer $id
  * @property string $name
- * @property string $bg
+ * @property integer $sort_order
  *
  * @property Item[] $items
  */
-class Room extends \yii\db\ActiveRecord
+class Room extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -31,7 +32,9 @@ class Room extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['name', 'bg'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 255],
+            [['sort_order'], 'integer'],
+            [['sort_order'], 'default', 'value' => 0],
         ];
     }
 
@@ -43,25 +46,16 @@ class Room extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Название'),
-            'bg' => Yii::t('app', 'Фон'),
+            'sort_order' => Yii::t('app', 'Порядок сортировки'),
         ];
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|ItemWidgetQuery
      */
-    public function getItems()
+    public function getItemWidgets()
     {
-        return $this->hasMany(Item::className(), ['room_id' => 'id'])->inverseOf('room');
-    }
-
-    /**
-     * @inheritdoc
-     * @return RoomQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new RoomQuery(get_called_class());
+        return $this->hasMany(ItemWidget::className(), ['room_id' => 'id'])->inverseOf('room');
     }
 
     /**

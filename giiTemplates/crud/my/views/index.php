@@ -17,27 +17,23 @@ echo "<?php\n";
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 use yii\helpers\Html;
-use <?= $generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\widgets\\ListView" ?>;
-<?= $generator->enablePjax ? 'use yii\widgets\Pjax;' : '' ?>
+<?= $generator->indexWidgetType === 'grid' ? null : "use yii\\widgets\\ListView;" ?>
+<?= $generator->enablePjax ? 'use yii\widgets\Pjax;' . "\n" : '' ?>
 
 $this->title = <?= $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) ?>;
 $this->params['breadcrumbs'][] = $this->title;
+$this->params['in-card'] = false;
 ?>
-<div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-index">
 
-    <p>
-        <?= "<?= " ?>Html::a(<?= $generator->generateString('Добавить') ?>, ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-<?php if(!empty($generator->searchModelClass)): ?>
-<?= "    <?php " . ($generator->indexWidgetType === 'grid' ? "// " : "") ?>echo $this->render('_search', ['model' => $searchModel]); ?>
-<?php endif; ?>
+<div class="card table-card">
+    <div class="table-card-actions">
+        <?= "<?= " ?>Html::a(<?= $generator->generateString('Добавить') ?>, ['create'], ['class' => 'btn btn-default btn-flat']) ?>
+    </div>
 
 <?= $generator->enablePjax ? '    <?php Pjax::begin(); ?>' . "\n" : '' ?>
 <?php if ($generator->indexWidgetType === 'grid'): ?>
-    <?= "<?= " ?>GridView::widget([
+    <?= "<?= " ?>\app\widgets\DataTable::widget([
         'dataProvider' => $dataProvider,
-        'summaryOptions' => ['class' => 'alert alert-info'],
-        'layout' => '{summary}<div class="table-responsive">{items}</div>{pager}',
         <?= !empty($generator->searchModelClass) ? "'filterModel' => \$searchModel,\n        'columns' => [\n" : "'columns' => [\n"; ?>
 <?php
 $count = 0;

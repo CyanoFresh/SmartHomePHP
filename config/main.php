@@ -40,11 +40,16 @@ return [
             'showScriptName' => false,
             'rules' => [
                 '' => 'panel/index',
-                'login' => 'auth/login',
                 '<controller>' => '<controller>/index',
+                'profile/<id:\d+>' => 'profile/index',
                 'admin/<controller>/<id:\d+>/<action:(create|update|delete)>' => 'admin/<controller>/<action>',
                 'admin/<controller>/<id:\d+>' => 'admin/<controller>/view',
                 'admin/<controller>s' => 'admin/<controller>/index',
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/room', 'api/item'],
+                    'pluralize' => false,
+                ],
             ],
         ],
         'view' => [
@@ -54,20 +59,15 @@ return [
             'force_charset' => 'UTF-8',
         ],
         'formatter' => [
-//            'dateFormat' => 'dd.MM.yyyy',
-//            'datetimeFormat' => 'php:d.m.Y H:i',
             'defaultTimeZone' => 'Europe/Kiev',
             'timeZone' => 'Europe/Kiev',
         ],
         'assetManager' => [
+            'appendTimestamp' => true,
             'bundles' => [
-                'dmstr\web\AdminLteAsset' => [
-                    'skin' => 'skin-purple',
+                'yii\bootstrap\BootstrapAsset' => [
+                    'css' => [],
                 ],
-//                'yii\bootstrap\BootstrapAsset' => [
-//                    'css' => [],
-//                    'js' => [],
-//                ],
             ],
         ],
     ],

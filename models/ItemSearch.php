@@ -63,8 +63,6 @@ class ItemSearch extends Item
             'type' => $this->type,
             'update_interval' => $this->update_interval,
             'save_history_interval' => $this->save_history_interval,
-            'room_id' => $this->room_id,
-            'sort_order' => $this->sort_order,
         ]);
 
         $query->andFilterWhere(['like', 'url', $this->url])

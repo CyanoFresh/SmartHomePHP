@@ -18,6 +18,9 @@ use yii\web\IdentityInterface;
  * @property string $auth_key
  * @property string $auth_token
  * @property string $api_key
+ * @property string $name
+ * @property string $avatar
+ * @property integer $room_id
  * @property integer $status
  * @property integer $group
  * @property integer $created_at
@@ -26,13 +29,15 @@ use yii\web\IdentityInterface;
  * @property boolean $isAdmin
  *
  * @property string $password write-only password
+ *
+ * @property Room $room
  */
 class User extends ActiveRecord implements IdentityInterface
 {
     const SCENARIO_CREATE = 'create';
     const SCENARIO_UPDATE = 'update';
 
-    const STATUS_DELETED = 0;
+    const STATUS_DISABLED = 0;
     const STATUS_ACTIVE = 10;
 
     const GROUP_ADMIN = 10;
@@ -65,14 +70,15 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['username', 'email'], 'required'],
-            [['api_key', 'auth_token'], 'string'],
-            [['group'], 'integer'],
+            [['api_key', 'auth_token', 'name', 'avatar'], 'string'],
+            [['group', 'room_id'], 'integer'],
             [['password'], 'required', 'on' => self::SCENARIO_CREATE],
             [['password'], 'safe', 'on' => self::SCENARIO_UPDATE],
             [['auth_token'], 'default', 'value' => null],
             [['status'], 'default', 'value' => self::STATUS_ACTIVE],
             [['status'], 'in', 'range' => self::getStatusesArray()],
             [['group'], 'in', 'range' => self::getGroupsArray()],
+            [['room_id'], 'exist', 'skipOnError' => true, 'targetClass' => Room::className(), 'targetAttribute' => ['room_id' => 'id']],
         ];
     }
 
@@ -88,6 +94,9 @@ class User extends ActiveRecord implements IdentityInterface
             'email' => 'Email',
             'status' => 'Статус',
             'group' => 'Группа',
+            'name' => 'Имя',
+            'avatar' => 'Аватар',
+            'room_id' => 'Комната',
             'api_key' => 'API ключ',
             'auth_token' => 'Auth токен',
             'created_at' => 'Дата создания',
@@ -102,7 +111,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             self::STATUS_ACTIVE => 'Активен',
-            self::STATUS_DELETED => 'Удален',
+            self::STATUS_DISABLED => 'Не активен',
         ];
     }
 
@@ -260,12 +269,13 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @param int $size
      * @return string
      */
-    public function getAvatar()
+    public function getAvatar($size = 45)
     {
         $hash = md5($this->email);
-        return 'https://www.gravatar.com/avatar/' . $hash . '?s=45';
+        return 'https://www.gravatar.com/avatar/' . $hash . '?s=' . $size;
     }
 
     /**
@@ -274,6 +284,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function getHistories()
     {
         return $this->hasMany(History::className(), ['user_id' => 'id'])->inverseOf('user');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRoom()
+    {
+        return $this->hasOne(Room::className(), ['id' => 'room_id']);
     }
 
     /**

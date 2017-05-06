@@ -1,16 +1,16 @@
 <?php
 
-namespace app\models;
+namespace app\modules\admin\models;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\User;
+use app\models\ItemWidget;
 
 /**
- * UserSearch represents the model behind the search form about `app\models\User`.
+ * ItemWidgetSearch represents the model behind the search form about `app\models\ItemWidget`.
  */
-class UserSearch extends User
+class ItemWidgetSearch extends ItemWidget
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class UserSearch extends User
     public function rules()
     {
         return [
-            [['id', 'status', 'group', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'email'], 'safe'],
+            [['id', 'active', 'sort_order', 'item_id', 'room_id'], 'integer'],
+            [['name', 'html_class', 'icon'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class UserSearch extends User
      */
     public function search($params)
     {
-        $query = User::find();
+        $query = ItemWidget::find();
 
         // add conditions that should always apply here
 
@@ -60,14 +60,15 @@ class UserSearch extends User
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'status' => $this->status,
-            'group' => $this->group,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'active' => $this->active,
+            'sort_order' => $this->sort_order,
+            'item_id' => $this->item_id,
+            'room_id' => $this->room_id,
         ]);
 
-        $query->andFilterWhere(['like', 'username', $this->username])
-            ->andFilterWhere(['like', 'email', $this->email]);
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'html_class', $this->html_class])
+            ->andFilterWhere(['like', 'icon', $this->icon]);
 
         return $dataProvider;
     }

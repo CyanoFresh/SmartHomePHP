@@ -1,27 +1,18 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $item \app\models\Item */
-
-use app\models\Item;
+/* @var $widget \app\models\ItemWidget */
 
 ?>
 
-<div class="col-md-3 col-sm-4 control-panel-item item-variable"
-     data-item-id="<?= $item->id ?>">
-    <div class="info-box bg-<?= $item->bg ?> <?= $item->class ?>">
-        <span class="info-box-icon"><i class="fa fa-<?= $item->icon ?>"></i></span>
-
-        <div class="info-box-content">
-            <span class="info-box-text"><?= $item->name ?></span>
-            <span class="info-box-number item-value <?= (in_array($item->type, [
-                Item::TYPE_VARIABLE_TEMPERATURE,
-                Item::TYPE_VARIABLE_HUMIDITY,
-                Item::TYPE_LIGHT_LEVEL
-            ])) ? 'temperature' : '' ?>">
-                НЕИЗВЕСТНО
-            </span>
+<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+    <div class="panel-item panel-item-variable <?= $widget->html_class ?> withripple"
+         title="<?= $widget->getName() ?>"
+         data-item-id="<?= $widget->item_id ?>"
+         data-item-type="<?= $widget->item->type ?>">
+        <div class="item-variable-icon">
+            <i class="fa <?= $widget->icon ?>"></i>
         </div>
-        <!-- /.info-box-content -->
+        <div class="item-variable-value item-value"><?= $widget->item->getDefaultNAValue() ?></div>
     </div>
 </div>

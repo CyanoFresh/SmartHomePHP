@@ -8,14 +8,13 @@ use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use React\EventLoop\Factory;
 use React\Socket\Server;
-use Yii;
 use yii\console\Controller;
 
-class PanelController extends Controller
+class StartCoreServerController extends Controller
 {
     public function actionIndex($port = 8081)
     {
-        echo "Starting server on port $port..." . PHP_EOL;
+        echo "Starting Core WS Server on port $port..." . PHP_EOL;
 
         $loop = Factory::create();
 

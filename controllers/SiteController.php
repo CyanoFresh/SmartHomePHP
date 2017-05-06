@@ -13,6 +13,7 @@ class SiteController extends Controller
             'error' => [
                 'class' => 'app\components\ErrorAction',
                 'layout' => Yii::$app->user->isGuest ? 'base' : 'main',
+                'view' => Yii::$app->user->isGuest ? '/error/guest-error' : '/error/error',
             ],
         ];
     }

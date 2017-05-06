@@ -36,7 +36,7 @@ if ($model->isNewRecord) {
             <h2>Выполнить</h2>
 
             <?= $form->field($model, 'item_id')->widget(Select2::className(), [
-                'data' => Item::getList(false, true),
+                'data' => Item::getList(true),
                 'options' => [
                     'placeholder' => 'Выберите элемент ...',
                 ],

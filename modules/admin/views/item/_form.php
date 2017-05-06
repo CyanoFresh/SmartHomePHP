@@ -12,7 +12,6 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 if ($model->isNewRecord) {
-    $model->active = true;
     $model->enable_log = true;
 }
 ?>
@@ -23,8 +22,6 @@ if ($model->isNewRecord) {
 
     <div class="row">
         <div class="col-md-6">
-            <h2>Основные настройки</h2>
-
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
             <?= $form->field($model, 'type')->dropDownList(Item::getTypesArray(), [
@@ -50,37 +47,7 @@ if ($model->isNewRecord) {
 
             <?= $form->field($model, 'save_history_interval')->input('number') ?>
         </div>
-        <div class="col-md-6">
-            <h2>Сниппет</h2>
-
-            <?= $form->field($model, 'icon')->textInput(['maxlength' => true]) ?>
-
-            <?= $form->field($model, 'bg')->dropDownList([
-                'light-blue' => 'Светло-синий',
-                'aqua' => 'Бирюзовый',
-                'green' => 'Зеленый',
-                'yellow' => 'Желтый',
-                'red' => 'Красный',
-                'gray' => 'Серый',
-                'navy' => 'Navy',
-                'teal' => 'Teal',
-                'purple' => 'Фиолетовый',
-                'orange' => 'Оранжевый',
-                'maroon' => 'Бордовый',
-                'black' => 'Черный',
-            ]) ?>
-
-            <?= $form->field($model, 'class')->textInput(['maxlength' => true]) ?>
-
-            <?= $form->field($model, 'room_id')->dropDownList(
-                ArrayHelper::map(Room::find()->all(), 'id', 'name')
-            ) ?>
-
-            <?= $form->field($model, 'sort_order')->input('number') ?>
-        </div>
     </div>
-
-    <?= $form->field($model, 'active')->checkbox() ?>
 
     <?= $form->field($model, 'enable_log')->checkbox() ?>
 
