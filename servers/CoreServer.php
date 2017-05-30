@@ -967,6 +967,15 @@ class CoreServer implements MessageComponentInterface
             return;
         }
 
+        $lastHistory = History::find()->where([
+            'type' => History::TYPE_ITEM_VALUE,
+            'item_id' => $item->id,
+        ])->orderBy('commited_at DESC')->one();
+
+        if ($lastHistory and $lastHistory->value == $value) {
+            return;
+        }
+
         $model = new History();
         $model->type = History::TYPE_ITEM_VALUE;
         $model->item_id = $item->id;
