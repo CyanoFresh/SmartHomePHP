@@ -277,7 +277,7 @@ $(document).ready(function () {
 
             $modal.modal('show').on('hidden.bs.modal', function (e) {
                 myLineChart.destroy();
-                $modal.find('canvas').remove();
+                $modal.find('canvas, iframe').remove();
                 $modal.find('.modal-body').append('<canvas id="item-chart"></canvas>');
             })
         }).fail(function () {
