@@ -235,7 +235,7 @@ $(document).ready(function () {
 
         $.ajax({
             url: itemValueChartUrl + '&item_id=' + itemId,
-            dataType: 'json',
+            dataType: 'json'
         }).success(function (result) {
             $modal.find('.item-chart-name').html(title);
 
@@ -275,7 +275,11 @@ $(document).ready(function () {
                 data: tempData
             });
 
-            $modal.modal('show');
+            $modal.modal('show').on('hidden.bs.modal', function (e) {
+                myLineChart.clear().destroy();
+                $modal.find('canvas').remove();
+                $modal.find('.modal-body').append('<canvas id="item-chart"></canvas>');
+            })
         }).fail(function () {
             showErrorMessage('Не удалось получить данные');
         });
