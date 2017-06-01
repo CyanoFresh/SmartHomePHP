@@ -20,6 +20,9 @@ $params = [
             'green' => 150,
             'blue' => 150,
         ],
+        'chart' => [
+            'forLast' => 7200,
+        ],
     ],
     'telegramBotApiKey' => '',
     'telegramBotChatId' => '',

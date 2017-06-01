@@ -283,7 +283,7 @@ class ItemController extends ActiveController
                 'type' => History::TYPE_ITEM_VALUE,
                 'item_id' => $item->id,
             ])
-            ->andWhere(['>=', 'commited_at', time() - 21600])
+            ->andWhere(['>=', 'commited_at', time() - Yii::$app->params['items']['chart']['forLast']])
             ->orderBy('commited_at DESC')
             ->all();
 
