@@ -242,7 +242,7 @@ $(document).ready(function () {
             var $canvas = $modal.find('#item-chart');
 
             Date.prototype.formatMMDDYYYY = function () {
-                return this.getHours() + ':' + this.getMinutes() + ':' + this.getSeconds();
+                return this.getHours() + ':' + this.getMinutes();
             };
 
             // Split timestamp and data into separate arrays
