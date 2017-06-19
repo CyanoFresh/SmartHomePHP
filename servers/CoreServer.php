@@ -299,8 +299,10 @@ class CoreServer implements MessageComponentInterface
             throw new NotFoundHttpException("Board with given ID does not exists");
         }
 
-        if (!$board->remote_connection and !IPHelper::isLocal($conn->remoteAddress)) {
-            $this->log("Remote connection blocked for board [$boardID]; IP: {$conn->remoteAddress}");
+        $ip = $conn->WebSocket->request->getHeader('X-Forwarded-For') != null ? $conn->WebSocket->request->getHeader('X-Forwarded-For') : $conn->remoteAddress;
+
+        if (!$board->remote_connection and !IPHelper::isLocal($ip)) {
+            $this->log("Remote connection blocked for board [$boardID]; IP: {$ip}");
 
             throw new ForbiddenHttpException("Remote connection is not allowed for this Board");
         }
