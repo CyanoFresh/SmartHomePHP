@@ -26,7 +26,7 @@ class AppAsset extends AssetBundle
         'yii\web\YiiAsset',
         'rmrevin\yii\fontawesome\AssetBundle',
         'app\assets\vendors\SnackbarjsAsset',
-//        'app\assets\vendors\SpectrumAsset',
+        'app\assets\vendors\SpectrumAsset',
 //        'dmstr\web\AdminLteAsset',
 //        'shifrin\noty\NotyAsset',
 //        'app\assets\MDThemeAsset',
