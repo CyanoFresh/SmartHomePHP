@@ -264,7 +264,7 @@ class CoreServer implements MessageComponentInterface
 
         $this->logUserConnection($user, true);
 
-        $this->log("Connected user [{$user->id}] [{$user->username}] IP: {$conn->remoteAddress}");
+        $this->log("Connected user [{$user->id}] [{$user->username}] IP: {$conn->remoteAddress} or {$conn->WebSocket->request->getHeader('X-Forwarded-For')}");
     }
 
     /**
