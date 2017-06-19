@@ -11,8 +11,6 @@ Author: Alex Solomaha <cyanofresh@gmail.com>
 
 Feel free to contribute!
 
-![Screen of Panel](http://image.prntscr.com/image/6e4e6e725328456e960e4a384e3bccba.png)
-
 FEATURES
 ------------
 
@@ -31,13 +29,13 @@ I've selected ESP8266 NodeMCU boards for low price and websocket module support.
 - [NodeMCU #2](https://github.com/CyanoFresh/SmartHome-NodeMCU-2)
 - [NodeMCU #3](https://github.com/CyanoFresh/SmartHome-NodeMCU-3)
 - [WeMos D1 Mini #1](https://github.com/CyanoFresh/SmartHome-Wemos-1)
-
+- ...
 
 REQUIREMENTS
 ------------
 
 - PHP >= 5.4.0
-- At least 1 open port (8081)
+- At least 1 open port for websockets (8081)
 
 
 INSTALLATION
@@ -52,18 +50,15 @@ composer install
 php init
 ~~~
 
-Then configure DB in config/db-local.php and run:
+Configure DB in config/db-local.php and run:
 
 ~~~
 php yii migrate
 ~~~
 
-**NOTES:**
-- Check and edit the other files in the `config/` directory to customize your application as required.
-
 
 To start the Main server:
 
 ~~~
-php yii panel
+php yii start-core-server
 ~~~

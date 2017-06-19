@@ -16,9 +16,9 @@ class PanelAsset extends AssetBundle
     ];
     public $depends = [
         'app\assets\AppAsset',
-        'app\assets\HandlebarsAsset',
-        'app\assets\SpectrumAsset',
-        'app\assets\ChartjsAsset',
+        'app\assets\vendors\HandlebarsAsset',
+        'app\assets\vendors\SpectrumAsset',
+        'app\assets\vendors\ChartjsAsset',
         'yii\web\JqueryAsset',
     ];
 }

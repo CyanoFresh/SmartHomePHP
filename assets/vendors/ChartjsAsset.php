@@ -1,14 +1,14 @@
 <?php
 
-namespace app\assets;
+namespace app\assets\vendors;
 
 use yii\web\AssetBundle;
 
-class HandlebarsAsset extends AssetBundle
+class ChartjsAsset extends AssetBundle
 {
-    public $sourcePath = '@bower/handlebars';
+    public $sourcePath = '@bower/chart.js/dist';
     public $js = [
-        'handlebars.js',
+        'Chart.min.js',
     ];
     public $publishOptions = [
         'only' => [

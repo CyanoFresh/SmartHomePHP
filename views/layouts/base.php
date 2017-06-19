@@ -6,10 +6,8 @@
 use app\assets\MDThemeAsset;
 use yii\helpers\Html;
 use app\assets\AppAsset;
-use yii\helpers\Url;
 
 AppAsset::register($this);
-MDThemeAsset::register($this);
 
 $bodyClass = isset($this->params['bodyClass']) ? $this->params['bodyClass'] : '';
 ?>
