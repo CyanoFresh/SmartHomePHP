@@ -214,8 +214,10 @@ class CoreServer implements MessageComponentInterface
             throw new UnauthorizedHttpException("Wrong credentials");
         }
 
+        $ip = $conn->WebSocket->request->getHeader('X-Forwarded-For') != null ? $conn->WebSocket->request->getHeader('X-Forwarded-For') : $conn->remoteAddress;
+
         // Check if it is an API request
-        $api = $conn->remoteAddress === '127.0.0.1' and $conn->WebSocket->request->getHeader('Origin') == 'origin';
+        $api = $ip === '127.0.0.1' and $conn->WebSocket->request->getHeader('Origin') == 'origin';
 
         // Close previous connection if it is not an API connection
 //        if (!$api and isset($this->userConnections[$user->id]) and $this->userConnections[$user->id] instanceof ConnectionInterface) {
@@ -264,7 +266,7 @@ class CoreServer implements MessageComponentInterface
 
         $this->logUserConnection($user, true);
 
-        $this->log("Connected user [{$user->id}] [{$user->username}] IP: {$conn->remoteAddress} or {$conn->WebSocket->request->getHeader('X-Forwarded-For')}");
+        $this->log("Connected user [{$user->id}] [{$user->username}] IP: {$ip}");
     }
 
     /**
