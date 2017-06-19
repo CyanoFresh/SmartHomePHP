@@ -62,3 +62,22 @@ To start the Main server:
 ~~~
 php yii start-core-server
 ~~~
+
+Enable WSS
+----
+
+Install and enable proxy module:
+
+~~~
+a2enmod proxy_wstunnel
+~~~
+
+Add this lines in the secured host conf body:
+
+~~~
+ProxyPreserveHost On
+ProxyPass /wss ws://127.0.0.1:8081
+ProxyPassReverse  /wss ws://127.0.0.1:8081
+~~~
+
+Where `8081` is your server's port
