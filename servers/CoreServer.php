@@ -264,7 +264,7 @@ class CoreServer implements MessageComponentInterface
 
         $this->logUserConnection($user, true);
 
-        $this->log("Connected user [{$user->id}] {$user->username}");
+        $this->log("Connected user [{$user->id}] [{$user->username}] IP: {$conn->remoteAddress}");
     }
 
     /**
