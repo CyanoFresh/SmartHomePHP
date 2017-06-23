@@ -410,7 +410,7 @@ class CoreServer implements MessageComponentInterface
                 ]);
 
                 if (!$item) {
-                    return $this->log('Trying to use unknown item');
+                    return $this->log("Trying to use unknown item (pin: $pin, board id: $board->id)");
                 }
 
                 // Trig event
