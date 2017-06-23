@@ -1121,6 +1121,25 @@ class CoreServer implements MessageComponentInterface
                 $this->sendToBoard($item->board_id, $data);
 
                 break;
+            case Task::TYPE_SWITCH_ITEM_VALUE:
+                $item = $task->item;
+
+                switch ($item->type) {
+                    case Item::TYPE_SWITCH:
+                        $data = [
+                            'type' => $this->getItemSavedValue($item->id) ? 'turnOFF' : 'turnON',
+                            'pin' => $item->pin,
+                        ];
+
+                        break;
+                    default:
+                        $this->log("Tried to switch non-switchable Item [$item->id]");
+                        return;
+                }
+
+                $this->sendToBoard($item->board_id, $data);
+
+                break;
             case Task::TYPE_NOTIFICATION_TELEGRAM:
                 $result = $task->sendNotificationTelegram();
 

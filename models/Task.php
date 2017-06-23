@@ -25,6 +25,7 @@ use yii\helpers\Json;
 class Task extends ActiveRecord
 {
     const TYPE_ITEM_VALUE = 10;
+    const TYPE_SWITCH_ITEM_VALUE = 11;
     const TYPE_NOTIFICATION_TELEGRAM = 20;
 
     /**
@@ -99,6 +100,7 @@ class Task extends ActiveRecord
     {
         return [
             self::TYPE_ITEM_VALUE => 'Изменить значение Элемента',
+            self::TYPE_SWITCH_ITEM_VALUE => 'Переключить значение Элемента',
             self::TYPE_NOTIFICATION_TELEGRAM => 'Сообщение Telegram',
         ];
     }
