@@ -5,6 +5,7 @@ namespace app\models;
 use voskobovich\linker\LinkerBehavior;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
@@ -147,8 +148,12 @@ class Task extends ActiveRecord
             . '/sendMessage?chat_id=' . Yii::$app->params['telegramBotChatId']
             . '&text=' . $this->text;
 
-        $result = file_get_contents($url);
-        $data = Json::decode($result);
+        try {
+            $result = file_get_contents($url);
+            $data = Json::decode($result);
+        } catch (Exception $exception) {
+            return false;
+        }
 
         return (isset($data['ok']) and $data['ok']);
     }
