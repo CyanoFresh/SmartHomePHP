@@ -21,6 +21,7 @@ use React\EventLoop\Timer\TimerInterface;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\VarDumper;
@@ -161,7 +162,8 @@ class CoreServer implements MessageComponentInterface
             $this->logUserConnection($conn->User, false);
 
             if (isset($this->userConnections[$conn->User->id][$conn->resourceId])
-                and $this->userConnections[$conn->User->id][$conn->resourceId] instanceof ConnectionInterface) {
+                and $this->userConnections[$conn->User->id][$conn->resourceId] instanceof ConnectionInterface
+            ) {
                 unset($this->userConnections[$conn->User->id][$conn->resourceId]);
             }
 
@@ -398,10 +400,10 @@ class CoreServer implements MessageComponentInterface
         $board = $from->Board;
         $data = Json::decode($msg);
 
-        $this->sendAdminUsers(Json::encode([
+        $this->sendAdminUsers([
             'type' => 'debug_message',
             'message' => "B [$board->id]: $msg",
-        ]));
+        ]);
 
         // Restart ping timer
         $this->startPingTimer($board->id);
@@ -888,9 +890,12 @@ class CoreServer implements MessageComponentInterface
 
         foreach (User::findAll(['group' => User::GROUP_ADMIN]) as $user) {
             if (isset($this->userConnections[$user->id])) {
+                /** @var Connection $userConnection */
                 foreach ($this->userConnections[$user->id] as $userConnection) {
-                    if ($userConnection instanceof ConnectionInterface) {
+                    try {
                         $userConnection->send($msg);
+                    } catch (Exception $e) {
+                        $this->log("Cannot send msg to admin user", true);
                     }
                 }
             }
