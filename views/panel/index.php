@@ -107,7 +107,8 @@ $this->title = 'Панель Управления';
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label for="rgb-widget-static-fade-time">Время перехода (мс)</label>
-                                <input type="number" min="0" step="500" class="form-control" id="rgb-widget-static-fade-time"
+                                <input type="number" min="0" step="500" class="form-control"
+                                       id="rgb-widget-static-fade-time"
                                        value="<?= Yii::$app->params['items']['rgb']['fade-time'] ?>">
                             </div>
                         </div>
@@ -142,12 +143,14 @@ $this->title = 'Панель Управления';
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label for="rgb-widget-fade-fade-time">Время перехода (мс)</label>
-                                <input type="number" min="0" step="500" class="form-control" id="rgb-widget-fade-fade-time"
+                                <input type="number" min="0" step="500" class="form-control"
+                                       id="rgb-widget-fade-fade-time"
                                        value="<?= Yii::$app->params['items']['rgb']['fade-time'] ?>">
                             </div>
                             <div class="form-group">
                                 <label for="rgb-widget-fade-color-time">Время цвета (мс)</label>
-                                <input type="number" min="0" step="500" class="form-control" id="rgb-widget-fade-color-time"
+                                <input type="number" min="0" step="500" class="form-control"
+                                       id="rgb-widget-fade-color-time"
                                        value="<?= Yii::$app->params['items']['rgb']['color-time'] ?>">
                             </div>
                             <button class="btn btn-primary btn-save-times" data-mode="fade">Применить</button>
@@ -159,16 +162,56 @@ $this->title = 'Панель Управления';
     </div>
 </script>
 
-<!-- Modal -->
+<!-- Item Chart Modal -->
 <div class="modal fade" id="item-chart-modal" tabindex="-1" role="dialog" aria-labelledby="item-chart-modal-label">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="item-chart-modal-label">График "<span class="item-chart-name"></span>"</h4>
             </div>
             <div class="modal-body">
                 <canvas id="item-chart"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Debug Modal -->
+<div class="modal fade" id="debug-modal" tabindex="-1" role="dialog" aria-labelledby="debug-modal-label">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="debug-modal-label">Debug</h4>
+            </div>
+            <div class="modal-body">
+                <div id="debug-messages"></div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label class="sr-only" for="exampleInputEmail3">Плата</label>
+                            <?= \kartik\select2\Select2::widget([
+                                'id' => 'send-board-board_id',
+                                'name' => 'dsfsdf',
+                                'data' => \app\models\Board::getList(),
+                            ]) ?>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-5">
+                        <textarea id="send-board-message" class="form-control" placeholder="Сообщение"></textarea>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <a href="#" class="btn btn-primary" id="send-board">Отправить</a>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>

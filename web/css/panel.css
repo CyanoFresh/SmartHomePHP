@@ -64,3 +64,11 @@
         width: 500px;
     }
 }
+
+#debug-messages {
+    height: 100px;
+    width: 100%;
+    overflow-y: scroll;
+    background: #efefef;
+    margin-bottom: 10px;
+}

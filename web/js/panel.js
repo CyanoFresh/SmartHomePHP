@@ -65,6 +65,13 @@ function onMessage(e) {
             case 'error':
                 showErrorMessage(data.message);
                 break;
+            case 'debug_message':
+                var d = new Date();
+                var strDate = d.getFullYear() + "." + (d.getMonth() + 1) + "." + d.getDate() + " " + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+
+                $('#debug-messages').prepend('<b>[' + strDate + ']</b> ' + data.message + "<br>");
+
+                break;
         }
     } catch (e) {
         showErrorMessage('Ошибка обработки ответа от сервера');
@@ -283,6 +290,16 @@ $(document).ready(function () {
         }).fail(function () {
             showErrorMessage('Не удалось получить данные');
         });
+    }).on('click', '#send-board', function (e) {
+        e.preventDefault();
+
+        send({
+            type: 'debug_send_to_board',
+            board_id: parseInt($('#send-board-board_id').val()),
+            message: $('#send-board-message').val(),
+        });
+
+        return false;
     });
 
     // RGB Widget

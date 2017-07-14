@@ -379,6 +379,8 @@ class CoreServer implements MessageComponentInterface
                 return $this->updateItems();
             case 'trig':
                 return $this->handleTrig($from, $user, $data);
+            case 'debug_send_to_board':
+                return $this->handleDebugSendToBoard($from, $user, $data);
         }
 
         return $this->log("Unknown command from user: $msg");
@@ -395,6 +397,11 @@ class CoreServer implements MessageComponentInterface
         /** @var Board $board */
         $board = $from->Board;
         $data = Json::decode($msg);
+
+        $this->sendAdminUsers(Json::encode([
+            'type' => 'debug_message',
+            'message' => "B [$board->id]: $msg",
+        ]));
 
         // Restart ping timer
         $this->startPingTimer($board->id);
@@ -804,6 +811,54 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
+     * @param ConnectionInterface $from
+     * @param User $user
+     * @param array $data
+     * @return mixed
+     * @throws ForbiddenHttpException
+     * @throws NotSupportedException
+     */
+    protected function handleDebugSendToBoard($from, $user, $data)
+    {
+        if (!$user->isAdmin) {
+            throw new ForbiddenHttpException('Not allowed');
+        }
+
+        $board_id = (int)$data['board_id'];
+        $board = Board::findOne($board_id);
+
+        if (!$board) {
+            return $from->send(Json::encode([
+                'type' => 'debug_message',
+                'message' => 'Board not found',
+            ]));
+        }
+
+        $message = Json::decode($data['message']);
+
+        switch ($board->type) {
+            case Board::TYPE_AREST:
+                throw new NotSupportedException();
+
+            case Board::TYPE_WEBSOCKET:
+                if (!$this->isBoardConnected($board->id)) {
+                    return $from->send(Json::encode([
+                        'type' => 'debug_message',
+                        'message' => 'Board not connected',
+                    ]));
+                }
+
+                $this->sendToBoard($board->id, $message);
+
+                $this->log("Sent to board [$board->id] message: " . $data['message']);
+
+                break;
+        }
+
+        return true;
+    }
+
+    /**
      * Send data to all users
      *
      * @param array $data
@@ -820,6 +875,24 @@ class CoreServer implements MessageComponentInterface
                 }
             } else {
                 $userConnections->send($msg);
+            }
+        }
+    }
+
+    /**
+     * @param array $data
+     */
+    protected function sendAdminUsers($data)
+    {
+        $msg = Json::encode($data);
+
+        foreach (User::findAll(['group' => User::GROUP_ADMIN]) as $user) {
+            if (isset($this->userConnections[$user->id])) {
+                foreach ($this->userConnections[$user->id] as $userConnection) {
+                    if ($userConnection instanceof ConnectionInterface) {
+                        $userConnection->send($msg);
+                    }
+                }
             }
         }
     }

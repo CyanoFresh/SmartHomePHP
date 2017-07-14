@@ -30,9 +30,13 @@ use yii\widgets\Breadcrumbs;
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
                 'homeLink' => false,
             ]) ?>
+
         </div>
 
         <ul class="nav navbar-nav navbar-right hidden-xs">
+            <li>
+                <a href="#" data-toggle="modal" data-target="#debug-modal"><i class="fa fa-bug"></i></a>
+            </li>
             <li class="dropdown notifications-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                    aria-expanded="false"><i class="fa fa-bell"></i></a>
