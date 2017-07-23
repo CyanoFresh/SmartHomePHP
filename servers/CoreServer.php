@@ -531,6 +531,9 @@ class CoreServer implements MessageComponentInterface
             case 'pong':
                 $this->log("Pong from board [$board->id]");
                 break;
+            case 'ping':
+                $this->log("Ping from board [$board->id]");
+                break;
             default:
                 $this->log("Unknown command: \"{$data['type']}\"");
                 break;
@@ -553,17 +556,17 @@ class CoreServer implements MessageComponentInterface
         $item = Item::findOne($item_id);
 
         if (!$item) {
-            return $from->send([
+            return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Такое устройство не существует',
-            ]);
+            ]));
         }
 
         if ($item->type !== Item::TYPE_SWITCH) {
-            return $from->send([
+            return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Данный тип устройства нельзя переключать',
-            ]);
+            ]));
         }
 
         $board = $item->board;
@@ -608,17 +611,17 @@ class CoreServer implements MessageComponentInterface
         $item = Item::findOne($item_id);
 
         if (!$item) {
-            return $from->send([
+            return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Такое устройство не существует',
-            ]);
+            ]));
         }
 
         if ($item->type !== Item::TYPE_SWITCH) {
-            return $from->send([
+            return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Данный тип устройства нельзя переключать',
-            ]);
+            ]));
         }
 
         $board = $item->board;
@@ -662,17 +665,17 @@ class CoreServer implements MessageComponentInterface
         $item = Item::findOne($item_id);
 
         if (!$item) {
-            return $from->send([
+            return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Такое устройство не существует',
-            ]);
+            ]));
         }
 
         if ($item->type !== Item::TYPE_RGB) {
-            return $from->send([
+            return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Данный тип устройства не является RGB',
-            ]);
+            ]));
         }
 
         $mode = $data['mode'];
