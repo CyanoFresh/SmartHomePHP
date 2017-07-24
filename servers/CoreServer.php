@@ -317,8 +317,8 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
-     * @param $from
-     * @param $msg
+     * @param Connection $from
+     * @param string $msg
      * @return bool
      */
     public function handleUserMessage($from, $msg)
@@ -351,8 +351,8 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
-     * @param $from
-     * @param $msg
+     * @param Connection $from
+     * @param string $msg
      * @return bool
      * @throws NotFoundHttpException
      */
@@ -494,7 +494,13 @@ class CoreServer implements MessageComponentInterface
                 $this->log("Pong from board [$board->id]");
                 break;
             case 'ping':
+
                 $this->log("Ping from board [$board->id]");
+
+                $from->send(Json::encode([
+                    'type' => 'pong',
+                ]));
+
                 break;
             default:
                 $this->log("Unknown command: \"{$data['type']}\"");
