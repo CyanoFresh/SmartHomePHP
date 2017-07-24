@@ -11,6 +11,7 @@ $params = [
     'server' => [
         'connectionCheckTimeout' => 180,
         'connectionCheckMaxIteration' => 2,
+        'maxLastPingTimeout' => 600,
     ],
     'items' => [
         'rgb' => [
