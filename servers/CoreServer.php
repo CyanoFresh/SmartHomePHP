@@ -99,7 +99,7 @@ class CoreServer implements MessageComponentInterface
             foreach ($this->boardConnections as $boardConnection) {
                 if (isset($boardConnection->lastPingAt)
                     && $boardConnection->lastPingAt < time() - Yii::$app->params['server']['maxLastPingTimeout']) {
-                    $this->log("Board [{$boardConnection->Board->id}] last heartbeat at $boardConnection->lastPingAt (".Yii::$app->formatter->asDatetime($boardConnection->lastPingAt)."). Disconnecting for inactivity");
+                    $this->log("Board [{$boardConnection->Board->id}] last heartbeat at $boardConnection->lastPingAt (" . Yii::$app->formatter->asDatetime($boardConnection->lastPingAt) . "). Disconnecting for inactivity");
                 }
             }
         });
@@ -206,7 +206,7 @@ class CoreServer implements MessageComponentInterface
             'auth_token' => $userAuthToken,
         ]);
 
-        if ( ! $user) {
+        if (!$user) {
             $this->log("Wrong credentials: '$userID', '$userAuthToken''");
 
             throw new UnauthorizedHttpException("Wrong credentials");
@@ -237,7 +237,7 @@ class CoreServer implements MessageComponentInterface
         $items = [];
 
         foreach ($itemModels as $itemModel) {
-            if ( ! $itemModel->widget) {
+            if (!$itemModel->widget) {
                 continue;
             }
 
@@ -279,7 +279,7 @@ class CoreServer implements MessageComponentInterface
         $boardID = $query->get('id');
         $boardSecret = $query->get('secret');
 
-        if ( ! $boardID or ! $boardSecret) {
+        if (!$boardID or !$boardSecret) {
             $this->log("Wrong board login data: '$boardID' and '$boardSecret'");
 
             throw new UnauthorizedHttpException('Wrong credentials');
@@ -287,7 +287,7 @@ class CoreServer implements MessageComponentInterface
 
         $board = Board::findOne($boardID);
 
-        if ( ! $board or $board->secret !== $boardSecret or $board->type !== Board::TYPE_WEBSOCKET ) {
+        if (!$board or $board->secret !== $boardSecret or $board->type !== Board::TYPE_WEBSOCKET) {
             $this->log("Board [$boardID] not found!");
 
             throw new NotFoundHttpException("Board with given ID does not exists");
@@ -296,7 +296,7 @@ class CoreServer implements MessageComponentInterface
         // Check if from local network
         $ip = $conn->WebSocket->request->getHeader('X-Forwarded-For') != null ? $conn->WebSocket->request->getHeader('X-Forwarded-For') : $conn->remoteAddress;
 
-        if ( ! $board->remote_connection and ! IPHelper::isLocal($ip)) {
+        if (!$board->remote_connection and !IPHelper::isLocal($ip)) {
             $this->log("Remote connection blocked for board [$boardID]; IP: {$ip}");
 
             throw new ForbiddenHttpException("Remote connection is not allowed for this Board");
@@ -323,7 +323,7 @@ class CoreServer implements MessageComponentInterface
         $user = $from->User;
         $data = Json::decode($msg);
 
-        if ( ! isset($data['type']) or $data['type'] == '') {
+        if (!isset($data['type']) or $data['type'] == '') {
             return $this->log("Unknown command from user: $msg");
         }
 
@@ -377,7 +377,7 @@ class CoreServer implements MessageComponentInterface
                     'pin' => $pin,
                 ]);
 
-                if ( ! $item) {
+                if (!$item) {
                     return $this->log("Trying to use unknown item (pin: $pin, board id: $board->id)");
                 }
 
@@ -409,7 +409,7 @@ class CoreServer implements MessageComponentInterface
                         'pin' => $pin,
                     ]);
 
-                    if ( ! $item) {
+                    if (!$item) {
                         return $this->log('Trying to use unknown item');
                     }
 
@@ -443,7 +443,7 @@ class CoreServer implements MessageComponentInterface
                     'board_id' => $board->id,
                 ]);
 
-                if ( ! $item) {
+                if (!$item) {
                     $this->log("Board [{$board->id}] tried to use unknown item");
                     throw new NotFoundHttpException('Item does not exist');
                 }
@@ -520,7 +520,7 @@ class CoreServer implements MessageComponentInterface
 
         $item = Item::findOne($item_id);
 
-        if ( ! $item) {
+        if (!$item) {
             return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Такое устройство не существует',
@@ -542,7 +542,7 @@ class CoreServer implements MessageComponentInterface
 
                 break;
             case Board::TYPE_WEBSOCKET:
-                if ( ! $this->isBoardConnected($board->id)) {
+                if (!$this->isBoardConnected($board->id)) {
                     return $from->send(Json::encode([
                         'type' => 'error',
                         'message' => 'Устройство не подключено',
@@ -575,7 +575,7 @@ class CoreServer implements MessageComponentInterface
 
         $item = Item::findOne($item_id);
 
-        if ( ! $item) {
+        if (!$item) {
             return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Такое устройство не существует',
@@ -597,7 +597,7 @@ class CoreServer implements MessageComponentInterface
 
                 break;
             case Board::TYPE_WEBSOCKET:
-                if ( ! $this->isBoardConnected($board->id)) {
+                if (!$this->isBoardConnected($board->id)) {
                     return $from->send(Json::encode([
                         'type' => 'error',
                         'message' => 'Устройство не подключено',
@@ -629,7 +629,7 @@ class CoreServer implements MessageComponentInterface
         $item_id = (int)$data['item_id'];
         $item = Item::findOne($item_id);
 
-        if ( ! $item) {
+        if (!$item) {
             return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Такое устройство не существует',
@@ -646,7 +646,7 @@ class CoreServer implements MessageComponentInterface
         $mode = $data['mode'];
         $fadeTime = isset($data['fade_time']) ? $data['fade_time'] : Yii::$app->params['items']['rgb']['fade-time'];
 
-        if ( ! in_array($mode, Item::getRGBModesArray())) {
+        if (!in_array($mode, Item::getRGBModesArray())) {
             throw new InvalidParamException('Unknown RGB mode');
         }
 
@@ -710,7 +710,7 @@ class CoreServer implements MessageComponentInterface
                 throw new NotSupportedException();
 
             case Board::TYPE_WEBSOCKET:
-                if ( ! $this->isBoardConnected($board->id)) {
+                if (!$this->isBoardConnected($board->id)) {
                     return $from->send(Json::encode([
                         'type' => 'error',
                         'message' => 'Устройство не подключено',
@@ -729,7 +729,7 @@ class CoreServer implements MessageComponentInterface
         $history->commited_at = time();
         $history->value = serialize($parameters);
 
-        if ( ! $history->save()) {
+        if (!$history->save()) {
             $this->log("Cannot log:");
             var_dump($history->errors);
         }
@@ -749,7 +749,7 @@ class CoreServer implements MessageComponentInterface
         $trigger_id = (int)$data['trigger_id'];
         $trigger = Trigger::findOne($trigger_id);
 
-        if ( ! $trigger) {
+        if (!$trigger) {
             return $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Такое триггер не существует',
@@ -772,7 +772,7 @@ class CoreServer implements MessageComponentInterface
         $history->user_id = $user->id;
         $history->commited_at = time();
 
-        if ( ! $history->save()) {
+        if (!$history->save()) {
             $this->log("Cannot log: ");
             var_dump($history->errors);
         }
@@ -790,14 +790,14 @@ class CoreServer implements MessageComponentInterface
      */
     protected function handleDebugSendToBoard($from, $user, $data)
     {
-        if ( ! $user->isAdmin) {
+        if (!$user->isAdmin) {
             throw new ForbiddenHttpException('Not allowed');
         }
 
         $board_id = (int)$data['board_id'];
         $board = Board::findOne($board_id);
 
-        if ( ! $board) {
+        if (!$board) {
             return $from->send(Json::encode([
                 'type' => 'debug_message',
                 'message' => 'Board not found',
@@ -811,7 +811,7 @@ class CoreServer implements MessageComponentInterface
                 throw new NotSupportedException();
 
             case Board::TYPE_WEBSOCKET:
-                if ( ! $this->isBoardConnected($board->id)) {
+                if (!$this->isBoardConnected($board->id)) {
                     return $from->send(Json::encode([
                         'type' => 'debug_message',
                         'message' => 'Board not connected',
@@ -820,7 +820,7 @@ class CoreServer implements MessageComponentInterface
 
                 $this->sendToBoard($board->id, $message);
 
-                $this->log("Sent to board [$board->id] message: ".$data['message']);
+                $this->log("Sent to board [$board->id] message: " . $data['message']);
 
                 break;
         }
@@ -904,7 +904,7 @@ class CoreServer implements MessageComponentInterface
         $output = '';
 
         if ($appendDate) {
-            $output .= '['.Yii::$app->formatter->asDatetime(time(), 'yyyy-MM-dd HH:mm:ss').'] ';
+            $output .= '[' . Yii::$app->formatter->asDatetime(time(), 'yyyy-MM-dd HH:mm:ss') . '] ';
         }
 
         $output .= $message;
@@ -948,7 +948,7 @@ class CoreServer implements MessageComponentInterface
      */
     protected function logBoardConnection($boardID, $connected)
     {
-        if ( ! Setting::getValueByKey('log.board_connection')) {
+        if (!Setting::getValueByKey('log.board_connection')) {
             return;
         }
 
@@ -958,7 +958,7 @@ class CoreServer implements MessageComponentInterface
         $model->value = $connected;
         $model->commited_at = time();
 
-        if ( ! $model->save()) {
+        if (!$model->save()) {
             $this->log("Cannot log: ");
             var_dump($model->errors);
         }
@@ -970,7 +970,7 @@ class CoreServer implements MessageComponentInterface
      */
     protected function logUserConnection($user, $connected)
     {
-        if ( ! Setting::getValueByKey('log.user_connection')) {
+        if (!Setting::getValueByKey('log.user_connection')) {
             return;
         }
 
@@ -980,7 +980,7 @@ class CoreServer implements MessageComponentInterface
         $model->value = $connected;
         $model->commited_at = time();
 
-        if ( ! $model->save()) {
+        if (!$model->save()) {
             $this->log("Cannot log: ");
             var_dump($model->errors);
         }
@@ -1000,7 +1000,7 @@ class CoreServer implements MessageComponentInterface
         $model->value = $value;
         $model->commited_at = time();
 
-        if ( ! $model->save()) {
+        if (!$model->save()) {
             $this->log("Cannot log: ");
             var_dump($model->errors);
         }
@@ -1012,7 +1012,7 @@ class CoreServer implements MessageComponentInterface
      */
     protected function logItemValue($item, $value)
     {
-        if ( ! $item->enable_log) {
+        if (!$item->enable_log) {
             $this->log("Logging for this item is disabled");
 
             return;
@@ -1033,7 +1033,7 @@ class CoreServer implements MessageComponentInterface
         $model->commited_at = time();
         $model->value = $value;
 
-        if ( ! $model->save()) {
+        if (!$model->save()) {
             $this->log("Cannot log: ");
             var_dump($model->errors);
         }
@@ -1053,7 +1053,7 @@ class CoreServer implements MessageComponentInterface
             'item_value' => $value,
         ]);
 
-        if ( ! $triggers) {
+        if (!$triggers) {
             return;
         }
 
@@ -1075,7 +1075,7 @@ class CoreServer implements MessageComponentInterface
             'connection_value' => $connected ? Trigger::CONNECTION_VALUE_CONNECTED : Trigger::CONNECTION_VALUE_DISCONNECTED,
         ]);
 
-        if ( ! $triggers) {
+        if (!$triggers) {
             return;
         }
 
@@ -1154,7 +1154,7 @@ class CoreServer implements MessageComponentInterface
             case Task::TYPE_NOTIFICATION_TELEGRAM:
                 $result = $task->sendNotificationTelegram();
 
-                if ( ! $result) {
+                if (!$result) {
                     $this->log("Cannot send telegram message");
                 } else {
                     $this->log("Message sent");
@@ -1182,7 +1182,7 @@ class CoreServer implements MessageComponentInterface
      */
     protected function valueToRgb($value)
     {
-        if ( ! is_array($value)) {
+        if (!is_array($value)) {
             $value = $this->valueToRgbData($value);
         }
 
@@ -1308,10 +1308,10 @@ class CoreServer implements MessageComponentInterface
                     $days = explode(',', $trigger->weekdays);
 
                     foreach ($days as $day) {
-                        $trigTimestamp = strtotime($day.', '.$trigger->time);
+                        $trigTimestamp = strtotime($day . ', ' . $trigger->time);
 
                         if (strtolower(date('l')) == $day) {
-                            $trigTimestamp = strtotime('+1 week, '.$trigger->time);
+                            $trigTimestamp = strtotime('+1 week, ' . $trigger->time);
                         }
 
                         if (isset($this->triggerTimers[$trigger->id][$trigTimestamp])) {
@@ -1337,7 +1337,7 @@ class CoreServer implements MessageComponentInterface
                                 }
                             );
                         } else {
-                            $this->log("Trigger time $trigTimestamp is lower than current time ".time());
+                            $this->log("Trigger time $trigTimestamp is lower than current time " . time());
                         }
                     }
                 } else {    // Everyday triggers
@@ -1349,7 +1349,7 @@ class CoreServer implements MessageComponentInterface
                     }
 
                     // Schedule trigger for today
-                    $trigTimestamp = strtotime('today, '.$trigger->time);
+                    $trigTimestamp = strtotime('today, ' . $trigger->time);
 
                     if (time() < $trigTimestamp) {
                         $timeout = $trigTimestamp - time();
@@ -1369,7 +1369,7 @@ class CoreServer implements MessageComponentInterface
                             }
                         );
                     } else {
-                        $trigTimestamp = strtotime('tomorrow, '.$trigger->time);
+                        $trigTimestamp = strtotime('tomorrow, ' . $trigger->time);
 
                         $timeout = $trigTimestamp - time();
 
@@ -1392,7 +1392,7 @@ class CoreServer implements MessageComponentInterface
             }
         }
 
-        $this->log("Done. Total count of timers: ".count($this->triggerTimers));
+        $this->log("Done. Total count of timers: " . count($this->triggerTimers));
     }
 
     /**
@@ -1406,7 +1406,7 @@ class CoreServer implements MessageComponentInterface
         $items = Item::find()->all();
 
         foreach ($items as $item) {
-            if ( ! $this->hasItemSavedValue($item->id)) {
+            if (!$this->hasItemSavedValue($item->id)) {
                 $this->saveItemValue($item->id, $item->getDefaultNAValue(), $item->type, false);
             }
         }
