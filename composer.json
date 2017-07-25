@@ -25,20 +25,20 @@
     "yiisoft/yii2-gii": "*"
   },
   "config": {
-    "process-timeout": 1800
-  },
-  "extra": {
-    "asset-installer-paths": {
-      "npm-asset-library": "vendor/npm",
-      "bower-asset-library": "vendor/bower"
-    },
-    "asset-repositories": [
-      {
-        "type": "bower-github",
-        "url": "https://github.com/CyanoFresh/snackbarjs",
-        "name": "bower-asset/snackbarjs"
-      }
-    ]
+    "process-timeout": 1800,
+    "fxp-asset": {
+      "installer-paths": {
+        "npm-asset-library": "vendor/npm",
+        "bower-asset-library": "vendor/bower"
+      },
+      "repositories": [
+        {
+          "type": "bower-github",
+          "url": "https://github.com/CyanoFresh/snackbarjs",
+          "name": "bower-asset/snackbarjs"
+        }
+      ]
+    }
   },
   "scripts": {
     "post-install-cmd": "php init --env=Development --overwrite=n"

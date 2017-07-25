@@ -1,4 +1,4 @@
-Solomaha Home
+Smart Home
 ============================
 
 This is core center for Solomaha Home system. Includes Web Panel and API.
@@ -14,22 +14,11 @@ Feel free to contribute!
 FEATURES
 ------------
 
-- Real time updates via WebSocket protocol
+- Real time via WebSocket protocol
 - Universal Admin Panel for creating Items, managing Boards, configure application, etc
-- Triggers (Events) with tasks (when triggered - doing tasks)
-- API
-- Web Panel
-
-
-DEVICES & ROMS
-------------
-
-I've selected ESP8266 NodeMCU boards for low price and websocket module support. It uses lua firmware
-
-- [NodeMCU #2](https://github.com/CyanoFresh/SmartHome-NodeMCU-2)
-- [NodeMCU #3](https://github.com/CyanoFresh/SmartHome-NodeMCU-3)
-- [WeMos D1 Mini #1](https://github.com/CyanoFresh/SmartHome-Wemos-1)
-- ...
+- Event system with multiple conditions and tasks
+- HTTP REST API
+- Web Panel for any device
 
 REQUIREMENTS
 ------------

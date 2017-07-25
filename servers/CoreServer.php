@@ -285,18 +285,15 @@ class CoreServer implements MessageComponentInterface
             throw new UnauthorizedHttpException('Wrong credentials');
         }
 
-        $board = Board::findOne([
-            'id' => $boardID,
-            'type' => Board::TYPE_WEBSOCKET,
-            'secret' => $boardSecret,
-        ]);
+        $board = Board::findOne($boardID);
 
-        if ( ! $board) {
+        if ( ! $board or $board->secret !== $boardSecret or $board->type !== Board::TYPE_WEBSOCKET ) {
             $this->log("Board [$boardID] not found!");
 
             throw new NotFoundHttpException("Board with given ID does not exists");
         }
 
+        // Check if from local network
         $ip = $conn->WebSocket->request->getHeader('X-Forwarded-For') != null ? $conn->WebSocket->request->getHeader('X-Forwarded-For') : $conn->remoteAddress;
 
         if ( ! $board->remote_connection and ! IPHelper::isLocal($ip)) {
