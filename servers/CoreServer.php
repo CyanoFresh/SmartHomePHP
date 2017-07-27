@@ -201,12 +201,9 @@ class CoreServer implements MessageComponentInterface
         $userID = $query->get('id');
         $userAuthToken = $query->get('auth_token');
 
-        $user = User::findOne([
-            'id' => $userID,
-            'auth_token' => $userAuthToken,
-        ]);
+        $user = User::findOne($userID);
 
-        if (!$user) {
+        if (!$user or $user->auth_token !== $userAuthToken) {
             $this->log("Wrong credentials: '$userID', '$userAuthToken''");
 
             throw new UnauthorizedHttpException("Wrong credentials");
@@ -217,14 +214,6 @@ class CoreServer implements MessageComponentInterface
         // Check if it is an API request
         $api = $ip === '127.0.0.1' and $conn->WebSocket->request->getHeader('Origin') == 'origin';
 
-        // Close previous connection if it is not an API connection
-//        if (!$api and isset($this->userConnections[$user->id]) and $this->userConnections[$user->id] instanceof ConnectionInterface) {
-//            $this->userConnections[$user->id]->close();
-//        }
-
-        // Regenerate auth token
-        $user->reGenerateAuthToken();
-
         // Attach to users
         $conn->User = $user;
         $conn->api = $api;
@@ -232,7 +221,7 @@ class CoreServer implements MessageComponentInterface
         $this->userConnections[$user->id][$conn->resourceId] = $conn;
 
         // Prepare Items for User
-        $itemModels = Item::find()->all();
+        $itemModels = Item::find()->with(['widget'])->all();
 
         $items = [];
 
@@ -261,6 +250,9 @@ class CoreServer implements MessageComponentInterface
             'type' => 'init',
             'items' => $items,
         ]));
+
+        // Regenerate auth token
+        $user->reGenerateAuthToken();
 
         $this->logUserConnection($user, true);
 
@@ -359,14 +351,6 @@ class CoreServer implements MessageComponentInterface
         $board = $from->Board;
         $data = Json::decode($msg);
 
-        $this->sendAdminUsers([
-            'type' => 'debug_message',
-            'message' => "B [$board->id]: $msg",
-        ]);
-
-        // Restart ping timer
-        $this->updateBoardLastPing($from);
-
         switch ($data['type']) {
             case 'value':
                 $value = $data['value'];
@@ -381,9 +365,6 @@ class CoreServer implements MessageComponentInterface
                     return $this->log("Trying to use unknown item (pin: $pin, board id: $board->id)");
                 }
 
-                // Trig event
-                $this->triggerItemValue($item, $value);
-
                 $value = $this->saveItemValue($item->id, $value, $item->type);
 
                 if ($item->widget) {
@@ -395,6 +376,9 @@ class CoreServer implements MessageComponentInterface
                         'value' => $value,
                     ]);
                 }
+
+                // Trig event
+                $this->triggerItemValue($item, $value);
 
                 // Save to history
                 $this->logItemValue($item, $value);
@@ -413,9 +397,6 @@ class CoreServer implements MessageComponentInterface
                         return $this->log('Trying to use unknown item');
                     }
 
-                    // Trig event
-                    $this->triggerItemValue($item, $value);
-
                     $value = $this->saveItemValue($item->id, $value, $item->type);
 
                     if ($item->widget) {
@@ -427,6 +408,9 @@ class CoreServer implements MessageComponentInterface
                             'value' => $value,
                         ]);
                     }
+
+                    // Trig event
+                    $this->triggerItemValue($item, $value);
 
                     // Save to history
                     $this->logItemValue($item, $value);
@@ -504,7 +488,8 @@ class CoreServer implements MessageComponentInterface
                 break;
         }
 
-        return false;
+        // Restart ping timer
+        $this->updateBoardLastPing($from);
     }
 
     /**
@@ -845,27 +830,6 @@ class CoreServer implements MessageComponentInterface
                 }
             } else {
                 $userConnections->send($msg);
-            }
-        }
-    }
-
-    /**
-     * @param array $data
-     */
-    protected function sendAdminUsers($data)
-    {
-        $msg = Json::encode($data);
-
-        foreach (User::findAll(['group' => User::GROUP_ADMIN]) as $user) {
-            if (isset($this->userConnections[$user->id])) {
-                /** @var Connection $userConnection */
-                foreach ($this->userConnections[$user->id] as $userConnection) {
-                    try {
-                        $userConnection->send($msg);
-                    } catch (Exception $e) {
-                        $this->log("Cannot send msg to admin user", true);
-                    }
-                }
             }
         }
     }
