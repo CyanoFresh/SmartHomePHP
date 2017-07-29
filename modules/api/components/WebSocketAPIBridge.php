@@ -76,7 +76,7 @@ class WebSocketAPIBridge
     public function turnOn($itemID)
     {
         return $this->send([
-            'type' => 'turnON',
+            'type' => 'turn_on',
             'item_id' => $itemID,
         ]);
     }
@@ -88,7 +88,7 @@ class WebSocketAPIBridge
     public function turnOff($itemID)
     {
         return $this->send([
-            'type' => 'turnOFF',
+            'type' => 'turn_off',
             'item_id' => $itemID,
         ]);
     }
