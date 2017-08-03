@@ -5,7 +5,7 @@
 
 ?>
 
-<div class="col-lg-3 col-md-4 col-sm-6">
+<div class="col-lg-4 col-md-6 col-xs-6">
     <div class="panel-item panel-item-switch withripple <?= $widget->html_class ?>" data-item-id="<?= $widget->item_id ?>">
         <div class="panel-item-switch-icon">
             <i class="fa <?= $widget->icon ?>"></i>

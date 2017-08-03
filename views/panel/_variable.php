@@ -5,7 +5,7 @@
 
 ?>
 
-<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">
+<div class="col-lg-3 col-sm-4 col-xs-4">
     <div class="panel-item panel-item-variable <?= $widget->html_class ?> withripple"
          title="<?= $widget->getName() ?>"
          data-item-id="<?= $widget->item_id ?>"

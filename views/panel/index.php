@@ -1,6 +1,7 @@
 <?php
 
 /* @var $this yii\web\View */
+
 /* @var $roomModels \app\models\Room[] */
 
 use app\assets\PanelAsset;
@@ -35,38 +36,42 @@ $this->title = 'Панель Управления';
                 <h1><?= Html::encode($this->title) ?></h1>
             </section>
 
-            <?php foreach ($roomModels as $room): ?>
-                <div class="card panel-room" data-room-id="<?= $room->id ?>">
-                    <div class="card-header">
-                        <h3 class="card-header-title"><?= $room->name ?></h3>
-                    </div>
+            <div class="row">
+                <?php foreach ($roomModels as $room): ?>
+                    <div class="col-md-6">
+                        <div class="card panel-room" data-room-id="<?= $room->id ?>">
+                            <div class="card-header">
+                                <h3 class="card-header-title"><?= $room->name ?></h3>
+                            </div>
 
-                    <div class="card-body">
-                        <div class="row panel-items-variable">
-                            <?php foreach ($room->getItemWidgets()->variables()->active()->all() as $widget): ?>
-                                <?= $this->render('_variable', [
-                                    'widget' => $widget,
-                                ]) ?>
-                            <?php endforeach; ?>
-                        </div>
-                        <div class="row panel-items-switch">
-                            <?php foreach ($room->getItemWidgets()->switches()->active()->all() as $widget): ?>
-                                <?= $this->render('_switch', [
-                                    'widget' => $widget,
-                                ]) ?>
-                            <?php endforeach; ?>
-                        </div>
-                        <div class="row panel-items-rgb">
-                            <?php foreach ($room->getItemWidgets()->rgb()->active()->all() as $widget): ?>
-                                <?= $this->render('_rgb', [
-                                    'widget' => $widget,
-                                ]) ?>
-                            <?php endforeach; ?>
+                            <div class="card-body">
+                                <div class="row panel-items-variable">
+                                    <?php foreach ($room->getItemWidgets()->variables()->active()->all() as $widget): ?>
+                                        <?= $this->render('_variable', [
+                                            'widget' => $widget,
+                                        ]) ?>
+                                    <?php endforeach; ?>
+                                </div>
+                                <div class="row panel-items-switch">
+                                    <?php foreach ($room->getItemWidgets()->switches()->active()->all() as $widget): ?>
+                                        <?= $this->render('_switch', [
+                                            'widget' => $widget,
+                                        ]) ?>
+                                    <?php endforeach; ?>
+                                </div>
+                                <div class="row panel-items-rgb">
+                                    <?php foreach ($room->getItemWidgets()->rgb()->active()->all() as $widget): ?>
+                                        <?= $this->render('_rgb', [
+                                            'widget' => $widget,
+                                        ]) ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <!-- /.box-body -->
                         </div>
                     </div>
-                    <!-- /.box-body -->
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
 </main>
