@@ -1472,7 +1472,7 @@ class CoreServer implements MessageComponentInterface
             case Item::TYPE_VARIABLE_TEMPERATURE:
             case Item::TYPE_VARIABLE_HUMIDITY:
                 $value = (float)$value;
-                $value = round($value, 2);
+                $value = round($value, 1);
 
                 return $value;
         }
