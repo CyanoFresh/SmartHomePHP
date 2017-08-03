@@ -48,7 +48,7 @@
 /* Popover */
 .popover {
     width: 300px;
-    box-shadow: 0 16px 24px 2px rgba(0,0,0,0.14), 0 6px 30px 5px rgba(0,0,0,0.12), 0 8px 10px -5px rgba(0,0,0,0.3);
+    box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.3);
     max-width: none;
     border-radius: 0;
     padding: 0;
@@ -71,4 +71,15 @@
     overflow-y: scroll;
     background: #efefef;
     margin-bottom: 10px;
+}
+
+.masonry-item {
+    display: inline-block;
+    position: relative;
+}
+
+
+@media screen and (max-width: 768px) {
+    /* 5 columns for larger screens */
+    .col-md-6.masonry-item { width: 100%; }
 }

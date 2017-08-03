@@ -19,6 +19,12 @@ initWebSocket(function () {
 
     $('#loader, .linear-loader').fadeOut(function () {
         $('.control-panel').fadeIn();
+
+        $('.masonry-container').masonry({
+            columnWidth: '.masonry-item',
+            itemSelector: '.masonry-item',
+            percentPosition: true
+        });
     });
 }, onMessage, function () {
     if (WSConnectionOpened) {

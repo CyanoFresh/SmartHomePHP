@@ -36,9 +36,9 @@ $this->title = 'Панель Управления';
                 <h1><?= Html::encode($this->title) ?></h1>
             </section>
 
-            <div class="row">
+            <div class="row masonry-container">
                 <?php foreach ($roomModels as $room): ?>
-                    <div class="col-md-6">
+                    <div class="col-md-6 col-sm-12 masonry-item">
                         <div class="card panel-room" data-room-id="<?= $room->id ?>">
                             <div class="card-header">
                                 <h3 class="card-header-title"><?= $room->name ?></h3>

@@ -19,6 +19,7 @@ class PanelAsset extends AssetBundle
         'app\assets\vendors\HandlebarsAsset',
         'app\assets\vendors\SpectrumAsset',
         'app\assets\vendors\ChartjsAsset',
+        'app\assets\vendors\MasonryAsset',
         'yii\web\JqueryAsset',
     ];
 }
