@@ -118,8 +118,6 @@ class CoreServer implements MessageComponentInterface
      */
     public function onOpen(ConnectionInterface $conn)
     {
-        /** @var Connection $conn */
-
         /** @var QueryString $query */
         $query = $conn->WebSocket->request->getQuery();
 
