@@ -249,7 +249,8 @@ $(document).ready(function () {
             var $canvas = $modal.find('#item-chart');
 
             Date.prototype.formatMMDDYYYY = function () {
-                return this.getHours() + ':' + this.getMinutes();
+                return (this.getHours() < 10 ? '0' : '') + this.getHours() +
+                    ':' + (this.getMinutes() < 10 ? '0' : '') + this.getMinutes();
             };
 
             // Split timestamp and data into separate arrays
@@ -258,7 +259,7 @@ $(document).ready(function () {
 
             $.each(result.data, function (key, value) {
                 labels.push(new Date(key * 1000).formatMMDDYYYY());
-                data.push(parseInt(value));
+                data.push(parseFloat(value));
             });
 
             // Create the chart.js data structure using 'labels' and 'data'
