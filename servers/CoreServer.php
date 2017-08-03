@@ -12,6 +12,8 @@ use app\models\Trigger;
 use app\models\History;
 use app\models\Item;
 use app\models\User;
+use BoardConnection;
+use Connection as CustomConnection;
 use Guzzle\Http\QueryString;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -21,10 +23,8 @@ use React\EventLoop\Timer\TimerInterface;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
-use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
-use yii\helpers\VarDumper;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -50,7 +50,7 @@ class CoreServer implements MessageComponentInterface
 
     /**
      * All connected boards
-     * @var ConnectionInterface[]
+     * @var BoardConnection[]
      */
     protected $boardConnections;
 
@@ -82,6 +82,8 @@ class CoreServer implements MessageComponentInterface
      */
     public function __construct($loop)
     {
+        $this->log("Initializing...");
+
         // Init variables
         $this->loop = $loop;
         $this->userConnections = [];
@@ -111,7 +113,8 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
-     * @inheritdoc
+     * @param CustomConnection|BoardConnection|ConnectionInterface $conn
+     * @throws BadRequestHttpException
      */
     public function onOpen(ConnectionInterface $conn)
     {
@@ -135,25 +138,29 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
-     * @inheritdoc
+     * @param ConnectionInterface|Connection|BoardConnection $from
+     * @param string $msg
+     * @return bool|void
      */
     public function onMessage(ConnectionInterface $from, $msg)
     {
         if (isset($from->User)) {
             $this->log("Message '$msg' from User [{$from->User->id}]");
 
-            return $this->handleUserMessage($from, $msg);
+            $this->handleUserMessage($from, $msg);
+            return;
         } elseif (isset($from->Board)) {
             $this->log("Message '$msg' from Board [{$from->Board->id}]");
 
-            return $this->handleBoardMessage($from, $msg);
+            $this->handleBoardMessage($from, $msg);
+            return;
         }
 
-        return $this->log("Message: '$msg' from unknown client");
+        $this->log("Message: '$msg' from unknown client");
     }
 
     /**
-     * @inheritdoc
+     * @param CustomConnection|ConnectionInterface $conn
      */
     public function onClose(ConnectionInterface $conn)
     {
@@ -192,7 +199,7 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
-     * @param Connection $conn
+     * @param CustomConnection $conn
      * @param QueryString $query
      * @throws UnauthorizedHttpException
      */
@@ -260,7 +267,7 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
-     * @param Connection $conn
+     * @param BoardConnection $conn
      * @param QueryString $query
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
@@ -306,7 +313,7 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
-     * @param Connection $from
+     * @param CustomConnection $from
      * @param string $msg
      * @return bool
      */
@@ -340,148 +347,30 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
-     * @param Connection $from
+     * @param BoardConnection $from
      * @param string $msg
-     * @return bool
      * @throws NotFoundHttpException
      */
     public function handleBoardMessage($from, $msg)
     {
-        /** @var Board $board */
         $board = $from->Board;
         $data = Json::decode($msg);
 
         switch ($data['type']) {
             case 'value':
-                $value = $data['value'];
-                $pin = (integer)$data['pin'];
-
-                $item = Item::findOne([
-                    'board_id' => $board->id,
-                    'pin' => $pin,
-                ]);
-
-                if (!$item) {
-                    return $this->log("Trying to use unknown item (pin: $pin, board id: $board->id)");
-                }
-
-                $value = $this->saveItemValue($item->id, $value, $item->type);
-
-                if ($item->widget) {
-                    $this->sendUsers([
-                        'type' => 'value',
-                        'item_id' => $item->id,
-                        'item_type' => $item->widget->type,
-                        'value_type' => $item->widget->value_type,
-                        'value' => $value,
-                    ]);
-                }
-
-                // Trig event
-                $this->triggerItemValue($item, $value);
-
-                // Save to history
-                $this->logItemValue($item, $value);
-
+                $this->handleBoardValueMessage($data, $board);
                 break;
             case 'values':
-                unset($data['type']);
-
-                foreach ($data as $pin => $value) {
-                    $item = Item::findOne([
-                        'board_id' => $board->id,
-                        'pin' => $pin,
-                    ]);
-
-                    if (!$item) {
-                        return $this->log('Trying to use unknown item');
-                    }
-
-                    $value = $this->saveItemValue($item->id, $value, $item->type);
-
-                    if ($item->widget) {
-                        $this->sendUsers([
-                            'type' => 'value',
-                            'item_id' => $item->id,
-                            'item_type' => $item->widget->type,
-                            'value_type' => $item->widget->value_type,
-                            'value' => $value,
-                        ]);
-                    }
-
-                    // Trig event
-                    $this->triggerItemValue($item, $value);
-
-                    // Save to history
-                    $this->logItemValue($item, $value);
-                }
-
+                $this->handleBoardValuesMessage($data, $board);
                 break;
             case 'rgb':
-                $itemId = (integer)$data['item_id'];
-                $mode = $data['mode'];
-                $fadeTime = (int)$data['fade_time'];
-
-                $item = Item::findOne([
-                    'id' => $itemId,
-                    'board_id' => $board->id,
-                ]);
-
-                if (!$item) {
-                    $this->log("Board [{$board->id}] tried to use unknown item");
-                    throw new NotFoundHttpException('Item does not exist');
-                }
-
-                $commonParameters = [
-                    'type' => 'rgb',
-                    'item_id' => $item->id,
-                    'mode' => $mode,
-                    'fade_time' => $fadeTime,
-                ];
-
-                $modeParameters = [];
-
-                if ($mode === Item::RGB_MODE_STATIC or $mode === Item::RGB_MODE_FADE) {
-                    // Fill saved values if not provided
-                    $red = isset($data['red']) ? $data['red'] : Yii::$app->params['items']['rgb']['red'];
-                    $green = isset($data['green']) ? $data['green'] : Yii::$app->params['items']['rgb']['green'];
-                    $blue = isset($data['blue']) ? $data['blue'] : Yii::$app->params['items']['rgb']['blue'];
-
-                    // Convert color from 1023 to 255
-                    $red = RGBHelper::from10to8($red);
-                    $green = RGBHelper::from10to8($green);
-                    $blue = RGBHelper::from10to8($blue);
-
-                    $modeParameters['red'] = $red;
-                    $modeParameters['green'] = $green;
-                    $modeParameters['blue'] = $blue;
-                }
-
-                if ($mode === Item::RGB_MODE_WAVE or $mode === Item::RGB_MODE_FADE) {
-                    $colorTime = isset($data['color_time']) ? $data['color_time'] : Yii::$app->params['items']['rgb']['color-time'];
-
-                    $modeParameters['color_time'] = $colorTime;
-                }
-
-                $parameters = ArrayHelper::merge($commonParameters, $modeParameters);
-
-                $this->sendUsers($parameters);
-
-                $this->logItemValue($item, serialize($parameters));
-                $this->saveItemValue($item->id, $parameters, $item->type);
-
+                $this->handleBoardRgbMessage($data, $board);
                 break;
             case 'pong':
-                $this->log("Pong from board [$board->id]");
+                $this->handleBoardPongMessage($board);
                 break;
             case 'ping':
-
-                $this->log("Ping from board [$board->id]");
-
-                $from->send(Json::encode([
-                    'type' => 'pong',
-                ]));
-
+                $this->handleBoardPingMessage($from, $board);
                 break;
             default:
                 $this->log("Unknown command: \"{$data['type']}\"");
@@ -714,7 +603,7 @@ class CoreServer implements MessageComponentInterface
         $history->commited_at = time();
         $history->value = serialize($parameters);
 
-        if (!$history->save()) {
+        if (!$history->save(false)) {
             $this->log("Cannot log:");
             var_dump($history->errors);
         }
@@ -757,7 +646,7 @@ class CoreServer implements MessageComponentInterface
         $history->user_id = $user->id;
         $history->commited_at = time();
 
-        if (!$history->save()) {
+        if (!$history->save(false)) {
             $this->log("Cannot log: ");
             var_dump($history->errors);
         }
@@ -922,7 +811,7 @@ class CoreServer implements MessageComponentInterface
         $model->value = $connected;
         $model->commited_at = time();
 
-        if (!$model->save()) {
+        if (!$model->save(false)) {
             $this->log("Cannot log: ");
             var_dump($model->errors);
         }
@@ -944,7 +833,7 @@ class CoreServer implements MessageComponentInterface
         $model->value = $connected;
         $model->commited_at = time();
 
-        if (!$model->save()) {
+        if (!$model->save(false)) {
             $this->log("Cannot log: ");
             var_dump($model->errors);
         }
@@ -964,7 +853,7 @@ class CoreServer implements MessageComponentInterface
         $model->value = $value;
         $model->commited_at = time();
 
-        if (!$model->save()) {
+        if (!$model->save(false)) {
             $this->log("Cannot log: ");
             var_dump($model->errors);
         }
@@ -997,7 +886,7 @@ class CoreServer implements MessageComponentInterface
         $model->commited_at = time();
         $model->value = $value;
 
-        if (!$model->save()) {
+        if (!$model->save(false)) {
             $this->log("Cannot log: ");
             var_dump($model->errors);
         }
@@ -1141,6 +1030,149 @@ class CoreServer implements MessageComponentInterface
     }
 
     /**
+     * @param array $data
+     * @param Board $board
+     */
+    public function handleBoardValueMessage($data, $board)
+    {
+        $value = $data['value'];
+        $pin = (integer)$data['pin'];
+
+        $this->handleBoardValue($board, $pin, $value);
+    }
+
+    /**
+     * @param array $data
+     * @param Board $board
+     */
+    public function handleBoardValuesMessage($data, $board)
+    {
+        // Remove type from list
+        unset($data['type']);
+
+        // Handle each value
+        foreach ($data as $pin => $value) {
+            $this->handleBoardValue($board, $pin, $value);
+        }
+    }
+
+    /**
+     * @param Board $board
+     * @param integer $pin
+     * @param mixed $value
+     */
+    protected function handleBoardValue($board, $pin, $value)
+    {
+        $item = Item::findOne([
+            'board_id' => $board->id,
+            'pin' => $pin,
+        ]);
+
+        if (!$item) {
+            $this->log("Trying to use unknown item (pin: $pin, board id: $board->id)");
+        }
+
+        $value = $this->saveItemValue($item->id, $value, $item->type);
+
+        if ($item->widget) {
+            $this->sendUsers([
+                'type' => 'value',
+                'item_id' => $item->id,
+                'item_type' => $item->widget->type,
+                'value_type' => $item->widget->value_type,
+                'value' => $value,
+            ]);
+        }
+
+        // Trig event
+        $this->triggerItemValue($item, $value);
+
+        // Save to history
+        $this->logItemValue($item, $value);
+    }
+
+    /**
+     * @param array $data
+     * @param Board $board
+     * @throws NotFoundHttpException
+     */
+    public function handleBoardRgbMessage($data, $board)
+    {
+        $itemId = (integer)$data['item_id'];
+        $mode = $data['mode'];
+        $fadeTime = (int)$data['fade_time'];
+
+        $item = Item::findOne([
+            'id' => $itemId,
+            'board_id' => $board->id,
+        ]);
+
+        if (!$item) {
+            $this->log("Board [{$board->id}] tried to use unknown item");
+            throw new NotFoundHttpException('Item does not exist');
+        }
+
+        $commonParameters = [
+            'type' => 'rgb',
+            'item_id' => $item->id,
+            'mode' => $mode,
+            'fade_time' => $fadeTime,
+        ];
+
+        $modeParameters = [];
+
+        if ($mode === Item::RGB_MODE_STATIC or $mode === Item::RGB_MODE_FADE) {
+            // Fill saved values if not provided
+            $red = isset($data['red']) ? $data['red'] : Yii::$app->params['items']['rgb']['red'];
+            $green = isset($data['green']) ? $data['green'] : Yii::$app->params['items']['rgb']['green'];
+            $blue = isset($data['blue']) ? $data['blue'] : Yii::$app->params['items']['rgb']['blue'];
+
+            // Convert color from 1023 to 255
+            $red = RGBHelper::from10to8($red);
+            $green = RGBHelper::from10to8($green);
+            $blue = RGBHelper::from10to8($blue);
+
+            $modeParameters['red'] = $red;
+            $modeParameters['green'] = $green;
+            $modeParameters['blue'] = $blue;
+        }
+
+        if ($mode === Item::RGB_MODE_WAVE or $mode === Item::RGB_MODE_FADE) {
+            $colorTime = isset($data['color_time']) ? $data['color_time'] : Yii::$app->params['items']['rgb']['color-time'];
+
+            $modeParameters['color_time'] = $colorTime;
+        }
+
+        $parameters = ArrayHelper::merge($commonParameters, $modeParameters);
+
+        $this->sendUsers($parameters);
+
+        $this->logItemValue($item, serialize($parameters));
+        $this->saveItemValue($item->id, $parameters, $item->type);
+    }
+
+    /**
+     * @param Board $board
+     */
+    public function handleBoardPongMessage($board)
+    {
+        $this->log("Pong from board [$board->id]");
+    }
+
+    /**
+     * @param ConnectionInterface $from
+     * @param Board $board
+     */
+    public function handleBoardPingMessage($from, $board)
+    {
+        $this->log("Ping from board [$board->id]");
+
+        $from->send(Json::encode([
+            'type' => 'pong',
+        ]));
+    }
+
+    /**
      * @param string $value
      * @return array
      */
@@ -1261,7 +1293,7 @@ class CoreServer implements MessageComponentInterface
                 $this->log("Date Trigger [{$trigger->id}] has past date. Disabling it...");
 
                 $trigger->active = false;
-                $trigger->save();
+                $trigger->save(false);
 
                 continue;
             } elseif ($trigger->type === Trigger::TYPE_BY_TIME) {
@@ -1441,16 +1473,19 @@ class CoreServer implements MessageComponentInterface
 
             case Item::TYPE_VARIABLE_TEMPERATURE:
             case Item::TYPE_VARIABLE_HUMIDITY:
-                return (int)$value;
+                $value = (float)$value;
+                $value = round($value, 2);
+
+                return $value;
         }
 
         return $value;
     }
 
     /**
-     * @param $boardConnection
+     * @param BoardConnection $boardConnection
      */
-    protected function updateBoardLastPing(ConnectionInterface &$boardConnection)
+    protected function updateBoardLastPing(&$boardConnection)
     {
         $boardConnection->lastPingAt = time();
     }

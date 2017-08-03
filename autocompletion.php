@@ -49,3 +49,26 @@ class ConsoleApplication extends yii\console\Application
 class User extends \yii\web\User
 {
 }
+
+/**
+ * Class Connection
+ *
+ * @property integer $resourceId
+ * @property \app\models\User $User
+ * @property boolean $api
+ * @property string $remoteAddress
+ */
+class Connection extends \Ratchet\WebSocket\Version\RFC6455\Connection
+{
+
+}
+
+/**
+ * Class BoardConnection
+ *
+ * @property \app\models\Board $Board
+ * @property integer $lastPingAt
+ */
+class BoardConnection extends Connection
+{
+}
