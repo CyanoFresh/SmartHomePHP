@@ -44,6 +44,14 @@ class ItemWidgetQuery extends ActiveQuery
     }
 
     /**
+     * @return $this
+     */
+    public function plant()
+    {
+        return $this->andWhere(['type' => ItemWidget::TYPE_PLANT]);
+    }
+
+    /**
      * @inheritdoc
      * @return ItemWidget[]|array
      */

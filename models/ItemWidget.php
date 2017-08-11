@@ -27,6 +27,7 @@ class ItemWidget extends ActiveRecord
     const TYPE_SWITCH = 10;
     const TYPE_VARIABLE = 20;
     const TYPE_RGB = 30;
+    const TYPE_PLANT = 40;
 
     const VALUE_TYPE_BOOLEAN = 10;
     const VALUE_TYPE_DOOR = 20;
@@ -125,6 +126,7 @@ class ItemWidget extends ActiveRecord
             self::TYPE_SWITCH => 'Переключатель',
             self::TYPE_VARIABLE => 'Переменная',
             self::TYPE_RGB => 'RGB',
+            self::TYPE_PLANT => 'Растение',
         ];
     }
 

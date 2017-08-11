@@ -339,6 +339,8 @@ class CoreServer implements MessageComponentInterface
                 return $this->handleTrig($from, $user, $data);
             case 'debug_send_to_board':
                 return $this->handleDebugSendToBoard($from, $user, $data);
+            case 'do_watering':
+                return $this->handleDoWatering($from, $user, $data);
         }
 
         return $this->log("Unknown command from user: $msg");
@@ -369,6 +371,9 @@ class CoreServer implements MessageComponentInterface
                 break;
             case 'ping':
                 $this->handleBoardPingMessage($from, $board);
+                break;
+            case 'watered':
+                $this->handleBoardWateredMessage($data, $from, $board);
                 break;
             default:
                 $this->log("Unknown command: \"{$data['type']}\"");
@@ -600,6 +605,68 @@ class CoreServer implements MessageComponentInterface
         $history->item_id = $item->id;
         $history->commited_at = time();
         $history->value = serialize($parameters);
+
+        if (!$history->save(false)) {
+            $this->log("Cannot log:");
+            var_dump($history->errors);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param ConnectionInterface $from
+     * @param User $user
+     * @param array $data
+     * @throws NotSupportedException
+     */
+    protected function handleDoWatering($from, $user, $data)
+    {
+        $item_id = (int)$data['item_id'];
+        $item = Item::findOne($item_id);
+
+        if (!$item) {
+            return $from->send(Json::encode([
+                'type' => 'error',
+                'message' => 'Такой элемент не существует',
+            ]));
+        }
+
+        if ($item->type !== Item::TYPE_PLANT) {
+            return $from->send(Json::encode([
+                'type' => 'error',
+                'message' => 'Данный тип устройства не является Plant',
+            ]));
+        }
+
+        $board = $item->board;
+
+        switch ($board->type) {
+            case Board::TYPE_AREST:
+                throw new NotSupportedException();
+
+            case Board::TYPE_WEBSOCKET:
+                if (!$this->isBoardConnected($board->id)) {
+                    return $from->send(Json::encode([
+                        'type' => 'error',
+                        'message' => 'Устройство не подключено',
+                    ]));
+                }
+
+                $this->sendToBoard($board->id, [
+                    'type' => 'do_watering',
+                    'item_id' => $item->id,
+                ]);
+
+                break;
+        }
+
+        $history = new History();
+        $history->type = History::TYPE_USER_ACTION;
+        $history->user_id = $user->id;
+        $history->item_id = $item->id;
+        $history->commited_at = time();
+        $history->value = 'do_watering';
 
         if (!$history->save(false)) {
             $this->log("Cannot log:");
@@ -1168,6 +1235,35 @@ class CoreServer implements MessageComponentInterface
         $from->send(Json::encode([
             'type' => 'pong',
         ]));
+    }
+
+    /**
+     * @param $data
+     * @param ConnectionInterface $from
+     * @param Board $board
+     * @throws NotFoundHttpException
+     */
+    public function handleBoardWateredMessage($data, $from, $board)
+    {
+        $itemId = (integer)$data['item_id'];
+
+        $item = Item::findOne([
+            'id' => $itemId,
+            'board_id' => $board->id,
+        ]);
+
+        if (!$item) {
+            $this->log("Board [{$board->id}] tried to use unknown item");
+            throw new NotFoundHttpException('Item does not exist');
+        }
+
+        $this->sendUsers([
+            'type' => 'watered',
+            'item_id' => $item->id,
+        ]);
+
+        $this->logItemValue($item, 'watered');
+        $this->saveItemValue($item->id, 'watered', $item->type);
     }
 
     /**

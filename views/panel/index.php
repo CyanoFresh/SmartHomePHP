@@ -66,6 +66,13 @@ $this->title = 'Панель Управления';
                                         ]) ?>
                                     <?php endforeach; ?>
                                 </div>
+                                <div class="row panel-items-plant">
+                                    <?php foreach ($room->getItemWidgets()->plant()->active()->all() as $widget): ?>
+                                        <?= $this->render('_plant', [
+                                            'widget' => $widget,
+                                        ]) ?>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                             <!-- /.box-body -->
                         </div>

@@ -1,7 +1,7 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\BoardSearch */
+/* @var $searchModel \app\models\search\BoardSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 use app\models\Board;

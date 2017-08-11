@@ -1,13 +1,16 @@
 <?php
 
-namespace app\models;
+namespace app\models\query;
+
+use app\models\Board;
+use yii\db\ActiveQuery;
 
 /**
  * This is the ActiveQuery class for [[Board]].
  *
  * @see Board
  */
-class BoardQuery extends \yii\db\ActiveQuery
+class BoardQuery extends ActiveQuery
 {
     /*public function active()
     {

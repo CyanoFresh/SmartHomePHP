@@ -68,6 +68,15 @@ function onMessage(e) {
             case 'rgb':
                 updateRGB(data.item_id, data);
                 break;
+            case 'soil_moisture':
+                itemValues[data.item_id] = data.value;
+
+                $('.panel-item-plant[data-item-id="' + data.item_id + '"]').find('.panel-item-plant-soil-moisture').html(data.value + ' %');
+
+                break;
+            case 'watered':
+                showSuccessMessage('Растение полито');
+                break;
             case 'error':
                 showErrorMessage(data.message);
                 break;
@@ -303,10 +312,17 @@ $(document).ready(function () {
         send({
             type: 'debug_send_to_board',
             board_id: parseInt($('#send-board-board_id').val()),
-            message: $('#send-board-message').val(),
+            message: $('#send-board-message').val()
         });
+    }).on('click', '.btn-plant-do-watering', function (e) {
+        e.preventDefault();
 
-        return false;
+        var item_id = $(this).parents('.panel-item-plant').data('item-id');
+
+        send({
+            type: 'do_watering',
+            item_id: item_id
+        });
     });
 
     // RGB Widget

@@ -83,3 +83,47 @@
     /* 5 columns for larger screens */
     .col-md-6.masonry-item { width: 100%; }
 }
+
+.panel-item-plant {
+    width: 100%;
+    background: #009688;
+    border-radius: 2px;
+    box-shadow: 0 1px 1.5px 0 rgba(0, 0, 0, .12), 0 1px 1px 0 rgba(0, 0, 0, .24);
+    color: #fff;
+    margin: 10px 0;
+    user-select: none;
+}
+
+.panel-item-plant-name {
+    background: rgba(0, 0, 0, 0.3);
+    text-align: center;
+    font-size: 15px;
+    padding: 5px 0;
+    font-weight: bold;
+}
+
+.panel-item-plant-actions {
+    padding: 10px;
+}
+
+.panel-item-plant-row {
+    display: flex;
+    position: relative;
+    width: 100%;
+    padding-top: 15px;
+}
+
+.panel-item-plant-soil-moisture {
+    font-size: 30px;
+    line-height: 45px;
+    text-align: center;
+    width: 50%;
+}
+
+.panel-item-plant-icon {
+    font-size: 45px;
+    text-align: center;
+    line-height: 1;
+    width: 50%;
+    border-right: 1px solid rgba(255,255,255,0.3);
+}
