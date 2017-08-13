@@ -822,8 +822,8 @@ class CoreServer implements MessageComponentInterface
         $output = '';
 
         if ($prependDate) {
-            $date = new \DateTime('now');
-            $output .= '[' . $date->format('Y-m-d H:i:s v') . '] ';
+            list($microseconds, $timestamp) = explode(' ', microtime());
+            $output .= '[' . date("Y-m-d H:i:s.", $timestamp) . (round($microseconds * 1000)) . '] ';
         }
 
         $output .= $message;
