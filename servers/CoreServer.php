@@ -814,15 +814,16 @@ class CoreServer implements MessageComponentInterface
      * Logs message into console or other storage
      *
      * @param string $message
-     * @param bool $appendDate
+     * @param bool $prependDate
      * @param bool $eol Put EndOfLine symbol at the end
      */
-    protected function log($message, $appendDate = true, $eol = true)
+    protected function log($message, $prependDate = true, $eol = true)
     {
         $output = '';
 
-        if ($appendDate) {
-            $output .= '[' . Yii::$app->formatter->asDatetime(time(), 'yyyy-MM-dd HH:mm:ss') . '] ';
+        if ($prependDate) {
+            $date = new \DateTime('now');
+            $output .= '[' . $date->format('Y-m-d H:i:s v') . '] ';
         }
 
         $output .= $message;

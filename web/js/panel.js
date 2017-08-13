@@ -145,7 +145,7 @@ function itemSwitchOff(itemId) {
     $item.addClass('off');
 }
 
-function itemSetValue(itemId, value) {
+function itemVariableSetValue(itemId, value) {
     $('.panel-item-variable[data-item-id="' + itemId + '"] > .item-variable-value').html(value);
 }
 
@@ -173,7 +173,7 @@ function updateItemValue(id, type, value, value_type) {
             break;
         case 20:    // Variable
             if (!value_type || value_type == null) {
-                return itemSetValue(id, value);
+                return itemVariableSetValue(id, value);
             }
 
             switch (value_type) {
@@ -205,8 +205,11 @@ function updateItemValue(id, type, value, value_type) {
                     break;
             }
 
-            itemSetValue(id, value);
+            itemVariableSetValue(id, value);
 
+            break;
+        case 40:    // Plant moisture
+            $('.panel-item-plant[data-item-id="' + id + '"] .panel-item-plant-soil-moisture').html(value);
             break;
     }
 }

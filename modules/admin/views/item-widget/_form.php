@@ -40,7 +40,7 @@ $('.fontawesome-iconpicker-input').iconpicker({container: 'body', inputSearch: t
                                     var widgetType = data.type;
                                     var valueType;
                                     
-                                    if (data.type == 20 || data.type == 21 || data.type == 22 || data.type == 25 || data.type == 26) {
+                                    if (data.type == 20 || data.type == 21 || data.type == 22 || data.type == 25 || data.type == 26 || data.type == 40) {
                                         widgetType = 20;
                                         $('.field-itemwidget-value_type').fadeIn().removeClass('hidden');
                                     }
@@ -59,6 +59,10 @@ $('.fontawesome-iconpicker-input').iconpicker({container: 'body', inputSearch: t
                                     
                                     if (data.type == 26) {
                                         valueType = 20;
+                                    }
+                                    
+                                    if (data.type == 40) {
+                                        valueType = 40;
                                     }
                                     
                                     $('#itemwidget-type').val(widgetType).change();
