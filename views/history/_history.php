@@ -47,7 +47,7 @@ use app\models\Item;
 
             <?php elseif ($model->item->type === Item::TYPE_RGB): ?></b>
 
-                установил значение <b><?= $model->value ?></b> на RGB ленту <b><?= $model->item->name ?></b>
+                установил значение <b><?= $model->value ?></b> на RGB <b><?= $model->item->name ?></b> в комнате <b><?= $model->item->board->name ?></b>
 
             <?php endif ?>
         <?php elseif ($model->type === History::TYPE_ITEM_VALUE): ?>
@@ -62,17 +62,19 @@ use app\models\Item;
                     ВЫКЛ
                 <?php endif ?>
 
+                в комнате <b><?= $model->item->board->name ?></b>
+
             <?php elseif ($model->item->type === Item::TYPE_VARIABLE_TEMPERATURE): ?>
 
-                Значение температуры <b><?= $model->item->name ?></b> было <b><?= $model->value ?> С*</b>
+                Значение температуры <b><?= $model->item->name ?></b> было <b><?= $model->value ?> °С</b> в комнате <b><?= $model->item->board->name ?></b>
 
             <?php elseif ($model->item->type === Item::TYPE_VARIABLE_HUMIDITY): ?>
 
-                Значение влажности <b><?= $model->item->name ?></b> было <b><?= $model->value ?> %</b>
+                Значение влажности <b><?= $model->item->name ?></b> было <b><?= $model->value ?> %</b> в комнате <b><?= $model->item->board->name ?></b>
 
             <?php elseif ($model->item->type === Item::TYPE_VARIABLE_BOOLEAN): ?>
 
-                Значение элемента <b><?= $model->item->name ?></b> было <b><?= Yii::$app->formatter->asBoolean($model->value) ?></b>
+                Значение элемента <b><?= $model->item->name ?></b> было <b><?= Yii::$app->formatter->asBoolean($model->value) ?></b> в комнате <b><?= $model->item->board->name ?></b>
 
             <?php elseif ($model->item->type === Item::TYPE_VARIABLE_BOOLEAN_DOOR): ?>
 
@@ -82,11 +84,11 @@ use app\models\Item;
                     открыта
                 <?php else: ?>
                     закрыта
-                <?php endif ?></b>
+                <?php endif ?></b> в комнате <b><?= $model->item->board->name ?></b>
 
             <?php else: ?>
 
-                Значение элемента <b><?= $model->item->name ?></b> было <b><?= $model->value ?></b>
+                Значение элемента <b><?= $model->item->name ?></b> было <b><?= $model->value ?></b> в комнате <b><?= $model->item->board->name ?></b>
 
             <?php endif ?>
         <?php endif; ?>

@@ -15,6 +15,7 @@ use app\models\User;
 use BoardConnection;
 use Connection as CustomConnection;
 use Guzzle\Http\QueryString;
+use Props\NotFoundException;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Ratchet\WebSocket\Version\RFC6455\Connection;
@@ -1126,6 +1127,7 @@ class CoreServer implements MessageComponentInterface
      * @param Board $board
      * @param integer $pin
      * @param mixed $value
+     * @throws NotFoundException
      */
     protected function handleBoardValue($board, $pin, $value)
     {
@@ -1136,6 +1138,7 @@ class CoreServer implements MessageComponentInterface
 
         if (!$item) {
             $this->log("Trying to use unknown item (pin: $pin, board id: $board->id)");
+            throw new NotFoundException('Item not found');
         }
 
         $value = $this->saveItemValue($item->id, $value, $item->type);

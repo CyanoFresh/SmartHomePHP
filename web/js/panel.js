@@ -209,7 +209,7 @@ function updateItemValue(id, type, value, value_type) {
 
             break;
         case 40:    // Plant moisture
-            $('.panel-item-plant[data-item-id="' + id + '"] .panel-item-plant-soil-moisture').html(value);
+            $('.panel-item-plant[data-item-id="' + id + '"] .panel-item-plant-soil-moisture').html(value + '%');
             break;
     }
 }
