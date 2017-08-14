@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use linslin\yii2\curl\Curl;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -22,7 +21,6 @@ use yii\helpers\ArrayHelper;
  * @property string $default_value
  *
  * @property History[] $histories
- * @property Room $room
  * @property Board $board
  * @property ItemWidget $widget
  */
