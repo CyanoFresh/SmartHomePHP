@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\query\ItemWidgetQuery;
 use Yii;
 use yii\db\ActiveRecord;
 

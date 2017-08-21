@@ -1,16 +1,16 @@
 <?php
 
-namespace app\models;
+namespace app\models\search;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Item;
+use app\models\History;
 
 /**
- * ItemSearch represents the model behind the search form about `app\models\Item`.
+ * HistorySearch represents the model behind the search form about `app\models\History`.
  */
-class ItemSearch extends Item
+class HistorySearch extends History
 {
     /**
      * @inheritdoc
@@ -18,8 +18,7 @@ class ItemSearch extends Item
     public function rules()
     {
         return [
-            [['id', 'type', 'update_interval', 'save_history_interval', 'room_id', 'board_id', 'sort_order'], 'integer'],
-            [['url', 'name'], 'safe'],
+            [['id', 'type', 'event_id', 'board_id', 'user_id', 'item_id', 'commited_at', 'value'], 'integer'],
         ];
     }
 
@@ -41,12 +40,17 @@ class ItemSearch extends Item
      */
     public function search($params)
     {
-        $query = Item::find();
+        $query = History::find();
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'commited_at' => SORT_DESC,
+                ],
+            ],
         ]);
 
         $this->load($params);
@@ -61,12 +65,13 @@ class ItemSearch extends Item
         $query->andFilterWhere([
             'id' => $this->id,
             'type' => $this->type,
-            'update_interval' => $this->update_interval,
-            'save_history_interval' => $this->save_history_interval,
+            'event_id' => $this->event_id,
+            'board_id' => $this->board_id,
+            'user_id' => $this->user_id,
+            'item_id' => $this->item_id,
+            'commited_at' => $this->commited_at,
+            'value' => $this->value,
         ]);
-
-        $query->andFilterWhere(['like', 'url', $this->url])
-            ->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

@@ -1,6 +1,8 @@
 <?php
 
-namespace app\models;
+namespace app\models\query;
+
+use app\models\History;
 
 /**
  * This is the ActiveQuery class for [[History]].

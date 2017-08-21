@@ -1,16 +1,16 @@
 <?php
 
-namespace app\models;
+namespace app\models\search;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\History;
+use app\models\Room;
 
 /**
- * HistorySearch represents the model behind the search form about `app\models\History`.
+ * RoomSearch represents the model behind the search form about `app\models\Room`.
  */
-class HistorySearch extends History
+class RoomSearch extends Room
 {
     /**
      * @inheritdoc
@@ -18,7 +18,8 @@ class HistorySearch extends History
     public function rules()
     {
         return [
-            [['id', 'type', 'event_id', 'board_id', 'user_id', 'item_id', 'commited_at', 'value'], 'integer'],
+            [['id', 'sort_order'], 'integer'],
+            [['name'], 'safe'],
         ];
     }
 
@@ -40,17 +41,12 @@ class HistorySearch extends History
      */
     public function search($params)
     {
-        $query = History::find();
+        $query = Room::find();
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort' => [
-                'defaultOrder' => [
-                    'commited_at' => SORT_DESC,
-                ],
-            ],
         ]);
 
         $this->load($params);
@@ -64,14 +60,10 @@ class HistorySearch extends History
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'type' => $this->type,
-            'event_id' => $this->event_id,
-            'board_id' => $this->board_id,
-            'user_id' => $this->user_id,
-            'item_id' => $this->item_id,
-            'commited_at' => $this->commited_at,
-            'value' => $this->value,
+            'sort_order' => $this->sort_order,
         ]);
+
+        $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

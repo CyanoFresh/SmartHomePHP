@@ -1,16 +1,16 @@
 <?php
 
-namespace app\models;
+namespace app\models\search;
 
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Room;
+use app\models\Item;
 
 /**
- * RoomSearch represents the model behind the search form about `app\models\Room`.
+ * ItemSearch represents the model behind the search form about `app\models\Item`.
  */
-class RoomSearch extends Room
+class ItemSearch extends Item
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class RoomSearch extends Room
     public function rules()
     {
         return [
-            [['id', 'sort_order'], 'integer'],
-            [['name'], 'safe'],
+            [['id', 'type', 'update_interval', 'save_history_interval', 'room_id', 'board_id', 'sort_order'], 'integer'],
+            [['url', 'name'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class RoomSearch extends Room
      */
     public function search($params)
     {
-        $query = Room::find();
+        $query = Item::find();
 
         // add conditions that should always apply here
 
@@ -60,10 +60,13 @@ class RoomSearch extends Room
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'sort_order' => $this->sort_order,
+            'type' => $this->type,
+            'update_interval' => $this->update_interval,
+            'save_history_interval' => $this->save_history_interval,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'url', $this->url])
+            ->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }

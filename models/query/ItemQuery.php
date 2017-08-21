@@ -1,6 +1,8 @@
 <?php
 
-namespace app\models;
+namespace app\models\query;
+
+use app\models\Item;
 
 /**
  * This is the ActiveQuery class for [[Item]].

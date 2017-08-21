@@ -1,7 +1,8 @@
 <?php
 
-namespace app\models;
+namespace app\models\query;
 
+use app\models\ItemWidget;
 use yii\db\ActiveQuery;
 
 /**
