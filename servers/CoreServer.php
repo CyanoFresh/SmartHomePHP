@@ -22,6 +22,7 @@ use Ratchet\WebSocket\Version\RFC6455\Connection;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use Yii;
+use yii\base\Component;
 use yii\base\InvalidParamException;
 use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
@@ -627,17 +628,19 @@ class CoreServer implements MessageComponentInterface
         $item = Item::findOne($item_id);
 
         if (!$item) {
-            return $from->send(Json::encode([
+            $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Такой элемент не существует',
             ]));
+            return;
         }
 
         if ($item->type !== Item::TYPE_PLANT) {
-            return $from->send(Json::encode([
+            $from->send(Json::encode([
                 'type' => 'error',
                 'message' => 'Данный тип устройства не является Plant',
             ]));
+            return;
         }
 
         $board = $item->board;
@@ -648,10 +651,11 @@ class CoreServer implements MessageComponentInterface
 
             case Board::TYPE_WEBSOCKET:
                 if (!$this->isBoardConnected($board->id)) {
-                    return $from->send(Json::encode([
+                    $from->send(Json::encode([
                         'type' => 'error',
                         'message' => 'Устройство не подключено',
                     ]));
+                    return;
                 }
 
                 $this->sendToBoard($board->id, [
@@ -673,8 +677,6 @@ class CoreServer implements MessageComponentInterface
             $this->log("Cannot log:");
             var_dump($history->errors);
         }
-
-        return true;
     }
 
     /**
@@ -705,7 +707,7 @@ class CoreServer implements MessageComponentInterface
 
         $this->log("Trigger [$trigger->id] triggered by manual");
 
-        $this->trigger($trigger);
+        $this->triggerTrigger($trigger);
 
         $history = new History();
         $history->type = History::TYPE_API_TRIGGER;
@@ -978,7 +980,7 @@ class CoreServer implements MessageComponentInterface
         }
 
         foreach ($triggers as $trigger) {
-            $this->trigger($trigger);
+            $this->triggerTrigger($trigger);
         }
     }
 
@@ -1000,7 +1002,7 @@ class CoreServer implements MessageComponentInterface
         }
 
         foreach ($triggers as $trigger) {
-            $this->trigger($trigger);
+            $this->triggerTrigger($trigger);
         }
     }
 
@@ -1293,7 +1295,7 @@ class CoreServer implements MessageComponentInterface
      */
     protected function triggerDate($trigger)
     {
-        $this->trigger($trigger);
+        $this->triggerTrigger($trigger);
     }
 
     /**
@@ -1301,7 +1303,7 @@ class CoreServer implements MessageComponentInterface
      */
     protected function triggerTime($trigger)
     {
-        $this->trigger($trigger);
+        $this->triggerTrigger($trigger);
 
         $this->scheduleTriggers();
     }
@@ -1311,7 +1313,7 @@ class CoreServer implements MessageComponentInterface
      *
      * @param Trigger $trigger
      */
-    protected function trigger($trigger)
+    protected function triggerTrigger($trigger)
     {
         /** @var Event[] $events */
         $events = $trigger->getEvents()->andWhere(['active' => true])->all();

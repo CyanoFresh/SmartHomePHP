@@ -70,17 +70,7 @@ return [
             ],
         ],
     ],
-    'modules' => [
-        'admin' => [
-            'class' => 'app\modules\admin\Module',
-        ],
-        'api' => [
-            'class' => 'app\modules\api\Module',
-        ],
-        'datecontrol' => [
-            'class' => '\kartik\datecontrol\Module'
-        ],
-    ],
+    'modules' => require 'modules.php',
     'params' => $params,
     'defaultRoute' => ['panel/index'],
 ];

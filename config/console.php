@@ -22,9 +22,13 @@ $config = [
                 ],
             ],
         ],
+        'eventManager' => [
+            'class' => 'app\components\EventManager',
+        ],
         'db' => $db,
     ],
     'params' => $params,
+    'modules' => require 'modules.php',
     /*
     'controllerMap' => [
         'fixture' => [ // Fixture generation command line.
