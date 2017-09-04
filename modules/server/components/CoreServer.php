@@ -53,29 +53,6 @@ class CoreServer extends BaseServer
     }
 
     /**
-     * @param string|array|object $data
-     */
-    public function sendAllUsers($data)
-    {
-        if (is_array($data) || is_object($data)) {
-            $msg = Json::encode($data);
-        } else {
-            $msg = $data;
-        }
-    }
-
-    /**
-     * @param string|array|object $data
-     */
-    public function sendAllDevices($data)
-    {
-
-        foreach ($this->deviceClients as $client) {
-            $client->send($msg);
-        }
-    }
-
-    /**
      * When a new connection is opened it will be passed to this method
      * @param  ConnectionInterface $connection The socket/connection that just connected to your application
      * @throws \Exception
@@ -94,18 +71,24 @@ class CoreServer extends BaseServer
 
     /**
      * This is called before or after a socket is closed (depends on how it's closed).  SendMessage to $conn will not result in an error if it has already been closed.
-     * @param  ConnectionInterface $conn The socket/connection that is closing/closed
+     * @param  ConnectionInterface $connection The socket/connection that is closing/closed
      * @throws \Exception
      */
-    public function onClose(ConnectionInterface $conn)
+    public function onClose(ConnectionInterface $connection)
     {
-        if (isset($this->clients[$conn->resourceId])) {
-            unset($this->clients[$conn->resourceId]);
+        if (isset($connection->user) && isset($this->userClients[$connection->user->id]) && isset($this->userClients[$connection->user->id][$connection->resourceId])) {
+            if (count($this->userClients[$connection->user->id]) === 1) {
+                unset($this->userClients[$connection->user->id]);
+            } else {
+                unset($this->userClients[$connection->user->id][$connection->resourceId]);
+            }
+        } elseif (isset($connection->device) && isset($this->deviceClients[$connection->device->id])) {
+            unset($this->deviceClients[$connection->device->id]);
         }
 
         $this->trigger(self::EVENT_CONNECTION_CLOSE, new ConnectionEvent([
             'server' => $this,
-            'connection' => $conn,
+            'connection' => $connection,
         ]));
     }
 
@@ -142,6 +125,7 @@ class CoreServer extends BaseServer
 
     /**
      * @param Connection $connection
+     * @return bool
      */
     protected function authenticate(Connection $connection)
     {
@@ -152,11 +136,9 @@ class CoreServer extends BaseServer
 
         switch ($type) {
             case 'user':
-                $this->authUser($connection, $query);
-                break;
+                return $this->authUser($connection, $query);
             case 'device':
-                $this->authDevice($connection, $query);
-                break;
+                return $this->authDevice($connection, $query);
             default:
                 throw new InvalidParamException('Unknown connection type');
         }
@@ -165,6 +147,7 @@ class CoreServer extends BaseServer
     /**
      * @param Connection $connection
      * @param QueryString $query
+     * @return bool
      */
     protected function authUser(Connection $connection, QueryString $query)
     {
@@ -207,7 +190,7 @@ class CoreServer extends BaseServer
                 ],
             ]));
 
-            return;
+            return false;
         }
 
         $user->reGenerateAuthToken();
@@ -229,11 +212,14 @@ class CoreServer extends BaseServer
                 'origin' => $origin,
             ],
         ]));
+
+        return true;
     }
 
     /**
      * @param Connection $connection
      * @param QueryString $query
+     * @return bool
      */
     protected function authDevice(Connection $connection, QueryString $query)
     {
@@ -266,9 +252,11 @@ class CoreServer extends BaseServer
             ]));
         }
 
+        $connection->device = $device;
+
         $this->deviceClients[$device->id] = $connection;
 
-        $this->trigger(self::EVENT_AUTH_USER, new DeviceAuthEvent([
+        $this->trigger(self::EVENT_AUTH_DEVICE, new DeviceAuthEvent([
             'connection' => $connection,
             'server' => $this,
             'device' => $device,
@@ -278,6 +266,8 @@ class CoreServer extends BaseServer
                 'ip' => $connection->remoteAddress,
             ],
         ]));
+
+        return true;
     }
 
     /**
@@ -308,6 +298,31 @@ class CoreServer extends BaseServer
             foreach ($this->userClients[$userId] as $connection) {
                 $connection->send($msg);
             }
+        }
+    }
+
+    /**
+     * @param int $deviceId
+     * @param object|array|string $data
+     */
+    public function sendDevice(int $deviceId, $data)
+    {
+        $msg = $this->encodeSendData($data);
+
+        if (isset($this->deviceClients[$deviceId])) {
+            $this->deviceClients[$deviceId]->send($msg);
+        }
+    }
+
+    /**
+     * @param object|array|string $data
+     */
+    public function sendDevices($data)
+    {
+        $msg = $this->encodeSendData($data);
+
+        foreach ($this->deviceClients as $connection) {
+            $connection->send($msg);
         }
     }
 
