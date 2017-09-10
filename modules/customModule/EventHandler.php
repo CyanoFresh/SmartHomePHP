@@ -10,19 +10,11 @@ class EventHandler
 {
     public static function onServerInit(ServerEvent $event)
     {
-        echo 'Server initialized' . PHP_EOL;
+        $event->server->echo('Server initialized');
     }
 
     public static function onMessage(ConnectionMessageEvent $event)
     {
-        echo 'New message from ' . $event->connection->resourceId . ': ' . $event->message . PHP_EOL;
-
-        $event->server->sendAllUsers([
-            'message',
-            [
-                'from_id' => $event->connection->resourceId,
-                'text' => $event->message,
-            ],
-        ]);
+        $event->server->echo('New message from ' . $event->connection->resourceId . ': ' . $event->message);
     }
 }

@@ -26,4 +26,29 @@ abstract class BaseServer extends Component implements MessageComponentInterface
         Yii::$app->eventManager->trigger($name, $event);
     }
 
+    /**
+     * @param string $message
+     * @param bool $prependDate
+     * @param bool $appendEol
+     */
+    public function echo(string $message, $prependDate = true, $appendEol = true)
+    {
+        $result = '';
+
+        if ($prependDate) {
+            $ms = explode(' ', microtime());
+            $ms = round((float)$ms[0], 3) * 1000;
+
+            $result .= '[' . date('Y-m-d h:i:s', time()) . '.' . $ms . '] ';
+        }
+
+        $result .= $message;
+
+        if ($appendEol) {
+            $result .= PHP_EOL;
+        }
+
+        echo $result;
+    }
+
 }

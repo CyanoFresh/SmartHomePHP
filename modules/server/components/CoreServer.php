@@ -60,6 +60,7 @@ class CoreServer extends BaseServer
     public function onOpen(ConnectionInterface $connection)
     {
         if (!$this->authenticate($connection)) {
+            $connection->close();
             return;
         }
 
@@ -101,6 +102,8 @@ class CoreServer extends BaseServer
      */
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
+        $conn->close();
+
         $this->trigger(self::EVENT_CONNECTION_ERROR, new ConnectionErrorEvent([
             'server' => $this,
             'connection' => $conn,
