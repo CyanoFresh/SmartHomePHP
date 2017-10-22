@@ -1267,7 +1267,7 @@ class CoreServer implements MessageComponentInterface
         ]);
 
         $this->logItemValue($item, 'watered');
-        $this->saveItemValue($item->id, 'watered', $item->type);
+//        $this->saveItemValue($item->id, 'watered', $item->type);
     }
 
     /**
